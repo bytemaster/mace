@@ -16,3 +16,6 @@
 [submodule "libs/rpc"]
 	path = libs/rpc
 	url = git@github.com:bytemaster/Boost.RPC.git
+[submodule "libs/network"]
+	path = libs/network
+	url = git@github.com:bytemaster/cpp-netlib.git
