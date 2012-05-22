@@ -1,10 +1,11 @@
 ---
-title : Home
+title : Introduction
 categories : [code | projects]
 ---
 
-My Home Page
+My Introduction Page
 
 {% highlight bash %}
 cd ~
 {% endhighlight %}
+
