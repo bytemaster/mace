@@ -1,0 +1,11 @@
+---
+layout: flat
+title: Contact
+---
+h1. Contact Me
+
+My username across every site is *(med)RyanCacophony*. If you want to contact me, your best bet is via email (I have *(med)Gmail*; You're smart enough to figure out the username), but if you're lucky you can find me on the likes of AIM, MSN, et cetera.
+
+If you're into the social media jive, you can find me on "Facebook":http://facebook.com/rclough, "Twitter":http://twitter.com/RyanCacophony, and "Github":http://github.com/RyanCacophony.
+
+The truly cutious will be able to find me in other places too...

@@ -1,0 +1,43 @@
+---
+title: Jello Mix
+subtitle: "Dance Dance Dance"
+layout: post
+category: music
+section: "hobbies"
+---
+
+I made this mix to give an idea of what kind of tracks I was going to play at a particular party I was DJing for.
+
+It's certainly not perfect, but it's only for fun.
+
+Note that this is *not* real DJing, I'm using traktor which beatmatches for me (usually).
+
+*(med)At the moment, the mix is unavailable due to my previous computer exploding.*
+
+<notextile>
+<p id="audioplayer_1">Jello Mix</p>  
+<script type="text/javascript">  
+AudioPlayer.embed("audioplayer_1", {soundFile: "/media/music/Ryan Clough Sample DJ.mp3"});  
+</script> 
+</notextile>
+"Download MP3 Here":/media/music/Ryan%20Clough%20Sample%20DJ.mp3 
+
+Track List:
+# 1. Into The Clouds (Mille Remix) - The Sound Of Arrows
+# 2. Night By Night (Midnight Conspiracy Remix) - Chromeo
+# 3. Hit My Ride (B. Rich Remix) - Ladybox
+# 4. Sexy Ole (Disco Fanatics Bootleg) - John Revox vs EasyTech
+# 5. 3 (Wolfgang Gartner Extended Mix) - Britney Spears
+# 6. The Final Countdown (DJ Zam Remix) - Europe
+# 7. Bounce (The Bloody Beetroots Remix) - MSTRKRFT
+# 8. Anthonio (Designer Drugs Remix) - Annie
+# 9. A Cause Des Garcons (Tepr Remix) - Yelle
+# 11. Bad Romance (Larry Tee & Per QX Super Disco Party Machine Extended Mix) - Lady GaGa
+# 12. Stupid Bitches (DatA Remix) - DSL
+# 13. Might Like You Better (Vindata Remix) - Amanda Blank
+# 14. Save the Flavor (Pance Party Remix) - BlacKMahal
+# 15. Amsterdam (AC Slater Remix) - Mightyfools
+# 16. Tik Tok (BarakVanunu Electro Mix) - Keesha
+# 17. Thunderstruck (Crookers Remix) - ACDC
+# 18. Crysteena (Fear of Tigers Remix) - Mille
+# 19. Blinded by the Light (DJ Donna Summer Boot) - Bruce Springsteen

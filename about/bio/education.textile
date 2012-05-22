@@ -1,0 +1,40 @@
+---
+layout: flat
+title: About Me -Education
+---
+h1. About Ryan
+
+This part of the site gets particularly wordy, so it's divided into a few pages.
+
+* "Music":/about/bio/music.html
+** "The Beginning":/about/bio/music.html#beg
+** "Metal":/about/bio/music.html#metal
+** "Jazz and Formal Training":/about/bio/music.html#jazz
+** "Electronic":/about/bio/music.html#elec
+* "Computers":/about/bio/comp.html
+** "The Beginning":/about/bio/comp.html#beg
+** "Software Engineering":/about/bio/comp.html#se
+** "Research Interests":/about/bio/comp.html#res
+* "Dance":/about/bio/dance.html
+** "Popping":/about/bio/dance.html#pop
+** "Swing Dance":/about/bio/dance.html#swing
+** "Other Styles":/about/bio/dance.html#othear
+* "Education":/about/bio/education.html
+** "High School":#high
+** "University":#uni
+
+h1. Education
+
+p.   
+
+h3(#high). High School
+
+I went to High School at Mystic Valley Regional -Prison Camp- Charter School. My graduating class had 33 students. We all knew eachother fairly well, and for the most part, we all got along well together.
+
+My experience there was mixed. I definitely believe their administration has a few too many heads up their asses, but I got a prime education that I wouldn't have at Malden High or any of the other local public schools. Looking back though, MVRCS really had much for me. No music program. No computer program. I guess in some respects, the value I got out of MVRCS was self made.
+
+h3(#uni). University
+
+I am now currently attending Rochester Institute of Technology. I'm studying Software Engineering, and I'm really enjoying my education, for the most part.
+
+While the city here utterly bores me, there's thankfully enough to do on campus to keep me occupied. I'm an alumni of Computer Science House, a member of the Society of Software Engineers, the Events Coordinator in the RIT Swing Dance Club, as well as a member of the Breakdance Club.

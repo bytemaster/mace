@@ -1,0 +1,23 @@
+---
+title: New Studio
+subtitle: "And a Dubstep Track!"
+layout: post
+category: music
+section: "hobbies"
+---
+
+I recently moved back home to Malden, MA, since I'll be working this summer in Cambridge at ITA software.
+
+I decided that as part of my getting back to making music, I'd make a home recording studio in my room over the summer as I get more money. just today (or technically yesterday) I got my computer and monitor for it. They are supposed to be dedicated to music.
+
+Anyways, enough with the rambling- As my first experiment, I spent a couple hours making a dubstep track. It's not complete, but that's why it was an experiment.
+
+It gets dirty about halfway in:
+
+<notextile>
+<p id="audioplayer_1">Dubtest</p>  
+<script type="text/javascript">  
+AudioPlayer.embed("audioplayer_1", {soundFile: "/media/music/Ryan Clough- Dubtest.mp3"});  
+</script> 
+</notextile>
+"Download MP3 Here":/media/music/Ryan%20Clough-%20Dubtest.mp3 

@@ -1,0 +1,25 @@
+---
+title: Mnml Track
+subtitle: "Brooklyn Rooftop"
+layout: post
+category: music
+section: "hobbies"
+---
+
+So I finally completed a track for my first time. This time it's a minimal house/techno track.
+
+I first heard minimal when I was living at a hostel in Brooklyn. There was a late night rooftop party on the building next to the hostel, so we ventured over and found our way up. I didn't quite understand the appeal of minimal at first, but after dancing until the sunrise, with friends from all over the world, I think I began to understand.
+
+I wrote the song using Reason 4. I've included a published .rps file in case you're curious as to how the track was made/automated/ how I made any particular sounds.
+
+Last but not least, please feel free to use this song in any way you feel fits. Just give credit back to me for the original work, and link me to anything you do. And if you feel like donating, you can paypal me at my email address (see the About page).
+
+<notextile>
+<p id="audioplayer_1">Ryan Clough</p>  
+<script type="text/javascript">  
+AudioPlayer.embed("audioplayer_1", {soundFile: "/media/music/Ryan Clough- Brooklyn Rooftop.mp3"});  
+</script> 
+</notextile>
+"Download MP3 Here":/media/music/Ryan%20Clough-%20Brooklyn%20Rooftop.mp3 
+"Download Reason File here":/media/music/Ryan%20Clough-%20Brooklyn%20Rooftop.rps
+(I havent tested this file on another computer, so let me know if you can't load any of the samples)

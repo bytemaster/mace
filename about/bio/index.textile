@@ -1,0 +1,24 @@
+---
+layout: flat
+title: About Ryan
+---
+h1. About Ryan
+
+This part of the site gets particularly wordy, so it's divided into a few pages.
+
+* "Music":/about/bio/music.html
+** "The Beginning":/about/bio/music.html#beg
+** "Metal":/about/bio/music.html#metal
+** "Jazz and Formal Training":/about/bio/music.html#jazz
+** "Electronic":/about/bio/music.html#elec
+* "Computers":/about/bio/comp.html
+** "The Beginning":/about/bio/comp.html#beg
+** "Software Engineering":/about/bio/comp.html#se
+** "Research Interests":/about/bio/comp.html#res
+* "Dance":/about/bio/dance.html
+** "Popping":/about/bio/dance.html#pop
+** "Swing Dance":/about/bio/dance.html#swing
+** "Other Styles":/about/bio/dance.html#othear
+* "Education":/about/bio/education.html
+** "High School":/about/bio/education.html#high
+** "University":/about/bio/education.html#uni

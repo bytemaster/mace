@@ -1,0 +1,16 @@
+---
+layout: flat
+title: About
+---
+
+h1. About
+
+p. !/media/images/nyc2.png!
+
+Hey! I'm *(med)Ryan Clough*, and I'm a "Software Engineer":http://www.se.rit.edu studying at "RIT":http://www.rit.edu.
+
+I find myself to be a "jack of all trades," but my greatest talents revolve around *(med)music* or *(med)computers*
+
+If you're interested in reading more about my life, you can visit my "Bio":/about/bio/ page. If you're interested in the details about this site, hop on over to the "Site Info":/about/site page. Lastly, if you're looking to contact me, you can visit my "Contact":/about/contact/ page.
+
+Resume available upon request.

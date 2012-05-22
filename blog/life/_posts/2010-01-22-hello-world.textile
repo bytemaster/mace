@@ -1,0 +1,12 @@
+---
+title: Hello, World
+subtitle: "Shall I write my first post?"
+layout: post
+category: life
+section: "blog"
+---
+As is traditional, I'm starting off my blog with a most traditional "Hello, World" post.
+
+At the moment, I'm still in the process of configuring, hacking, and filling the website, but having a post in here will serve as some good solitude, as well as give me something to test my code with :P.
+
+So bare with me as this site undergoes some changes. I'm surely to converge to a solution at some point in the near future!
