@@ -1,5 +1,0 @@
-#add_library(cppnetlib-uri STATIC src/parse_uri_impl.cpp)
-#add_library(cppnetlib-server-parsers STATIC src/server_request_parsers_impl.cpp)
-include_directories(include)
-add_subdirectory(src)
-add_subdirectory(example)
