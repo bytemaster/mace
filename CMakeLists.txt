@@ -27,5 +27,18 @@ option( ENABLE_ARM "Build for ARM CPU" OFF )
 #ADD_DEFINITIONS( -DBOOST_CONTEXT_UCTX )
 #ADD_DEFINITIONS( -D_XOPEN_SOURCE )
 
+IF( WIN32 )
+ELSE(WIN32)
+   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+#    INCLUDE(CheckCCompilerFlag)
+#    CHECK_C_COMPILER_FLAG(-std=c++0x HAVE_CPPOX)
+#    IF( HAVE_CPPOX )
+#    ELSE( HAVE_CPPOX )
+#        MESSAGE( STATUS "DISABLING C++0x Optimizations" )
+#        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+#    ENDIF( HAVE_CPPOX )
+ENDIF(WIN32)
+
 
 add_subdirectory(libs)
+add_subdirectory(examples)
