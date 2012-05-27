@@ -1,0 +1,168 @@
+/**
+  @defgroup mace_stub Stub Library
+  @ingroup mace
+  
+  As defined by wikipedia, a <a href="http://en.wikipedia.org/wiki/Stub_(distributed_computing)"><b>stub</b></a>
+  is a piece of code used for converting parameters passed durring a Remote Procedule Call (RPC).  The MACE Stub library
+  provides a means to automatically and dynamically generate Stubs for C++ class interface without resorting to
+  code generation or an interface description language (IDL).
+
+  The definition of RPC traditionally implies over the network, however, for the purposes of this library 'remote' could
+  also mean a different thread, process, a scripting engine or any other non-native calling system. Examples are provided for
+  a simple RPC over UDP system and an actor paraidigm via Boost.ASIO.
+
+  Using stubs you can achieve a level of abstraction in your code that is not possible by other means.  Your objects no long
+  care about where they are run: which thread, which process, or which machine, or which protocol or transport is used. 
+
+  @section mace_stub_example Stub Basic Example (Type Erasure)
+
+  The first step is to define your stub interface.  This could be an interface lacking implementation, or
+  it could be any other class in you wish to expose on the network.
+
+  Given the following interfaces:
+
+  @snippet calculator.hpp Define interfaces
+
+  You would use the following macros to define an appropriate stub:
+
+  @snippet calculator.hpp Expose interfaces
+
+  Once you have defined your stub you can use @ref mace::stub::ptr<calculator> to refer to any object with that
+  interface.  For example consider the following class:
+
+  @snippet rpc_server.cpp Define Class
+
+  It provides all of the methods of <code>calculator</code> but does not share the same inheritance nor a common
+  base class.  Even though there is no relationship between CalculatorServer and calculator, we can still use
+  it generically in any algorithm that operates on a <code>mace::stub::ptr<calculator></code>.
+
+  @snippet rpc_server.cpp Assign Stub
+
+  @section mace_stub_rpc_client_example RPC Client Example
+
+  The real power of stubs goes beyond simple type erasure, to providing automatic conversion of parameters passed durring a
+  remote procedure call whether 'remote' means a different Boost.ASIO strand, or a different computer running software written
+  in a different language.  Normally this task is performed via code generation that takes an interface description language and
+  generates a stub class; however, the MACE Stub Library utilizes the power of C++ templates to achieve the same transformation
+  natively and as much run-time effeciency as code generation schemes. 
+
+  This example will demonstrate how to initialize a @ref stub::ptr<calculator> that will perform RPC calls over UDP using Boost.Serialization
+  to serialize the arguments and deserialize the results.  For the sake of simplicity, this example uses blocking synchronous network calls.
+
+  The primary thing to understand is that the default @ref mace::stub::ptr<T> is essentially a virtual table comprized of @ref boost::function<> 
+  objects.  To define an RPC client we must merely generate a functor for each method.  This can be done using a visitor.  
+
+  @subsection rpc_client_funtor RPC Client Functor
+  First, lets define the function object.
+
+  @snippet rpc.hpp RPC Client Functor
+
+  In the example, the functor takes two template parameters, a Boost.Fusion Sequence (parameter types) and a ResultType.  The constructor
+  takes a pointer to our @ref rpc_client which handles communication and a function name which is used to identify the method when it is
+  received by the RPC server.
+
+  The body of the functor takes a @ref Sequence of parameters and returns a Result.  It uses boost serialization to serialize the parameters, sends
+  the serialized string out over the network and then dezerializes the result.
+
+  @subsection rpc_client_visitor RPC Client Visitor
+  Next we must assign each method on our @ref stub::ptr<T> with a properly instantiated instance of our @ref rpc_functor<Seq,Result>. This is achieved
+  by creating a visitor:
+
+  @snippet rpc.hpp RPC Client Visitor
+
+  This visitor will be called for each method on the interface.  <code>MemberPtr</code> will have a type of something like:
+  <code>MemberType (stub::vtable<Interface,InterfaceDelegate>::*)</code> and <code>m</code> will be a compile-time constant pointing
+  to the actual member.  By passing the member pointer as a template parameter instead of an argument the compiler is given the opportunity to
+  inline more effectively as well as reduce unnecessary indirection.
+
+  <code>MemberType</code> depends entirely upon which <code>InterfaceDelegate</code> was used to define your stub.  The <code>InterfaceDelegate</code>
+  enables the stub interface to be transformed.  The default delegate simply 'mirrors' the actual interface with the addition of the ability to
+  make fused calls.   Lets stop to take a look at how <code>mace::stub::mirror_interface</code> defines <code>MemberType</code>.
+
+  @code
+template<typename R, typename Class, PARAM_TYPE_NAMES>
+struct mirror_member<R(Class::*)(PARAM_TYPES)const> {
+  typedef typename adapt_void<R>::result_type                    result_type;
+  typedef mirror_member                                          self_type;
+  typedef boost::fusion::vector<PARAM_TYPES>                     fused_params;
+  typedef boost::fusion::vector<DEDUCED_PARAM_TYPES>             deduced_params;
+  typedef boost::function_traits<result_type(PARAM_TYPES)>       traits;
+  static const bool                                              is_const = true;
+
+  typedef typename boost::remove_pointer<result_type(*)(PARAM_TYPES)>::type   signature;
+
+  result_type operator()( PARAM_ARGS )const {
+    return m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
+  }
+  result_type operator() ( const fused_params& fp )const {
+    return m_delegate( fp );
+  }
+  template<typename T>
+  mirror_member& operator=( const T& d )  {
+    m_delegate = adapt_void<R,T>(d);
+    return *this;
+  }
+  template<typename C, typename M>
+  void set_delegate(  C* s, M m );
+  private:
+    boost::function<result_type(const fused_params&)> m_delegate; 
+};
+  @endcode
+
+  As you can see the <code>MemberType</code> provided by @ref mace::stub::mirror_interface provides many helpful
+  template-meta-programming typedefs that we can leverage within our visitor.  In particular, knowing the fused 
+  parameter type and the result type is critical in initializing the proper @ref rpc_functor<Seq,Result>.
+
+  Because <code>MemberPtr</code> is the type of a pointer, we must enlist Boost.FunctionTypes to get the type
+  of the member before we can access type @ref result_type and @ref fused_params type.
+
+  Once we have the @ref result_type and @ref fused-params we create an @ref rpc_functor<member::fused_params,member::result_type>
+  and give it the name of the function which is passed with our visitor along with a pointer to the @ref rpc_client which ultimately
+  dispatches the remote procedure call after the parameters are serailized by @ref rpc_functor<>.
+
+
+@subsection rpc_client_visitor_useage Visiting your Interface
+
+  After you have defined your functor type and visitor type all that remains is to visit your interface.
+
+  @snippet rpc.hpp RPC Client Constructor
+
+  This is done using the @ref mace::stub::vtable_reflector<InterfaceType,InterfaceDelegate>::visit method which
+  you will pass a copy of your visitor.  This method will then call your visitor for each member on the interface.
+
+@subsection rpc_client_invoke RPC Client Invoke
+
+  The last detail of our RPC client is the method that actually sends the call and waits for a response.  This code
+  is dirt simple:
+
+  @snippet rpc.hpp RPC Client invoke
+
+  This is the method referenced from the @ref rpc_client_funtor.
+
+@subsection rpc_client_use Using our RPC Client
+
+  Now that we have defined how to convert an interface to an RPC over UDP interface, we can use this interface
+  with a natural C++ calling syntax.  Algorithms that are designed around @ref mace::stub::ptr<calculator> would
+  not be able to tell the difference between a RPC client or a simple local pointer.
+  
+  @code
+  double r  = calc->add( 5, 5 );
+  double r2 = generic_calc->add( 5, 5 );
+  @endcode
+
+@subsection rpc_server Defining an RPC Server
+
+The RPC Server would use a similar pattern, except its visitor would store a functor in a map indexed by method name and the
+functor would deserialize parameters, call the original method, and serialize the result.
+
+@snippet rpc.hpp RPC Server Functor and Visitor
+
+
+In under 200 lines of code we were able to create a generic, reusable, effecient RPC framework that provides a natural calling
+syntax via the use of the MACE.Stub library.  The full listing of this code can be found at @ref examples/rpc.hpp
+
+  @example examples/rpc.hpp
+  See @ref mace_stub_rpc_client_example for an explanation of this example.
+
+
+*/

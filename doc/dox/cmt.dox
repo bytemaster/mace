@@ -1,0 +1,231 @@
+/**
+  @defgroup boost_cmt Boost.CMT - Cooperative Multi-Tasking
+
+  In a cooperative implementation of multitasking, each task must explicitly 
+  yield control to the central scheduler to allow the next task to run. This means that 
+  a misbehaving task that never yields control, can starve all other tasks.
+
+  Multithreading on the other hand, at least on most implementations, implies preemptive multitasking; 
+  each task is allowed to run for a certain amount of time, called time-slice. When the time-slice is 
+  over the task is forcibly interrupted and the scheduler selects the next task. If the interrupted task
+  was manipulating some shared resource, this can be left in an undefined state. A task cannot control 
+  when is preempted, so it must be pessimistic and lock all shared resources that it uses. As any 
+  programmer that has had to work with heavily threaded applications knows, dealing with complex locking is
+  not a trivial task. In addition both locking and thread switching imposes some considerable overhead.
+
+  Cooperative multitasking does not have these problems as long as a task never yields (waits) while manipulating shared state.
+
+
+  @section cmt_single_thread Single Threaded Benchmark
+
+    Here is a simple benchmark program that performs an asynchornous operation
+    and waits on the result.  This example is effecitvely synchronous because only
+    one async operation is in flight at a time and there is only one real thread.
+
+    @include cmt_st.cpp
+
+  @section cmt_multi_threading Multi-Threading with Boost.CMT
+
+  In this example all tasks will occur in parallel in three different threads (t1,t2, and main).
+
+  While <code>main</code> waits for results from threads <code>t1</code> and \p t2 it will switch
+  contexts and execute other operations that are scheduled in the \p main thread such as calculating
+  the result of \p f3.
+
+  @include cmt_mt.cpp
+
+  @section cmt_exception Exception Handling
+
+  Any exception thrown durring an asynchronous operation is caught by the thread that calls @ref cmt::future::wait()
+
+  @section cmt_usleep Yielding and Sleeping
+
+  The current task can either yield and allow other tasks to run before returning or it can sleep for
+  an specific amount of time while allowing other tasks to run.
+
+  @code
+      cmt::usleep(100000/*us*/);
+      cmt::yield();
+
+      // or the more verbose...
+      cmt::thread::current().usleep(10000);
+      cmt::thread::current().yield();
+  @endcode
+
+  You can only yield or sleep for the current thread. If there are no other tasks ready to run then yield()
+  returns immediately.  
+
+  @note Sleep and yield times are dependent upon other tasks yielding in a timely manner.
+
+
+  @section cmt_async_signal_wait Boost.Signals Integration
+
+  This example shows how a task can wait on an event triggered by a boost::signal and return the
+  parameters emited by the signal.  The output of the following program is 'hello world!' after waiting
+  for 2 seconds.
+
+  Everything in this example runs in the main thread.
+
+  @include cmt_signal.cpp
+
+  @section cmt_promise Using Promises 
+  
+  Sometimes you need to perform an asynchronous operation of your own, such as a network call or waiting on
+  user input.  Here is an example from Boost.CMT's ASIO wrapper.  Using <code>cmt::asio::read</code> you can
+  perform a 'synchronous' read in the current thread without blocking the current thread.  Instead the current
+  thread will switch to running other tasks while waiting for the read to complete and then switch back once
+  the read is ready.  If an error occurs then <code>read()</code> will throw the exception passed to ASIO's 
+  completion handler.
+
+  @code
+    template<typename AsyncReadStream, typename MutableBufferSequence>
+    size_t read( AsyncReadStream& s, const MutableBufferSequence& buf, const microseconds& timeout_us = microseconds::max() ) {
+        promise<size_t>::ptr p(new promise<size_t>());
+        boost::asio::async_read( s, buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
+        return p->wait(timeout_us);
+    }
+    void read_write_handler( const promise<size_t>::ptr& p, const boost::system::error_code& ec, size_t bytes_transferred ) {
+        if( !ec ) p->set_value(bytes_transferred);
+        else p->set_exception( boost::copy_exception( boost::system::system_error(ec) ) );
+    }
+  @endcode
+
+  @section cmt_asio_integration Boost.ASIO Integration 
+    
+
+
+  @section cmt_vs_asio Boost.CMT vs Boost.ASIO 
+    Boost.ASIO is currently how many projects perform asynchronous operations and multi-plex tasks on a pool
+    of threads running <code>asio::io_service::run</code>.  Synchronization occurs via the use of
+    <code>asio::io_service::strand</code> which ensures that no two handlers within the strand can
+    be run at the same time.  Unfortunately, this is not useful for handlers that may want to block.
+
+    The Boost.Thread library includes <code>boost::future<T></code> type that on the surface looks very
+    similar to boost::cmt::future<T>, except that several problems emerge in practice:
+
+    - If you block waiting on a future from a ASIO callback handler you can stall an entire strand and
+      hold up an entire OS thread reducing the effective size of your thread pool.
+
+    - By stalling a strand you can end up with deadlock if two strands post events containing promises to
+      one another and then both wait on the future.  With cooperative threads, you can gaurantee that no
+      two 'fibers' will run at the same time allowing one to work while the other blocks.  
+    
+    Consider the following case study:
+
+    - perform 2 async operation and add the result.
+
+    - print an error if either fails.
+     
+<table><tr><th>Boost.ASIO</th><th>Boost.CMT</th></tr><tr><td>
+    @code
+    void async_opp(function<void(int,bool)> callback) {
+      callback( 42, error_code );  
+    }
+    void another_async_opp(function<void(int,bool)> callback) {
+        callback( 53, error_code );  
+    }
+
+    // Requires shared or global state
+    mutex            m;
+    int              shared_state = 0;
+    int              results[2];
+    asio::io_service io_service
+
+    // could be called by any thread running ioservice!
+    void handle_result(int r, bool error) {
+       unique_lock(m); // must protect shared_state  
+       if( error && state != -1 ) { 
+          state = -1; 
+          std::cerr<<"An error occured!\n"; 
+       } else if( state != -1 ) {
+          results[state++] = r;
+          if( state == 2 ) 
+              std::cout<<results[0]+results[1]<<std::endl;
+       }
+    }
+    void test( ) {
+      io_service.post( bind( async_opp, handle_result ) );
+      io_service.post( bind( another_async_opp, handle_result ) );
+      other_work();
+      // do other work
+   }
+   @endcode
+</tr></td>
+  <td valign="top" >
+  @code
+  int async_opp() { return 42; }
+  int another_async_opp() { return 53; }
+
+  // given
+  cmt::thread* t1;
+  cmt::thread* t2;
+
+  void test() {
+    cmt::future<int> f1 = t1->async<int>( async_opp );
+    cmt::future<int> f2 = t2->async<int>( another_async_opp );
+    async<void>( other_work ); // in current thread
+
+    try {
+      // while waiting other_work can run in this thread.
+      std::cerr<< f1.wait() + f2.wait() << std::endl;
+    } catch ( ... ) {
+      std::cerr<<"An error occured!\n";
+    }
+  }
+  @endcode
+    - If this were implemented using <code>boost::future<T></code> then <code>other_work</code>
+    could not occur in the same thread while waiting for other asynchronous
+    opperations to complete.  
+    - In order to avoid blocking an entire <code>boost::asio::strand</code>, 
+      you would have to revert to fine-grained locking with mutex.
+  </td></tr>
+  <tr><td valign="top">
+  @code
+  void test2( ) {
+    test(); // behaves asynchronously, unexpected,  when is it done?
+    // must we propagate another callback? 
+    test( test2_complete_callback ); 
+  }
+  @endcode
+    - now what about exceptions??
+    - should we block this thread, add a global wait condition?
+    - perhaps an event queue to help structure the problem? 
+    - Adopt a data-flow architecture? 
+    - Avoid async designs all together?         
+  </td><td valign="top">
+  @code
+  void test2() { 
+    test(); // behaves synchronously as expected
+    async(test); // or call async and forget! 
+  }
+  @endcode
+  </td></table>
+  </table>
+
+
+    @section boost_cmt_cooperative_threading_vs_qt_eventloop  Cooperative Threading vs Qt-like Event Loops
+
+    The cooperative multi-tasking implementation is far supperior to the QApplication/QThread event loop when it comes to
+    waiting for asynchronous tasks.  If you want to implement a method in Qt that synchronously invokes a remote procedure
+    call, then it must block the thread while it waits for the return value.  If you want to keep the user interface
+    responsive then you may optionally "recursively" process events.  
+
+    There are many problems with recursive event loop invocations that lead to dead locks because the tasks must complete
+    in the order in which they were called or the stack can never unwind.  
+
+    Typically the solution to this problem is to use callbacks, signals, and other notification techniques.  The problem
+    with this approach is that you lose the "localization of code" and variables / algorithms end up spread across 
+    multiple methods.  Local variables then need to be "maintained" outside of function scope as class member variables, often
+    allocated on the heap.  This greatly increases the complexity of the code.
+
+    This complexity becomes obvious when you have many asynchronous operations that must be performed synchrously or have some
+    non-trivial dependency.   Suppose you need to invoke 3 remote procedure calls on 3 different servers and that you need the
+    return value from 1 of the calls before you can invoke the other two and that you need all three values before you can
+    do your final calculations.   This task is creates a mess of speghetti code with callbacks, state machine variables, etc unless
+    you are willing to accept the performance hit of blocking an entire "heavy weight", preemitvely multi-tasked, operating system thread.
+
+    This same problem becomes trivial with the use of the Boost.CMT library.  Simply asynchronously invoke each method which will return a
+    future object.  Then pass the futures into the other methods which will automatically run when the data is available.  A complex
+    asynchronous mess turns into what looks like synchronous code.
+*/
+

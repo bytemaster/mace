@@ -39,10 +39,10 @@ namespace mace { namespace stub {
    *  This class is specialized by MACE_STUB and MACE_STUB_DERIVED to visit
    *  all stub methods.
    */
-  template<typename InterfaceType> 
+  template<typename InterfaceType,typename InterfaceDelegate = mace::stub::mirror_interface> 
   struct vtable_reflector {
-    template<typename Visitor, typename InterfaceDelegate>
-    static void visit( const mace::stub::vtable<InterfaceType,InterfaceDelegate>& vtbl, const Visitor& v ) {}
+    template<typename Visitor>
+    static void visit( const Visitor& v ) {}
   };
 
 #ifndef DOXYGEN
@@ -69,7 +69,7 @@ namespace mace { namespace stub {
 
 
 #define MACE_STUB_VTABLE_VISIT_BASE( r, visitor, name ) \
-  vtable_reflector<name>::visit( (const mace::stub::vtable<name,InterfaceDelegate>*)vtbl, visitor );
+  vtable_reflector<name,InterfaceDelegate>::visit( visitor );
 
 #define MACE_STUB_VTABLE_VISIT_MEMBER( r, visitor, elem ) \
   visitor.template operator()<BOOST_TYPEOF(&vtable_type::elem),&vtable_type::elem>( BOOST_PP_STRINGIZE(elem) );
@@ -92,11 +92,10 @@ struct vtable<NAME,InterfaceDelegate> : BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_
     typedef NAME interface_type; \
     BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_DEFINE_MEMBER, NAME, MEMBERS ) \
 }; \
-template<> struct vtable_reflector<NAME> { \
+template<typename InterfaceDelegate> struct vtable_reflector<NAME,InterfaceDelegate> { \
     typedef NAME interface_type; \
-    template<typename Visitor, typename InterfaceDelegate> \
-    static void visit( const mace::stub::vtable<NAME,InterfaceDelegate>* vtbl,  \
-                       const Visitor& visitor ) { \
+    template<typename Visitor> \
+    static void visit( const Visitor& visitor ) { \
         typedef mace::stub::vtable<NAME,InterfaceDelegate> vtable_type; \
         BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_VISIT_BASE, visitor, INHERITS ) \
         BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_VISIT_MEMBER, visitor, MEMBERS ) \

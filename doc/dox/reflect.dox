@@ -1,0 +1,147 @@
+/**
+  @defgroup boost_reflect Boost.Reflect -  Compile Time and Runtime Reflection 
+
+  The Boost.Reflect library provides a simple, yet flexible means of adding compile time and
+  runtime reflection or introspection to C++ types and interfaces.
+
+  The library has three main components:
+
+  @li Type Info            - alternative to typeid() 
+  @li Property Visitor     - visit and inspect class members and names
+  @li Interface Adaption   - create stubs / adaptations to reflected interfaces
+  @li Generic Value Type   - runtime dynamic access to class methods and members
+*/
+
+/**
+  @defgroup boost_reflect_typeinfo Type Info
+  @ingroup boost_reflect
+  @brief Expose and query type names, members, and methods.
+
+  Often times it is helpful to have access to the string name of a class type, particularlly when
+  you are putting print statements in templated code.  This information is made available through
+  a very simple templated method.
+  @code
+    reflect::get_typename<uint32_t>(); // return "uint32_t"
+    reflect::get_typename<std::vector<uint32_t> >(); // return "std::vector<uint32_t>"
+  @endcode
+
+  These names will be the same on all compilers so long as you utilize one of the following macro:
+  @code
+    BOOST_REFLECT_TYPEINFO( your_namespace::your_class )
+    BOOST_REFLECT_TYPEINFO_ALIAS( your_namespace::your_class, "AkaMyClass" )
+  @endcode
+
+  @section boost_reflect_visitor Boost.Reflect Visitors (to JSON example)
+
+  To reflect the members of a struct you want to use one of the 
+  following macros which automatically include BOOST_REFLECT_TYPEINFO for
+  the class name.
+
+  BOOST_REFLECT( Class, MemberSequence) \n
+  BOOST_REFLECT_DERIVED( Class, BaseSequence, MemberSequence)
+
+  @code
+  struct A {  std::string hello; };
+  struct B : A { 
+    std::string world;  
+    int other;
+  };
+
+  BOOST_REFLECT( A, (hello) )
+  BOOST_REFLECT_DERIVED( B, (A), (world)(other) )
+  @endcode
+
+  You can then convert these types to json by defining a visitor:
+  @snippet reflect_to_json.cpp Define a visitor
+
+  Then use the <code>reflect::reflector<T></code> to visit the members.
+  @snippet reflect_to_json.cpp Use a visitor
+
+  When combined with the following base cases:
+
+  @snippet reflect_to_json.cpp Define base cases
+
+  Makes conversion to json of complex types trivial:
+
+  @snippet reflect_to_json.cpp Reflect your types
+
+  Convert it to JSON: 
+
+  @snippet reflect_to_json.cpp To JSON Example
+
+  The above code will generate the following output:
+
+  @code
+{"name":"My Address Book","is_locked":false,"contacts":[{"first_name":"Steve","last_name":"Jobs","zip":90210},{"first_name":"Bill","last_name":"Gates","zip":10000}]}
+  @endcode
+
+  See the full text for this example in @ref examples/reflect_to_json.cpp
+
+  Next Topic: @ref boost_reflect_erasure
+
+  @example examples/reflect_to_json.cpp
+  See @ref boost_reflect_visitor for an explanation of this example.
+*/
+
+/**
+  @defgroup boost_reflect_erasure Type Erasure
+  @ingroup boost_reflect
+  @brief Define an interface without using inheritance.
+  
+
+  Next: @ref boost_reflect_adapt
+*/
+
+/**
+  @defgroup boost_reflect_adapt Interface Adaptation 
+  @ingroup boost_reflect
+  @brief Adapt an interface to create stubs, proxies, actors, etc.
+  
+
+  Next: @ref boost_reflect_value
+*/
+/**
+  @defgroup boost_reflect_value Generics
+  @ingroup boost_reflect
+  @brief Dynamic runtime access to fields of reflected classes.
+
+  Given a reflected type, boost::reflect::value, boost::reflect::value_ref, and 
+  boost::reflect::value_cref provide dynamic runtime querying of the members on 
+  the type.  This is an ideal replacement for void* or even boost::any.
+
+  @snippet reflect_to_json.cpp Reflect your types
+
+  @code
+    address_book ab;  
+    ab.name      = "My Address Book";
+    ab.is_locked = false;
+    ab.contacts.push_back( contact( "Steve", "Jobs", 90210 ) );
+    ab.contacts.push_back( contact( "Bill", "Gates", 10000 ) );
+
+    // store a generic reference to the address book
+    reflect::value_ref v(ab);
+
+    // access sub members
+    ab["is_locked"].as<int>();  // 0
+    ab["is_locked"].as<std::string>(); // "false"
+    ab["is_locked"].as<address_book>(); // throws bad_value_cast
+
+    // store a generic const reference to the address book
+    reflect::value_cref cv(ab);
+
+    // create a copy of ab, like boost::any, except you can still query and access methods.
+    reflect::value cv(ab);
+
+    std::cerr<< v["contacts"][0]["first_name"].as<std::string>() <<std::endl; // print Steve
+    v["contacts"][0]["first_name"].set_as( std::string( "New Name" ) );
+
+    BOOST_ASSERT( ab.contacts[0].first_name == "New Name" );
+  @endcode
+
+
+  You can use convert a reflect::value to json with the following code:
+
+  @snippet 
+
+  
+*/

@@ -1,0 +1,68 @@
+/**
+  @mainpage MACE 1.0.0 
+
+  @section mace_intro Introduction to MACE
+
+  MACE (Massively Asynchronous Coding Environment), is a collection of software libraries that
+  aim to simplify developing modular, asynchronous applications in C++.  The three main libraries
+  provide tools for:
+
+    - @ref boost_cmt
+        - @ref cmt_single_thread
+        - @ref cmt_multi_threading
+        - @ref cmt_async_signal_wait
+        - @ref cmt_usleep
+        - @ref cmt_asio_integration
+        - @ref cmt_promise
+        - @ref cmt_vs_asio
+
+    - @ref boost_reflect
+        - @ref boost_reflect_typeinfo
+        - @ref boost_reflect_visitor
+        - @ref boost_reflect_erasure
+        - @ref boost_reflect_adapt
+        - @ref boost_reflect_value
+
+    - Remote Procedure Calls   (JSON-RPC, XML-RPC, ...)
+    - Actor Paradigm 
+
+  All of these libraries are being developed as a proposal for inclusion with Boost and therefore
+  use the boost namespace.
+
+  @section mace_install Installing MACE
+
+  On Linux/Mac OS X MACE will install to <code>/usr/local/mace/include</code> and <code>/usr/local/mace/lib</code> so
+  you will need to add those directories to your include and library search paths.
+
+  @subsection mace_dependencies Dependencies 
+
+    @li CMake
+    @li boost 1.47 or newer
+    @li boost.context (included)
+    @li boost.atomic (included)
+    @li boost.move (included)
+    @li boost.network (inclued, from cpp-netlib)
+
+  When Boost 1.50 is released it should include some of these libraries (like Boost.Context) and they will
+  no longer be included.
+
+  @subsection mace_download  Download 
+
+  The current version is  <a href="">mace-1.0.0</a>.
+
+  Version numbers have the following meaning: MAJOR.MINOR.PATCH where Major version 
+  is bumped anytime the API breaks, minor version is bumped any time new methods are added, 
+  and patch is updated for bug fixes.
+
+  You can clone the latest version from github and initilize it as follows.
+
+  @code
+    git clone https://github.com/bytemaster/mace
+    cd mace
+    git submodule init
+    git submodule update
+    cmake .
+    make
+    make install
+  @endcode
+*/

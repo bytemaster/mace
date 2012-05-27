@@ -101,13 +101,11 @@
 
       template<typename T, typename VTableType>
       static void set_vtable( VTableType& vtable, T& value ) {
-        vtable_reflector<typename VTableType::interface_type>::visit( &vtable,
-                    detail::mirror_interface::set_visitor<T,VTableType>(vtable,value) );
+        vtable_reflector<typename VTableType::interface_type,mirror_interface>::visit( detail::mirror_interface::set_visitor<T,VTableType>(vtable,value) );
       }
       template<typename T, typename VTableType>
       static void set_vtable( VTableType& vtable, const T& value ) {
-        vtable_reflector<typename VTableType::interface_type>::visit( &vtable,
-                    detail::mirror_interface::set_visitor<T,VTableType>(vtable,value) );
+        vtable_reflector<typename VTableType::interface_type,mirror_interface>::visit( detail::mirror_interface::set_visitor<T,VTableType>(vtable,value) );
       }
     };
 

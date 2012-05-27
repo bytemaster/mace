@@ -1,3 +1,4 @@
+ADD_SUBDIRECTORY( stub )
 ADD_SUBDIRECTORY( context )
 ADD_SUBDIRECTORY( atomic )
 ADD_SUBDIRECTORY( network )

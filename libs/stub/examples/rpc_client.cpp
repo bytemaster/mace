@@ -26,16 +26,19 @@ int main( int argc, char** argv ) {
     }
     using namespace boost;
     try {
-        stub::rpc_client<Calculator> calc;
+        //! [Using RPC Client]
+        stub::rpc_client<calculator> calc;
         calc.connect_to( argv[1], boost::lexical_cast<uint16_t>(argv[2]) );
 
-        stub::ptr<Calculator> generic_calc(calc);
+        // or cast it to a generic stub::ptr<calculator>
+        stub::ptr<calculator> generic_calc(calc);
+        //! [Using RPC Client]
         
         boost::posix_time::ptime start = boost::posix_time::microsec_clock::universal_time();
         double sum = 0;
         int i = 0;
         for( i = 0; i < 100000; ++i ) {
-            sum += generic_calc->add(5);
+            sum += generic_calc->add(5,5);
         }
         boost::posix_time::ptime end = boost::posix_time::microsec_clock::universal_time();
         uint64_t us = (end-start).total_microseconds();

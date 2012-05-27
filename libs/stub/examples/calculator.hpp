@@ -3,20 +3,20 @@
 #include <mace/stub/vtable.hpp>
 #include <string>
 
-struct Service {
-    std::string name()const;
-    int         exit();
+//! [Define interfaces]
+struct service {
+  std::string name()const;
+  int         exit();
 };
-struct Calculator : Service {
-    double add( double v );           
-    double add2( double v, double v2 );
-    double sub( double v );           
-    double mult( double v );           
-    double div( double v );           
-    double result()const;
+struct calculator : service {
+  double add( double v, double v2 );
+  double sub( double v, double v2 );           
 };
+//! [Define interfaces]
 
-MACE_STUB( Service, (name)(exit) )
-MACE_STUB_DERIVED( Calculator, (Service), (add)(add2)(sub)(mult)(div)(result) )
+//! [Expose interfaces]
+MACE_STUB( service, (name)(exit) )
+MACE_STUB_DERIVED( calculator, (service), (add)(sub) )
+//! [Expose interfaces]
 
 #endif // _MACE_STUB_CALCULATOR_HPP
