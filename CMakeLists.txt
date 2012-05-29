@@ -39,6 +39,11 @@ ELSE(WIN32)
 #    ENDIF( HAVE_CPPOX )
 ENDIF(WIN32)
 
+if( UNIX ) 
+  if( NOT APPLE )  
+    set(rt_library rt ) 
+  endif() 
+endif()
 
 add_subdirectory(libs)
 add_subdirectory(examples)

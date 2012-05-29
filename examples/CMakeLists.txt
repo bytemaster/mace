@@ -7,12 +7,13 @@ SET( libraries
     mace_cmt
     boost_context 
     pthread
-    rt
+    ${rt_library}
     ${Boost_THREAD_LIBRARY} 
     ${Boost_CHRONO_LIBRARY} 
     ${Boost_ASIO_LIBRARY} 
     ${Boost_SYSTEM_LIBRARY} 
     ${Boost_SIGNALS_LIBRARY})
+
 
 add_executable( cmt_mt  cmt_mt.cpp  )
 target_link_libraries( cmt_mt ${libraries} )
