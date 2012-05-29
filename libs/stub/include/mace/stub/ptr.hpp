@@ -67,7 +67,7 @@ namespace mace { namespace stub {
    */
   template<typename InterfaceType,typename InterfaceDelegate, typename Visitor>
   void visit( const ptr<InterfaceType,InterfaceDelegate>& aptr, Visitor v ) {
-      mace::stub::vtable_reflector<InterfaceType>::visit( &*aptr, v );
+      mace::stub::vtable_reflector<InterfaceType,InterfaceDelegate>::visit( v );
   }
 
 } }
