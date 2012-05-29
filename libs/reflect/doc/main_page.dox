@@ -1,0 +1,183 @@
+/**
+    @defgroup boost_reflect Boost.Reflect
+
+    The Boost Reflect library provides a means to quickly describe the interface of
+    a class or struct and then use that description to provide compile-time and
+    run-time reflection on the interface.  
+*/
+
+/**
+    @defgroup boost_reflect_introduction  Introduction
+    @ingroup boost_reflect
+
+       There have been many libraries that attempt to provide Reflection tools for
+       C++ programs.  The most robust solution is the 
+       <a href="http://kifri.fri.uniza.sk/~chochlik/mirror-lib/html/">Boost Mirror library</a>.  
+        Despite its ability to reflect just about every c++ construct, the Boost Mirror library
+        requires the developer to enter more text to describe the interface than it took to
+        write the interface in the first place. 
+
+        Boost.Reflect attempts to find a middle ground with a focus on providing the most useful
+       features while minimizing the amount of work a developer must do to reflect
+       those properties.   Boost.Reflect goes one step further and provides a generic Type Erasure
+       construct, boost::reflect::any_ptr<Interface>.   
+
+        @section boost_reflect_motivation   Motivation
+
+        It is not uncommon for developers to write some code that needs to interface 
+        with many different systems in slightly different ways.  The result is ususally
+        the creation of many different "wrappers" each exposing the core function of
+        an object in a slightly different way.
+
+            - Remote Procedure Client / Server Stubs
+            - Scripting Language Hooks
+            - Type Erasure Interfaces
+            - Command Line Arguments
+            - Actor Paradigmn
+            - Configuration 
+
+        All of these tasks represent the creation of code that is derived from
+        the core interface in a well defined manner.  Each wrapper is tightly
+        coupled to the core interface, such that if the core interface changes then
+        all the wrappers must make a similar change.  Coding these wrappers is the
+        type of task that makes your hands ache just thinking about all of the
+        mindless typing involved.
+
+        @section boost_reflect_reflection   Reflection
+
+        The reflection provided by Boost.Reflect focuses on exposing typenames, inheritance,
+        return values, method names, parameter types, constness, and public
+        members.  All reflection is non-invasive and may be added to any
+        class or struct.
+
+        @section boost_reflect_type_erasure Type Erasure
+
+        In the world of generic programming, type information tends to propogate as
+        template parameters.  <i>"Type Erasure is the process of turning a wide variety of
+        types with a common interface into one type with that same interface."</i>
+
+            - <a href="http://www.boostpro.com/mplbook/">C++ Template Metaprogramming</a> by Dave Abrahams & Aleksy Curtovoy
+
+        Common uses of type erasure include boost::any and boost::function.  Boost.Any 
+        erases all type information except its name and copy semantics.  Boost.Function
+        erases everything about a type except the calling signature.  Algorithms written
+        with Boost.Any and Boost.Function can be agnostic to the huge amount of type
+        variation possible for functors, function pointers, member function pointers,
+        or storage.
+
+        This article on <a href="http://www.artima.com/cppsource/type_erasure.html">type erasure</a>
+        shows how Generic Programming (Templates) often conflicts with good Object Oriented design 
+        because generic programing exposes the internal implementation details that good
+        Object Oriented design goes to great lengths to hide.
+
+
+        <center><table width="75%"><tr><td>
+        Good engineering involves compromise at every turn. A good, working, 
+        finished product is never pure by the standards of any one idiom or 
+        methodology. The art of good engineering is not the art of 
+        discovering and applying the one right idiom over all others. The 
+        art of good engineering is to know what your options are, and then 
+        to choose your trade-offs wisely rather than letting others choose 
+        them for you.
+        <td></tr></table></center>
+
+        I found the following quote from the article really helps put the debate between
+        'fast' generic programing and 'slow' object oriented programming.
+
+        <center><table width="75%"><tr><td>
+        Optimization whose effect no user ever notices is the root of many evils, among them the failure of software projects and the subsequent failure of businesses.
+        <td></tr></table></center>
+
+        Boost.Reflect focuses on being as efficeint as possible without sacraficing 
+        development speed and proper Object Oriented abstraction.  If you don't
+        use boost::reflect::any_ptr<Interface> in your inner loops, then your users will
+        never notice one extra layer of indirection or an extra couple of bytes of 
+        RAM.  Your company, managers, and customers will notice the cost savings in
+        reducing your development time, decouping components, and added resiliance
+        to change that developing with Boost.Reflect can provide through type erasure.
+*/
+/**
+    @mainpage  
+
+    The Boost Reflect library provides a means to quickly describe the interface of
+    a class or struct and then use that description to provide compile-time and
+    run-time reflection on the interface.  
+    
+    
+    @note This library is not part of the official Boost C++ libraries.  It was developed
+    with the intention of being submitted for review by the Boost community and therefore
+    everything is coded accoding to the Boost C++ Coding Guidlines.
+
+    @section toc Table of Contents
+        
+        - @ref boost_reflect_introduction
+            - @ref boost_reflect_motivation
+            - @ref boost_reflect_reflection
+            - @ref boost_reflect_type_erasure
+        - @ref boost_reflect_quickstart
+            - @ref boost_reflect_basic
+            - @ref boost_reflect_erasures
+        - @ref boost_reflect_vtable  
+        - @ref boost_reflect_rationale
+        - @ref boost_reflect_acknowledgements
+
+*/
+
+/**
+    @defgroup boost_reflect_rationale Design Rationale
+    @ingroup boost_reflect
+
+    There has been discussion on the Boost mailing list regarding how 
+    the type erasure should be implemented.  The obvious, "ideal", 
+    would be something where the 'weight' of the any_ptr<> is no more 
+    than boost::any.  This approach would 'convert' any type passed 
+    into the constructor into a polymorphic type implementing the interface.
+    Then the cost of a call is one virtual method invocation 
+    (assuming proper inlining).
+
+    This solution has already been implemented via 
+    <a href="http://www.cdiggins.com/bil.html">Boost.Interfaces</a>.
+
+    The interface declaration used by Boost.Interfaces is:
+
+    @code
+        BOOST_INTERFACE_BEGIN(IShape)
+            BOOST_INTERFACE_CONST_FUNCTION0(GetX, int)
+            BOOST_INTERFACE_CONST_FUNCTION0(GetY, int)
+            BOOST_INTERFACE_CONST_FUNCTION0(GetArea, double)
+            BOOST_INTERFACE_FUNCTION2(SetXY, void, (int, x), (int, y))
+            BOOST_INTERFACE_FUNCTION2(OffSetXY, void, (int, x), (int, y))
+            BOOST_INTERFACE_CONST_FUNCTION0(GetName, const char*)
+        BOOST_INTERFACE_END(IShape)
+    @endcode
+
+    Unfortunately, there is no clear way to define a macro based solution that 
+    achieves what Boost.Interfaces achieves without specifying your entire 
+    interface with the (relatively) messy syntax above.  A downside to the approach above
+    is that any types that happen to contain a ',' would require special handling.  
+    A benefit to the above approach is that there is potential for knowng the 
+    parameter names in addition to the types.
+
+    I opted for a simpler syntax that can apply to pre-existing types along with the potential 
+    for more dynamic interface implementations rather than going for maximum possible performance
+    or the minimum possible memory usage.  With the proper "InterfaceDelegate", there is the potential
+    that each method turns into a Don Clugston fast delegate.  Thus you can get 
+    the 'fastest possible delegation' at the price of 16 bytes per method 
+    (on 64 bit machines) and a little extra one-time initialization cost.  
+
+*/
+
+/**
+    @defgroup boost_reflect_acknowledgements Acknowledgements
+    @ingroup boost_reflect
+    
+        Ideas, inspiration, and code were borrowed from:
+         - <a href="http://www.cdiggins.com/bil.html">Boost.Interfaces</a> - Jonathan Turkanis & Christopher Diggins.
+         - <a href="http://kifri.fri.uniza.sk/~chochlik/mirror-lib/html/">Boost.Mirror</a> - Matus Chochlik.  
+         - <a href="http://www.codeproject.com/cpp/fast_delegate.asp">Fast Delegate</a> - Don Clugston. 
+         - <a href="http://www.boostpro.com/mplbook/">C++ Template Metaprogramming</a> by Dave Abrahams & Aleksy Curtovoy
+         - <a href="http://www.artima.com/cppsource/type_erasure.html">On the Tension Between Object-Oriented and Generic Programming in C++
+         and What Type Erasure Can Do About It</a> by Thomas Becker
+        
+
+*/

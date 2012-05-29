@@ -1,0 +1,9 @@
+/*.cmake
+/*.swp
+/Makefile
+/CMakeFiles/
+/jsonv
+/rpcc
+/rpcs
+/*.swo
+/*.swn
