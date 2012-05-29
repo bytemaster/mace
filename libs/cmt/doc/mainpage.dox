@@ -1,0 +1,234 @@
+/**
+    @mainpage
+
+    Boost.CMT simplifies the development of asynchronous, multi-threaded applications by providing a cooperative
+    multi-tasking system and simplified inter-thread communication.
+
+    @section boost_cmt_toc Table of Contents
+
+    - @ref boost_cmt_motivation
+        - @ref boost_cmt_multi_task_vs_multi_thread
+        - @ref boost_cmt_cooperative_threading_vs_qt_eventloop
+    - @ref boost_cmt_dependencies
+    - @ref boost_cmt_quickstart 
+        - @ref boost_cmt_async_same_thread
+        - @ref boost_cmt_async_signal_wait
+        - @ref boost_cmt_interthread
+        - @ref boost_cmt_usleep
+        - @ref boost_cmt_asio
+
+*/
+
+/** @defgroup boost_cmt Boost.CMT
+*/
+
+/** @defgroup boost_cmt_dependencies Dependencies
+    @ingroup boost_cmt
+
+    Boost.CMT builds off of the following libraries:
+
+    - Boost.Context [ @link https://github.com/bytemaster/boost_context @endlink ]
+    - Boost.Move
+    - Boost.Atomic
+    - Boost.Thread
+    - Boost.Exception
+    - Boost.Optional
+    - Boost.TypeTraits
+    - Boost.Signals [optional]
+*/
+
+/** @defgroup boost_cmt_installation  Installation
+    @ingroup boost_cmt
+
+    Boost.CMT can be built by checking out my development repository: https://github.com/bytemaster/dev
+
+    @code
+    git clone https://github.com/bytemaster/dev
+    cd dev
+    git submodule init
+    git submodule update
+    cmake .
+    make
+    make install
+    @endcode
+*/
+
+/**
+    @defgroup boost_cmt_quickstart Quick Start
+    @ingroup boost_cmt
+
+
+    @section boost_cmt_async_same_thread Asynchronous Calls in Current Thread
+
+    Here is a simple benchmark program that performs an asynchornous operation
+    and waits on the result.
+
+    @code
+    using namespace boost::cmt;
+
+    int hello(const std::string& world ) {
+        return world.size(); 
+    }
+
+    void bench() {
+        ptime start = microsec_clock::universal_time();
+        int sum = 0;
+        for( uint32_t i = 0; i < 1000; ++i ) 
+            sum += async<int>( boost::bind(hello, "world"), "hello_func" ).wait();
+        ptime end = microsec_clock::universal_time();
+        slog( "%1% calls/sec", (1000.0/((stop-start).total_microseconds()/1000000.0)) );
+    }
+
+    int main( int argc, char** argv ) {
+        async( bench );
+        boost::cmt::exec(); 
+    }
+    @endcode
+
+    In the code above, @link boost::cmt::async boost::cmt::async<int>(functor) @endlink takes a
+    functor that takes 0 parameters and returns an integer.  The result is a boost::cmt::future<int> which
+    will not block until wait() is called.  
+
+    @section boost_cmt_async_signal_wait Asynchronously wait on a Signal
+
+    This example shows how a task can wait on an event triggered by a boost::signal.
+
+    @code
+
+    boost::signal<void(std::string)> test_signal;
+   
+    void delay()
+    {
+        boost::cmt::usleep(2000000);
+        test_signal("hello world!");
+    }
+
+    void wait_on_signal() {
+        std::string rtn = boost::cmt::wait(test_signal);
+    }
+
+    int main( int argc, char** argv ) {
+         async( delay );
+         async( wait_on_signal );
+         boost::cmt::exec(); 
+    }
+    @endcode
+
+    @section boost_cmt_interthread Inter-thread Invocations
+
+    Sometimes you really want things to happen in parallel on multiple real CPU cores.  In this case you will need to
+    have some kind of inter-thread synchronization.  Boost.CMT enables lock-free interthread communication by posting
+    tasks to an appropriate event queue and returning a boost::cmt::future.
+
+    @code
+        boost::cmt::thread* t = boost::cmt::thread::create();
+        future<int> fut_val = t->async( boost::bind( hello, "world" ) );
+        int val = t->sync( boost::bind( hello, "world" ) );
+        int val2 = fut_val.wait();
+    @endcode
+
+    In this example I introduce a new method, <code>thread::sync<rtn>(functor)</code>, which is identical to
+    <code>thread::async<rtn>(functor).wait()</code> except that it can avoid extra heap allocations because it
+    knows that the boost::cmt::promise's life will not excede the scope of thread::sync and therefore
+    the promise can be allocated on the stack.
+
+    @section boost_cmt_usleep Yielding and Sleeping
+
+    The current task can either yield and allow other tasks to run before returning or it can sleep for
+    an specific amount of time while allowing other tasks to run.
+
+    @code
+        boost::cmt::usleep(100000/*us*/);
+        boost::cmt::yield();
+
+        // or the more verbose...
+        boost::cmt::thread::current().usleep(10000);
+        boost::cmt::thread::current().yield();
+    @endcode
+
+    You can only yield or sleep for the current thread. If there are no other tasks ready to run then yield()
+    returns immediately.  
+
+
+*/
+
+
+/**
+    @defgroup boost_cmt_motivation Motivation
+    @ingroup boost_cmt
+
+    @section boost_cmt_multi_task_vs_multi_thread Multitasking versus Multithreading
+
+    In a cooperative implementation of multitasking, each task must explicitly 
+    yield control to the central scheduler to allow the next task to run. This means that 
+    a misbehaving task that never yields control, can starve all other tasks.
+
+    Multithreading on the other hand, at least on most implementations, implies preemptive multitasking; 
+    each task is allowed to run for a certain amount of time, called time-slice. When the time-slice is 
+    over the task is forcibly interrupted and the scheduler selects the next task. If the interrupted task
+    was manipulating some shared resource, this can be left in an undefined state. A task cannot control 
+    when is preempted, so it must be pessimistic and lock all shared resources that it uses. As any 
+    programmer that has had to work with heavily threaded applications knows, dealing with complex locking is
+    not a trivial task. In addition both locking and thread switching imposes some considerable overhead.
+
+    Cooperative multitasking does not have these problems as long as a task never yields (waits) while manipulating shared state.
+
+
+    This does not mean that multithreading has not its place, there are at least two scenarios where true concurrency and preemption are required:
+
+    -# Real time applications. 
+        Preemption is required in practice in real-time applications. Almost all real-time scheduling algorithms need 
+        preemption to guarantee that tasks always meet their deadline.
+    -# Multiprocessing.  
+        To take advantage of hardware parallelism tasks must be run in parallel. With the current trend of multi-core architectures 
+        this will be more and more necessary. While shared memory threads are not the only abstraction that take advantage of 
+        hardware parallelism (multiple processes, message passing and OpenMP are other examples), they are certainly the most popular.
+
+    Unfortunately threads are often abused for general multitasking, where preemption is a burden instead of a benefit.  The primary use
+    case for cooperative multi-tasking is waiting upon many asynchronous events and executing small, light-weight tasks asynchronously.
+
+    In this use case only one thread is needed and it can run other tasks any time one task needs to wait for more input.
+
+
+    @section boost_cmt_cooperative_threading_vs_qt_eventloop  Cooperative Threading vs Qt-like Event Loops
+
+    The cooperative multi-tasking implementation is far supperior to the QApplication/QThread event loop when it comes to
+    waiting for asynchronous tasks.  If you want to implement a method in Qt that synchronously invokes a remote procedure
+    call, then it must block the thread while it waits for the return value.  If you want to keep the user interface
+    responsive then you may optionally "recursively" process events.  
+
+    There are many problems with recursive event loop invocations that lead to dead locks because the tasks must complete
+    in the order in which they were called or the stack can never unwind.  
+
+    Typically the solution to this problem is to use callbacks, signals, and other notification techniques.  The problem
+    with this approach is that you lose the "localization of code" and variables / algorithms end up spread across 
+    multiple methods.  Local variables then need to be "maintained" outside of function scope as class member variables, often
+    allocated on the heap.  This greatly increases the complexity of the code.
+
+    This complexity becomes obvious when you have many asynchronous operations that must be performed synchrously or have some
+    non-trivial dependency.   Suppose you need to invoke 3 remote procedure calls on 3 different servers and that you need the
+    return value from 1 of the calls before you can invoke the other two and that you need all three values before you can
+    do your final calculations.   This task is creates a mess of speghetti code with callbacks, state machine variables, etc unless
+    you are willing to accept the performance hit of blocking an entire "heavy weight", preemitvely multi-tasked, operating system thread.
+
+    This same problem becomes trivial with the use of the Boost.CMT library.  Simply asynchrounsly invoke each method which will return a
+    future object.  Then pass the futures into the other methods which will automatically run when the data is available.  A complex
+    asynchronous mess turns into what looks like synchronous code.
+
+*/
+
+/**
+    @defgroup boost_cmt_asio  Boost.CMT ASIO
+    @ingroup boost_cmt
+
+    Boost.CMT provides most of the wrappers you need to use boost::asio as part of a cooperative multi-tasked system.  You get 
+    all of the benefits of asynchronous read/write operations with the ease of use of synchronous operations.
+
+    See this header for more information: @link boost/cmt/asio.hpp @endlink
+
+    In addition to wrapping boost::asio functions, Boost.CMT ASIO also implements socket and acceptor classes that take advantage
+    of multi-tasking.  
+
+    - boost::cmt::asio::tcp::socket
+    - boost::cmt::asio::tcp::acceptor
+*/
