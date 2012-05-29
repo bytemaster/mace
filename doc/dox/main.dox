@@ -24,8 +24,17 @@
     - @ref mace_stub
         - @ref mace_stub_example
         - @ref mace_stub_rpc_client_example
+  
+    - @ref mace_rpc
+        - @ref mace_rpc_json_tcp_client
+        - @ref mace_rpc_json_notice
+        - @ref mace_rpc_json_named_param
+        - @ref mace_rpc_json_callbacks
+        - @ref mace_rpc_json_type_erasure
+        - @ref mace_rpc_json_tcp_server
+        - @ref mace_rpc_json_http_client
+        - @ref mace_rpc_json_http_server
 
-    - Remote Procedure Calls   (JSON-RPC, XML-RPC, ...)
     - Actor Paradigm 
 
   All of these libraries are being developed as a proposal for inclusion with Boost and therefore

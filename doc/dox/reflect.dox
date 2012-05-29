@@ -1,5 +1,6 @@
 /**
   @defgroup mace_reflect Reflect Library
+  @ingroup mace
 
   The MACE.Reflect library provides a simple, yet flexible means of adding compile time and
   runtime reflection or introspection to C++ types and interfaces.

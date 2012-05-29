@@ -1,5 +1,6 @@
 /**
   @defgroup mace_cmt CMT (Cooperative Multi-Tasking) Library
+  @ingroup mace
 
   In a cooperative implementation of multitasking, each task must explicitly 
   yield control to the central scheduler to allow the next task to run. This means that 
@@ -24,7 +25,7 @@
 
     @include cmt_st.cpp
 
-  @section cmt_multi_threading Multi-Threading with Boost.CMT
+  @section cmt_multi_threading Multi-Threading with MACE.CMT
 
   In this example all tasks will occur in parallel in three different threads (t1,t2, and main).
 
@@ -71,7 +72,7 @@
   @section cmt_promise Using Promises 
   
   Sometimes you need to perform an asynchronous operation of your own, such as a network call or waiting on
-  user input.  Here is an example from Boost.CMT's ASIO wrapper.  Using <code>cmt::asio::read</code> you can
+  user input.  Here is an example from MACE.CMT's ASIO wrapper.  Using <code>cmt::asio::read</code> you can
   perform a 'synchronous' read in the current thread without blocking the current thread.  Instead the current
   thread will switch to running other tasks while waiting for the read to complete and then switch back once
   the read is ready.  If an error occurs then <code>read()</code> will throw the exception passed to ASIO's 
@@ -94,7 +95,7 @@
     
 
 
-  @section cmt_vs_asio Boost.CMT vs Boost.ASIO 
+  @section cmt_vs_asio MACE.CMT vs Boost.ASIO 
     Boost.ASIO is currently how many projects perform asynchronous operations and multi-plex tasks on a pool
     of threads running <code>asio::io_service::run</code>.  Synchronization occurs via the use of
     <code>asio::io_service::strand</code> which ensures that no two handlers within the strand can
@@ -116,7 +117,7 @@
 
     - print an error if either fails.
      
-<table><tr><th>Boost.ASIO</th><th>Boost.CMT</th></tr><tr><td>
+<table><tr><th>Boost.ASIO</th><th>MACE.CMT</th></tr><tr><td>
     @code
     void async_opp(function<void(int,bool)> callback) {
       callback( 42, error_code );  
@@ -224,7 +225,7 @@
     do your final calculations.   This task is creates a mess of speghetti code with callbacks, state machine variables, etc unless
     you are willing to accept the performance hit of blocking an entire "heavy weight", preemitvely multi-tasked, operating system thread.
 
-    This same problem becomes trivial with the use of the Boost.CMT library.  Simply asynchronously invoke each method which will return a
+    This same problem becomes trivial with the use of the MACE.CMT library.  Simply asynchronously invoke each method which will return a
     future object.  Then pass the futures into the other methods which will automatically run when the data is available.  A complex
     asynchronous mess turns into what looks like synchronous code.
 */

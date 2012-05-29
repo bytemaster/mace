@@ -85,6 +85,15 @@ BOOST_PP_LIST_ENUM( \
 
 #endif  // not DOXYGEN
 
+/**
+ *  @def MACE_STUB_DERIVED(NAME,INHERITS,MEMBERS)
+ *  
+ *  @note Must be used at global scope.
+ *
+ *  @param NAME a fully qualified class name.
+ *  @param INHERITS a sequence of fully qualified base classes that NAME inherits from ie: (method1)(method2)(method3)...
+ *  @param MEMBERS a sequence of member methods on NAME ie: (method1)(method2)(method3)...
+ */
 #define MACE_STUB_DERIVED( NAME, INHERITS, MEMBERS ) \
 namespace mace { namespace stub { \
 template<typename InterfaceDelegate > \
@@ -105,6 +114,14 @@ template<typename InterfaceDelegate> struct vtable_reflector<NAME,InterfaceDeleg
 \
 } } 
 
+/**
+ *  @def MACE_STUB( NAME, MEMBERS )
+ *
+ *  @note Must be used at global scope.
+ *
+ *  @param NAME a fully qualified class name.
+ *  @param MEMBERS a sequence of member methods on NAME ie: (method1)(method2)(method3)...
+ */
 #define MACE_STUB( NAME, MEMBERS ) \
     MACE_STUB_DERIVED( NAME, BOOST_PP_SEQ_NIL, MEMBERS )
 

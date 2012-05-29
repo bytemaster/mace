@@ -1,0 +1,184 @@
+/**
+  @defgroup mace_rpc Remote Procedure Call Library
+  @ingroup mace
+
+  @brief Implements stubs for various RPC protocols.
+
+  The MACE.RPC Library leverages the features of @ref mace_reflect, @ref mace_stub, and @ref mace_cmt 
+  to provide the most effecient, and native-feeling C++ RPC library known to man. 
+
+  This library currently implements the JSON RPC-2.0 spec, but will expand to include XML-RPC,
+  and various other protocols.  
+
+  @section mace_rpc_dependencies Dependencies
+
+  - @ref mace_cmt is used to handle multi-tasking and asynchronous operations.
+  - @ref mace_reflect is used for serailizing types.
+  - @ref mace_stub is used to provide native calling syntax.
+
+  Boost.ASIO is used for network communication.
+*/
+
+
+/**
+  @defgroup mace_rpc_json JSON-RPC 
+  @ingroup mace_rpc
+
+  The MACE.RPC library supports JSON-RPC 1.0 / 2.0 calls over TCP or HTTP.  It also
+  transparently supports passing callback methods over RPC assuming your client and
+  server both understand the convention.
+
+  At the most basic level is the mace::rpc::json::connection which provides 'raw' access
+  to the JSON-RPC protocol.  Each connection allows you to register methods to be called 
+  and make calls to the remote connection.  You should only use a 'raw' connection if
+  API you are interfacing to is highly dynamic and cannot be represented as a C++ struct.
+
+  In the following sections examples will be provided on how to create both client and servers
+  that handle JSON-RPC over either TCP or HTTP. Because MACE.RPC leverages the MACE @ref mace_stub 
+  to provide a native calling syntax, it is recommended that you review: @ref mace_stub_example 
+
+  @section mace_rpc_json_tcp_client JSON-RPC Client over TCP 
+
+  Given a basic calculator api:
+  @code
+  struct calculator {
+    double add( double, double );
+    double sub( double, double );
+    double mult( double, double );
+    double div( double, double );
+  }
+  MACE_STUB( calculator, (add)(sub)(mult)(div) )
+  @endcode
+
+  You would create a JSON-RPC TCP client as follows:
+
+  @code
+  mace::rpc::json::client<calculator>  calc( host, port );
+  @endcode
+
+  Which can be used as follows:
+
+  @code
+  try {
+    // synchronous
+    double result = calc->add( 4.4, 5.5 );
+    
+    // asynchronous
+    mace::cmt::future<double> sr = calc->sub( 3.3, 2.2 );
+    mace::cmt::future<double> mr = calc->mult( 3.3, 2.2 );
+    mace::cmt::future<double> dr = calc->div( 3.3, 2.2 );
+    
+    std::cout<<sr.wait()<<", "<<mr.wait()<<", "<<dr.wait()<<std::endl;
+  } catch ( const mace::rpc::exception& e ) {
+    std::cerr<<e.message()<<std::endl;
+  }
+  @endcode
+
+  In this example, add will occur first, then sub, mult, and div will occur asynchronously 
+  and will not block until you call mace::cmt::future<T>::wait().  If an error object is
+  received then an exception will be thrown.   Exceptions will also be thrown if the connection is
+  closed while waiting on the result.
+
+  @section mace_rpc_json_notice Sending Notices
+
+  If you would like to send a notice then you would use the following code:
+
+  @code
+  calc->add.notice(4.4,5.5); // return void.
+  @endcode
+
+  @section mace_rpc_json_named_param Named Parameters
+  
+  MACE.RPC's support for JSON-RPC 2.0 includes Named Parameter support.  To enable named parameters, you
+  must modify your interface.  Consider the following interface:
+
+  @code
+  struct vec : public mace::rpc::json::named_parameters{
+    boost::optional<double> x;
+    boost::optional<double> y;
+    boost::optional<double> z;
+  };
+  MACE_REFLECT( vec, (x)(y)(z) );
+
+  struct vec_calc : calculator {
+    double dot( const vec& v );
+  };
+  MACE_STUB_DERIVED( vec_calc, (calculator), (dot) )
+  @endcode
+
+  Notice that the <code>dot( const vec& v )</code> method takes exactly one parameter.  Normally,
+  this parameter would be passed as:
+
+  @code 
+  { "jsonrpc":"2.0", "method":"dot", "params":[{"x":1.0,"y":2.0,"z":3.0}]}
+  @endcode
+
+  But because <code>vec</code> inherits @ref mace::rpc::json::named_parameters, this single parameter will
+  be translated as:
+
+  @code 
+  { "jsonrpc":"2.0", "method":"dot", "params":{"x":1.0,"y":2.0,"z":3.0}}
+  @endcode
+
+  Because the fields in <code>vec</code> are of type <code>boost::optional<T></code>, if no value is 
+  set then the field will be left out of the JSON string entirely.
+
+  @section mace_rpc_json_callbacks RPC Callbacks
+
+  If your interface contains any parameters or return values that include a <code>boost::function<Signature></code>
+  type then that function will be captured and registered with the client.  The server will receive a the callback
+  name and pass a functor that knows how to make the callback over the JSON-RPC connection to the registered method. 
+  This process is entirely transparent to both sides of the connection.
+
+  Consider the following interface:
+  @code
+  struct stock_ticker {
+    void set_callback( boost::function<void(std::string,double)>& quote );
+  };
+  MACE_STUB( stock_ticker, (set_callback) )
+  @endcode
+
+  Your client could then be implemented as like so:
+  @code
+  void print_stock( const std::string& name, double price ) {
+    std::cout<<name<<":"<<price<<std::endl;
+  }
+  int main( int argc, char** argv ) {
+    mace::rpc::json::client<stock_ticker> c(argv[1],atoi(argv[2]));
+    c->set_callback( print_stock );
+    mace::cmt::exec();
+  }
+  @endcode
+
+  @section mace_rpc_json_type_erasure Type Erasure
+
+  Because MACE.RPC leverages the @ref mace_stub we can completely hide the fact that our
+  algorithms are using a remote class via type erasure.
+
+  @code
+  mace::rpc::json::client<stock_ticker> c(argv[1],atoi(argv[2]));
+  mace::stub::ptr<stock_ticker> st(c);
+  st->set_callback(print_stock);
+  @endcode
+
+  In this case the caller only knows about the mace::stub::ptr and has no knowledge that
+  in reality they are making RPC calls.  When you use this abstraction all RPC calls are
+  synchronous and you lose the ability to perform RPC-specific actions like specifying
+  a call should be sent as a notice.
+
+  If you would like to preserve the asynchronous features but still abstract the RPC
+  implementation then you can use:
+
+  @code
+  mace::rpc::json::client<stock_ticker> c(argv[1],atoi(argv[2]));
+  mace::actor::ptr<stock_ticker> st(c);
+  st->set_callback(print_stock);
+  @endcode
+  
+
+  @section mace_rpc_json_tcp_server JSON-RPC Server over TCP 
+  
+  @section mace_rpc_json_http_client JSON-RPC Client over HTTP 
+
+  @section mace_rpc_json_http_server JSON-RPC Server over HTTP 
+*/
