@@ -58,14 +58,14 @@
   @snippet rpc.hpp RPC Client Functor
 
   In the example, the functor takes two template parameters, a Boost.Fusion Sequence (parameter types) and a ResultType.  The constructor
-  takes a pointer to our @ref rpc_client which handles communication and a function name which is used to identify the method when it is
+  takes a pointer to our <code>rpc_client</code> which handles communication and a function name which is used to identify the method when it is
   received by the RPC server.
 
-  The body of the functor takes a @ref Sequence of parameters and returns a Result.  It uses boost serialization to serialize the parameters, sends
+  The body of the functor takes a  <code>Sequence</code> of parameters and returns a <code>Result</code>.  It uses boost serialization to serialize the parameters, sends
   the serialized string out over the network and then dezerializes the result.
 
   @subsection rpc_client_visitor RPC Client Visitor
-  Next we must assign each method on our @ref stub::ptr<T> with a properly instantiated instance of our @ref rpc_functor<Seq,Result>. This is achieved
+  Next we must assign each method on our @ref stub::ptr<T> with a properly instantiated instance of our <code>rpc_functor<Seq,Result></code>. This is achieved
   by creating a visitor:
 
   @snippet rpc.hpp RPC Client Visitor
@@ -111,14 +111,14 @@ struct mirror_member<R(Class::*)(PARAM_TYPES)const> {
 
   As you can see the <code>MemberType</code> provided by @ref mace::stub::mirror_interface provides many helpful
   template-meta-programming typedefs that we can leverage within our visitor.  In particular, knowing the fused 
-  parameter type and the result type is critical in initializing the proper @ref rpc_functor<Seq,Result>.
+  parameter type and the result type is critical in initializing the proper <code>rpc_functor<Seq,Result></code>.
 
   Because <code>MemberPtr</code> is the type of a pointer, we must enlist Boost.FunctionTypes to get the type
-  of the member before we can access type @ref result_type and @ref fused_params type.
+  of the member before we can access type <code>result_type</code> and <code>fused_params</code> type.
 
-  Once we have the @ref result_type and @ref fused-params we create an @ref rpc_functor<member::fused_params,member::result_type>
-  and give it the name of the function which is passed with our visitor along with a pointer to the @ref rpc_client which ultimately
-  dispatches the remote procedure call after the parameters are serailized by @ref rpc_functor<>.
+  Once we have the @ref result_type and <code>fused_params</code> we create an <code>rpc_functor<member::fused_params,member::result_type></code>
+  and give it the name of the function which is passed with our visitor along with a pointer to the <code>rpc_client</code> which ultimately
+  dispatches the remote procedure call after the parameters are serailized by <code>rpc_functor<></code>.
 
 
 @subsection rpc_client_visitor_useage Visiting your Interface
@@ -161,7 +161,7 @@ functor would deserialize parameters, call the original method, and serialize th
 In under 200 lines of code we were able to create a generic, reusable, effecient RPC framework that provides a natural calling
 syntax via the use of the MACE.Stub library.  The full listing of this code can be found at @ref examples/rpc.hpp
 
-  @example examples/rpc.hpp
+  @example stub/examples/rpc.hpp
   See @ref mace_stub_rpc_client_example for an explanation of this example.
 
 

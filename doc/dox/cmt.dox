@@ -1,5 +1,5 @@
 /**
-  @defgroup boost_cmt Boost.CMT - Cooperative Multi-Tasking
+  @defgroup mace_cmt CMT (Cooperative Multi-Tasking) Library
 
   In a cooperative implementation of multitasking, each task must explicitly 
   yield control to the central scheduler to allow the next task to run. This means that 
@@ -101,7 +101,7 @@
     be run at the same time.  Unfortunately, this is not useful for handlers that may want to block.
 
     The Boost.Thread library includes <code>boost::future<T></code> type that on the surface looks very
-    similar to boost::cmt::future<T>, except that several problems emerge in practice:
+    similar to mace::cmt::future<T>, except that several problems emerge in practice:
 
     - If you block waiting on a future from a ASIO callback handler you can stall an entire strand and
       hold up an entire OS thread reducing the effective size of your thread pool.
@@ -203,7 +203,7 @@
   </table>
 
 
-    @section boost_cmt_cooperative_threading_vs_qt_eventloop  Cooperative Threading vs Qt-like Event Loops
+    @section mace_cmt_cooperative_threading_vs_qt_eventloop  Cooperative Threading vs Qt-like Event Loops
 
     The cooperative multi-tasking implementation is far supperior to the QApplication/QThread event loop when it comes to
     waiting for asynchronous tasks.  If you want to implement a method in Qt that synchronously invokes a remote procedure

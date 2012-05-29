@@ -17,9 +17,9 @@ namespace mace { namespace stub {
     };
 
     /**
-     *  @brief Converts functors returning void to functors returning \link 
-               mace::stub::void_t void_t   \link
-
+     *  @brief Converts functors returning void to functors returning 
+     *         @ref mace::stub::void_t 
+     *
      *  Generic code that deals with functions returning void is a special case
      *  that requires many work arounds.  This class adapts a void(FusionSeq) functor
      *  into a void_t(FusionSeq) functor.

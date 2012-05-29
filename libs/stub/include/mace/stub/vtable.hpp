@@ -90,6 +90,7 @@ namespace mace { namespace stub { \
 template<typename InterfaceDelegate > \
 struct vtable<NAME,InterfaceDelegate> : BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_PUBLIC_BASE, InterfaceDelegate, INHERITS ) private vtable_base<NAME> { \
     typedef NAME interface_type; \
+    typedef InterfaceDelegate delegate_type; \
     BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_DEFINE_MEMBER, NAME, MEMBERS ) \
 }; \
 template<typename InterfaceDelegate> struct vtable_reflector<NAME,InterfaceDelegate> { \

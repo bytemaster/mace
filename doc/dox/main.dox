@@ -7,7 +7,7 @@
   aim to simplify developing modular, asynchronous applications in C++.  The three main libraries
   provide tools for:
 
-    - @ref boost_cmt
+    - @ref mace_cmt
         - @ref cmt_single_thread
         - @ref cmt_multi_threading
         - @ref cmt_async_signal_wait
@@ -16,12 +16,14 @@
         - @ref cmt_promise
         - @ref cmt_vs_asio
 
-    - @ref boost_reflect
-        - @ref boost_reflect_typeinfo
-        - @ref boost_reflect_visitor
-        - @ref boost_reflect_erasure
-        - @ref boost_reflect_adapt
-        - @ref boost_reflect_value
+    - @ref mace_reflect
+        - @ref mace_reflect_typeinfo
+        - @ref mace_reflect_visitor
+        - @ref mace_reflect_value
+
+    - @ref mace_stub
+        - @ref mace_stub_example
+        - @ref mace_stub_rpc_client_example
 
     - Remote Procedure Calls   (JSON-RPC, XML-RPC, ...)
     - Actor Paradigm 

@@ -1,20 +1,19 @@
 /**
-  @defgroup boost_reflect Boost.Reflect -  Compile Time and Runtime Reflection 
+  @defgroup mace_reflect Reflect Library
 
-  The Boost.Reflect library provides a simple, yet flexible means of adding compile time and
+  The MACE.Reflect library provides a simple, yet flexible means of adding compile time and
   runtime reflection or introspection to C++ types and interfaces.
 
   The library has three main components:
 
   @li Type Info            - alternative to typeid() 
   @li Property Visitor     - visit and inspect class members and names
-  @li Interface Adaption   - create stubs / adaptations to reflected interfaces
   @li Generic Value Type   - runtime dynamic access to class methods and members
 */
 
 /**
-  @defgroup boost_reflect_typeinfo Type Info
-  @ingroup boost_reflect
+  @defgroup mace_reflect_typeinfo Type Info
+  @ingroup mace_reflect
   @brief Expose and query type names, members, and methods.
 
   Often times it is helpful to have access to the string name of a class type, particularlly when
@@ -27,18 +26,18 @@
 
   These names will be the same on all compilers so long as you utilize one of the following macro:
   @code
-    BOOST_REFLECT_TYPEINFO( your_namespace::your_class )
-    BOOST_REFLECT_TYPEINFO_ALIAS( your_namespace::your_class, "AkaMyClass" )
+    MACE_REFLECT( your_namespace::your_class )
+    MACE_REFLECT_TYPEINFO_ALIAS( your_namespace::your_class, "AkaMyClass" )
   @endcode
 
-  @section boost_reflect_visitor Boost.Reflect Visitors (to JSON example)
+  @section mace_reflect_visitor Member Visitors (to JSON example)
 
   To reflect the members of a struct you want to use one of the 
-  following macros which automatically include BOOST_REFLECT_TYPEINFO for
+  following macros which automatically include MACE_REFLECT_TYPEINFO for
   the class name.
 
-  BOOST_REFLECT( Class, MemberSequence) \n
-  BOOST_REFLECT_DERIVED( Class, BaseSequence, MemberSequence)
+  MACE_REFLECT( Class, MemberSequence) \n
+  MACE_REFLECT_DERIVED( Class, BaseSequence, MemberSequence)
 
   @code
   struct A {  std::string hello; };
@@ -47,8 +46,8 @@
     int other;
   };
 
-  BOOST_REFLECT( A, (hello) )
-  BOOST_REFLECT_DERIVED( B, (A), (world)(other) )
+  MACE_REFLECT( A, (hello) )
+  MACE_REFLECT_DERIVED( B, (A), (world)(other) )
   @endcode
 
   You can then convert these types to json by defining a visitor:
@@ -77,36 +76,19 @@
 
   See the full text for this example in @ref examples/reflect_to_json.cpp
 
-  Next Topic: @ref boost_reflect_erasure
+  Next Topic: @ref mace_reflect_erasure
 
   @example examples/reflect_to_json.cpp
-  See @ref boost_reflect_visitor for an explanation of this example.
+  See @ref mace_reflect_visitor for an explanation of this example.
 */
 
 /**
-  @defgroup boost_reflect_erasure Type Erasure
-  @ingroup boost_reflect
-  @brief Define an interface without using inheritance.
-  
-
-  Next: @ref boost_reflect_adapt
-*/
-
-/**
-  @defgroup boost_reflect_adapt Interface Adaptation 
-  @ingroup boost_reflect
-  @brief Adapt an interface to create stubs, proxies, actors, etc.
-  
-
-  Next: @ref boost_reflect_value
-*/
-/**
-  @defgroup boost_reflect_value Generics
-  @ingroup boost_reflect
+  @defgroup mace_reflect_value Generics
+  @ingroup mace_reflect
   @brief Dynamic runtime access to fields of reflected classes.
 
-  Given a reflected type, boost::reflect::value, boost::reflect::value_ref, and 
-  boost::reflect::value_cref provide dynamic runtime querying of the members on 
+  Given a reflected type, mace::reflect::value, mace::reflect::value_ref, and 
+  mace::reflect::value_cref provide dynamic runtime querying of the members on 
   the type.  This is an ideal replacement for void* or even boost::any.
 
   @snippet reflect_to_json.cpp Reflect your types

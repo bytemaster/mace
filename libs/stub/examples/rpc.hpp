@@ -3,7 +3,7 @@
  */
 
 /**
- *  @example rpc.hpp
+ *  @example stub/examples/rpc.hpp
  *  @brief Defines a simple UDP based RPC interface using Boost.Serialization
  */
 #ifndef _MACE_STUB_RPC_HPP_
