@@ -1,32 +1,32 @@
-	CMakeCache.txt
-	CMakeFiles/
-	Makefile
-	cmake_install.cmake
-	examples/CMakeFiles/
-	examples/Makefile
-	examples/cmake_install.cmake
-	examples/cmt_it
-	examples/cmt_mt
-	examples/cmt_signal
-	examples/cmt_st
-	examples/reflect_to_json
-	libs/CMakeFiles/
-	libs/Makefile
-	libs/cmake_install.cmake
-	libs/network/CMakeFiles/
-	libs/network/Makefile
-	libs/network/cmake_install.cmake
-	libs/network/example/CMakeFiles/
-	libs/network/src/CMakeFiles/
-	libs/network/src/cmake_install.cmake
-	libs/network/src/libcppnetlib-client-connections.a
-	libs/network/src/libcppnetlib-server-parsers.a
-	libs/network/src/libcppnetlib-uri.a
-	libs/stub/CMakeFiles/
-	libs/stub/Makefile
-	libs/stub/cmake_install.cmake
-	libs/stub/examples/CMakeFiles/
-	libs/stub/examples/Makefile
-	libs/stub/examples/cmake_install.cmake
-	libs/stub/examples/stub_rpc_client
-	libs/stub/examples/stub_rpc_server
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+examples/CMakeFiles/
+examples/Makefile
+examples/cmake_install.cmake
+examples/cmt_it
+examples/cmt_mt
+examples/cmt_signal
+examples/cmt_st
+examples/reflect_to_json
+libs/CMakeFiles/
+libs/Makefile
+libs/cmake_install.cmake
+libs/network/CMakeFiles/
+libs/network/Makefile
+libs/network/cmake_install.cmake
+libs/network/example/CMakeFiles/
+libs/network/src/CMakeFiles/
+libs/network/src/cmake_install.cmake
+libs/network/src/libcppnetlib-client-connections.a
+libs/network/src/libcppnetlib-server-parsers.a
+libs/network/src/libcppnetlib-uri.a
+libs/stub/CMakeFiles/
+libs/stub/Makefile
+libs/stub/cmake_install.cmake
+libs/stub/examples/CMakeFiles/
+libs/stub/examples/Makefile
+libs/stub/examples/cmake_install.cmake
+libs/stub/examples/stub_rpc_client
+libs/stub/examples/stub_rpc_server
