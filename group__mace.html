@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>MACE: MACE 1.0.0</title>
+<title>MACE: MACE - Massively Asynchronous Coding Environment</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -46,7 +46,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
@@ -87,84 +87,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#groups">Modules</a>  </div>
   <div class="headertitle">
-<div class="title">MACE 1.0.0 </div>  </div>
+<div class="title">MACE - Massively Asynchronous Coding Environment</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2><a class="anchor" id="mace_intro"></a>
-Introduction to MACE</h2>
-<p>MACE (Massively Asynchronous Coding Environment), is a collection of software libraries that aim to simplify developing modular, asynchronous applications in C++. The three main libraries provide tools for:</p>
-<ul>
-<li><a class="el" href="group__mace__cmt.html">CMT (Cooperative Multi-Tasking) Library</a><ul>
-<li><a class="el" href="group__mace__cmt.html#cmt_single_thread">Single Threaded Benchmark</a></li>
-<li><a class="el" href="group__mace__cmt.html#cmt_multi_threading">Multi-Threading with MACE.CMT</a></li>
-<li><a class="el" href="group__mace__cmt.html#cmt_async_signal_wait">Boost.Signals Integration</a></li>
-<li><a class="el" href="group__mace__cmt.html#cmt_usleep">Yielding and Sleeping</a></li>
-<li><a class="el" href="group__mace__cmt.html#cmt_asio_integration">Boost.ASIO Integration</a></li>
-<li><a class="el" href="group__mace__cmt.html#cmt_promise">Using Promises</a></li>
-<li><a class="el" href="group__mace__cmt.html#cmt_vs_asio">MACE.CMT vs Boost.ASIO</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li><a class="el" href="group__mace__reflect.html">Reflect Library</a><ul>
-<li><a class="el" href="group__mace__reflect__typeinfo.html">Type Info</a></li>
-<li><a class="el" href="group__mace__reflect__typeinfo.html#mace_reflect_visitor">Member Visitors (to JSON example)</a></li>
-<li><a class="el" href="group__mace__reflect__value.html">Generics</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li><a class="el" href="group__mace__stub.html">Stub Library</a><ul>
-<li><a class="el" href="group__mace__stub.html#mace_stub_example">Stub Basic Example (Type Erasure)</a></li>
-<li><a class="el" href="group__mace__stub.html#mace_stub_rpc_client_example">RPC Client Example</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li><a class="el" href="group__mace__rpc.html">Remote Procedure Call Library</a><ul>
-<li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_tcp_client">JSON-RPC Client over TCP</a></li>
-<li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_notice">Sending Notices</a></li>
-<li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_named_param">Named Parameters</a></li>
-<li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_callbacks">RPC Callbacks</a></li>
-<li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_type_erasure">Type Erasure</a></li>
-<li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_tcp_server">JSON-RPC Server over TCP</a></li>
-<li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_http_client">JSON-RPC Client over HTTP</a></li>
-<li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_http_server">JSON-RPC Server over HTTP</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>Actor Paradigm</li>
-</ul>
-<p>All of these libraries are being developed as a proposal for inclusion with Boost and therefore use the boost namespace.</p>
-<h2><a class="anchor" id="mace_install"></a>
-Installing MACE</h2>
-<p>On Linux/Mac OS X MACE will install to <code>/usr/local/mace/include</code> and <code>/usr/local/mace/lib</code> so you will need to add those directories to your include and library search paths.</p>
-<h3><a class="anchor" id="mace_dependencies"></a>
-Dependencies</h3>
-<ul>
-<li>CMake </li>
-<li>boost 1.47 or newer </li>
-<li>boost.context (included) </li>
-<li>boost.atomic (included) </li>
-<li>boost.move (included) </li>
-<li>boost.network (inclued, from cpp-netlib)</li>
-</ul>
-<p>When Boost 1.50 is released it should include some of these libraries (like Boost.Context) and they will no longer be included.</p>
-<h3><a class="anchor" id="mace_download"></a>
-Download</h3>
-<p>The current version is <a href="">mace-1.0.0</a>.</p>
-<p>Version numbers have the following meaning: MAJOR.MINOR.PATCH where Major version is bumped anytime the API breaks, minor version is bumped any time new methods are added, and patch is updated for bug fixes.</p>
-<p>You can clone the latest version from github and initilize it as follows.</p>
-<div class="fragment"><pre class="fragment">    git clone https:<span class="comment">//github.com/bytemaster/mace</span>
-    cd mace
-    git submodule init
-    git submodule update
-    cmake .
-    make
-    make install
-</pre></div> </div></div><!-- contents -->
+
+<p>A collection of libraries for developing asynchronous / distributed applications.  
+</p>
+<table class="memberdecls">
+<tr><td colspan="2"><h2><a name="groups"></a>
+Modules</h2></td></tr>
+<tr class="memitem:group__mace__cmt"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mace__cmt.html">CMT (Cooperative Multi-Tasking) Library</a></td></tr>
+<tr class="memitem:group__mace__reflect"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mace__reflect.html">Reflect Library</a></td></tr>
+<tr class="memitem:group__mace__rpc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mace__rpc.html">Remote Procedure Call Library</a></td></tr>
+<tr class="memdesc:group__mace__rpc"><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Implements stubs for various RPC protocols. </p>
+<br/></td></tr>
+<tr class="memitem:group__mace__stub"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mace__stub.html">Stub Library</a></td></tr>
+</table>
+</div><!-- contents -->
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
