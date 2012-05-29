@@ -8,7 +8,7 @@ default_target: all
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canonical targets will work.
+# Disable implicit rules so canoncical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -30,19 +30,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /opt/local/bin/cmake
+CMAKE_COMMAND = /usr/local/bin/cmake
 
 # The command to remove a file.
-RM = /opt/local/bin/cmake -E remove -f
+RM = /usr/local/bin/cmake -E remove -f
 
 # The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
+CMAKE_EDIT_COMMAND = /usr/local/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/dlarimer/projects/mace
+CMAKE_SOURCE_DIR = /root/mace
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/dlarimer/projects/mace
+CMAKE_BINARY_DIR = /root/mace
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -50,7 +50,7 @@ CMAKE_BINARY_DIR = /Users/dlarimer/projects/mace
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/opt/local/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/local/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -60,19 +60,19 @@ edit_cache/fast: edit_cache
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/opt/local/bin/cmake -P cmake_install.cmake
+	/usr/local/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/opt/local/bin/cmake -P cmake_install.cmake
+	/usr/local/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/usr/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
@@ -82,7 +82,7 @@ install/local/fast: install/local
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/usr/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
@@ -101,7 +101,7 @@ list_install_components/fast: list_install_components
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/opt/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -110,14 +110,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/dlarimer/projects/mace && $(CMAKE_COMMAND) -E cmake_progress_start /Users/dlarimer/projects/mace/CMakeFiles /Users/dlarimer/projects/mace/libs/network/src/CMakeFiles/progress.marks
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/dlarimer/projects/mace/CMakeFiles 0
+	cd /root/mace && $(CMAKE_COMMAND) -E cmake_progress_start /root/mace/CMakeFiles /root/mace/libs/network/src/CMakeFiles/progress.marks
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/mace/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/clean
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/clean
 .PHONY : clean
 
 # The main clean target
@@ -126,22 +126,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/preinstall
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/preinstall
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/dlarimer/projects/mace && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /root/mace && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/rule
 .PHONY : libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/rule
 
 # Convenience name for target.
@@ -150,12 +150,12 @@ cppnetlib-client-connections: libs/network/src/CMakeFiles/cppnetlib-client-conne
 
 # fast build rule for target.
 cppnetlib-client-connections/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/build.make libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/build.make libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/build
 .PHONY : cppnetlib-client-connections/fast
 
 # Convenience name for target.
 libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/rule
 .PHONY : libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/rule
 
 # Convenience name for target.
@@ -164,12 +164,12 @@ cppnetlib-server-parsers: libs/network/src/CMakeFiles/cppnetlib-server-parsers.d
 
 # fast build rule for target.
 cppnetlib-server-parsers/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/build.make libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/build.make libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/build
 .PHONY : cppnetlib-server-parsers/fast
 
 # Convenience name for target.
 libs/network/src/CMakeFiles/cppnetlib-uri.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/CMakeFiles/cppnetlib-uri.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/src/CMakeFiles/cppnetlib-uri.dir/rule
 .PHONY : libs/network/src/CMakeFiles/cppnetlib-uri.dir/rule
 
 # Convenience name for target.
@@ -178,7 +178,7 @@ cppnetlib-uri: libs/network/src/CMakeFiles/cppnetlib-uri.dir/rule
 
 # fast build rule for target.
 cppnetlib-uri/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/build
 .PHONY : cppnetlib-uri/fast
 
 client.o: client.cpp.o
@@ -186,7 +186,7 @@ client.o: client.cpp.o
 
 # target to build an object file
 client.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/build.make libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/client.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/build.make libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/client.cpp.o
 .PHONY : client.cpp.o
 
 client.i: client.cpp.i
@@ -194,7 +194,7 @@ client.i: client.cpp.i
 
 # target to preprocess a source file
 client.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/build.make libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/client.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/build.make libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/client.cpp.i
 .PHONY : client.cpp.i
 
 client.s: client.cpp.s
@@ -202,7 +202,7 @@ client.s: client.cpp.s
 
 # target to generate assembly for a file
 client.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/build.make libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/client.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/build.make libs/network/src/CMakeFiles/cppnetlib-client-connections.dir/client.cpp.s
 .PHONY : client.cpp.s
 
 server_request_parsers_impl.o: server_request_parsers_impl.cpp.o
@@ -210,7 +210,7 @@ server_request_parsers_impl.o: server_request_parsers_impl.cpp.o
 
 # target to build an object file
 server_request_parsers_impl.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/build.make libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/server_request_parsers_impl.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/build.make libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/server_request_parsers_impl.cpp.o
 .PHONY : server_request_parsers_impl.cpp.o
 
 server_request_parsers_impl.i: server_request_parsers_impl.cpp.i
@@ -218,7 +218,7 @@ server_request_parsers_impl.i: server_request_parsers_impl.cpp.i
 
 # target to preprocess a source file
 server_request_parsers_impl.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/build.make libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/server_request_parsers_impl.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/build.make libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/server_request_parsers_impl.cpp.i
 .PHONY : server_request_parsers_impl.cpp.i
 
 server_request_parsers_impl.s: server_request_parsers_impl.cpp.s
@@ -226,7 +226,7 @@ server_request_parsers_impl.s: server_request_parsers_impl.cpp.s
 
 # target to generate assembly for a file
 server_request_parsers_impl.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/build.make libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/server_request_parsers_impl.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/build.make libs/network/src/CMakeFiles/cppnetlib-server-parsers.dir/server_request_parsers_impl.cpp.s
 .PHONY : server_request_parsers_impl.cpp.s
 
 uri/schemes.o: uri/schemes.cpp.o
@@ -234,7 +234,7 @@ uri/schemes.o: uri/schemes.cpp.o
 
 # target to build an object file
 uri/schemes.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/schemes.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/schemes.cpp.o
 .PHONY : uri/schemes.cpp.o
 
 uri/schemes.i: uri/schemes.cpp.i
@@ -242,7 +242,7 @@ uri/schemes.i: uri/schemes.cpp.i
 
 # target to preprocess a source file
 uri/schemes.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/schemes.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/schemes.cpp.i
 .PHONY : uri/schemes.cpp.i
 
 uri/schemes.s: uri/schemes.cpp.s
@@ -250,7 +250,7 @@ uri/schemes.s: uri/schemes.cpp.s
 
 # target to generate assembly for a file
 uri/schemes.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/schemes.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/schemes.cpp.s
 .PHONY : uri/schemes.cpp.s
 
 uri/uri.o: uri/uri.cpp.o
@@ -258,7 +258,7 @@ uri/uri.o: uri/uri.cpp.o
 
 # target to build an object file
 uri/uri.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/uri.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/uri.cpp.o
 .PHONY : uri/uri.cpp.o
 
 uri/uri.i: uri/uri.cpp.i
@@ -266,7 +266,7 @@ uri/uri.i: uri/uri.cpp.i
 
 # target to preprocess a source file
 uri/uri.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/uri.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/uri.cpp.i
 .PHONY : uri/uri.cpp.i
 
 uri/uri.s: uri/uri.cpp.s
@@ -274,7 +274,7 @@ uri/uri.s: uri/uri.cpp.s
 
 # target to generate assembly for a file
 uri/uri.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/uri.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/src/CMakeFiles/cppnetlib-uri.dir/build.make libs/network/src/CMakeFiles/cppnetlib-uri.dir/uri/uri.cpp.s
 .PHONY : uri/uri.cpp.s
 
 # Help Target
@@ -315,6 +315,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/dlarimer/projects/mace && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /root/mace && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

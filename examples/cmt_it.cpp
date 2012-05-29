@@ -10,7 +10,7 @@ int main( int argc, char** argv ) {
     cmt::thread* t = cmt::thread::create("bench");
     int sum = 0;
     for( uint32_t i = 0; i < 100000; ++i ) 
-        sum += t->sync<int>( bind(hello, "world") );
+        sum += t->async<int>( bind(hello, "world") ).wait();
     system_clock::time_point end = system_clock::now();
     slog( "%1% calls/sec", 
       (100000.0/((system_clock::now() - start).count()/1000000000.0)) );
