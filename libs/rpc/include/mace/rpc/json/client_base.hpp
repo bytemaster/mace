@@ -27,6 +27,8 @@ class client_base {
       m_con->notice_fused( method, param );
     }
 
+    mace::rpc::json::connection::ptr get_connection()const { return m_con; }
+
   protected:
       mace::rpc::json::connection::ptr m_con;
 };

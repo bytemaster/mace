@@ -178,7 +178,17 @@
 
   @section mace_rpc_json_tcp_server JSON-RPC Server over TCP 
   
-  @section mace_rpc_json_http_client JSON-RPC Client over HTTP 
+  @section mace_rpc_json_http_client JSON-RPC Client over HTTP  (Bitcoin Client)
+
+  The default HTTP client will open a new HTTP connection for each call and uses 
+  cpp-netlib's network library to peform the HTTP request.   You use it like the
+  TCP client except that certain features, like callbacks, are not supported.
+
+  In this example the client should interface with your local <a href="http://bitcoin.org">bitcoin</a> 
+  server using the <a href="https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_Calls_list">Bitcoin API</a>
+
+  @include rpc/examples/jsonhttpc.cpp
+
 
   @section mace_rpc_json_http_server JSON-RPC Server over HTTP 
 */

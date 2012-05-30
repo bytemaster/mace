@@ -52,11 +52,16 @@ void async_post_http_request(
   }
 }
 
+using namespace boost::network::http;
+
 class http_connection_private {
   public:
       http_connection_private( const std::string& url )
       :m_url(url),m_client(new boost::network::http::client( boost::network::http::_cache_resolved = true))
-      {}
+      {
+        // network::http::_openssl_certificate 
+        // network::http::_openssl_verify_path 
+      }
 
       std::map<std::string,std::string>                m_headers;
       // thread that does the actual work... 

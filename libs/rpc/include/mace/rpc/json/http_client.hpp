@@ -2,7 +2,7 @@
 #define _MACE_RPC_JSON_HTTP_CLIENT_HPP_
 #include <mace/stub/ptr.hpp>
 #include <mace/rpc/json/client_interface.hpp>
-#include <mace/rpc/json/client_base.hpp>
+#include <mace/rpc/json/http_client_base.hpp>
 #include <mace/rpc/json/http_connection.hpp>
 
 namespace mace { namespace rpc {  namespace json {
@@ -17,12 +17,12 @@ namespace mace { namespace rpc {  namespace json {
    */
   template<typename InterfaceType>
   class http_client : public mace::stub::ptr<InterfaceType, mace::rpc::json::client_interface>, 
-                      public client_base {
+                      public http_client_base {
     public:
       typedef boost::shared_ptr<http_client>   ptr;
 
       http_client( const std::string& url )
-      :client_base( boost::make_shared<http_connection>(url) ) {
+      :http_client_base( boost::make_shared<http_connection>(url) ) {
          mace::rpc::json::client_interface::set( *this );
       }
 
