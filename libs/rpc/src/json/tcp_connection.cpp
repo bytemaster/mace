@@ -58,7 +58,7 @@ class tcp_connection_private {
                 }
                 ++itr;
             }
-        } catch ( const std::exception& e ) {
+        } catch ( const std::exception&  ) {
           //wlog( "%1%", boost::diagnostic_information(e) );
         }
         self.closed();

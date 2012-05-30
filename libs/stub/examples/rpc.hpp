@@ -36,6 +36,7 @@ class rpc_client : public stub::ptr<InterfaceType,InterfaceDelegate> {
    bool connect_to( const std::string& host, uint16_t port ) {
        m_sock.open(boost::asio::ip::udp::v4());
        m_ep = boost::asio::ip::udp::endpoint( boost::asio::ip::address::from_string(host), port );
+	   return true;
    }
 
    //! [RPC Client invoke]

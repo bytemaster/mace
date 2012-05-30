@@ -236,16 +236,16 @@ bool value::is_bool()const    { return 0 != boost::get<bool>(&val);        }
 bool value::is_real()const    { return 0 != boost::get<double>(&val);      }
 
 bool value::operator == ( const null_t& nt )const { return 0 != boost::get<null_t>(&val); }
-value::operator int()const                        { return boost::get<double>(val);      }
-value::operator int64_t()const                    { return boost::get<double>(val);      }
-value::operator uint64_t()const                   { return boost::get<double>(val);      }
-value::operator uint32_t()const                   { return boost::get<double>(val);      }
-value::operator uint16_t()const                   { return boost::get<double>(val);      }
-value::operator uint8_t()const                    { return boost::get<double>(val);      }
-value::operator int16_t()const                    { return boost::get<double>(val);      }
-value::operator int8_t()const                     { return boost::get<double>(val);      }
+value::operator int()const                        { return (int)boost::get<double>(val);      }
+value::operator int64_t()const                    { return (int64_t)boost::get<double>(val);      }
+value::operator uint64_t()const                   { return (uint64_t)boost::get<double>(val);      }
+value::operator uint32_t()const                   { return (uint32_t)boost::get<double>(val);      }
+value::operator uint16_t()const                   { return (uint16_t)boost::get<double>(val);      }
+value::operator uint8_t()const                    { return (uint8_t)boost::get<double>(val);      }
+value::operator int16_t()const                    { return (int16_t)boost::get<double>(val);      }
+value::operator int8_t()const                     { return (int8_t)boost::get<double>(val);      }
 value::operator double()const                     { return boost::get<double>(val);      }
-value::operator float()const                      { return boost::get<double>(val);      }
+value::operator float()const                      { return (float)boost::get<double>(val);      }
 value::operator bool()const                       { return boost::get<bool>(val);        }
 value::operator std::string()const { 
    return boost::apply_visitor( detail::cast_visitor<std::string>(), val );
@@ -256,20 +256,20 @@ value::operator const json::array&()const         { return boost::get<json::arra
 value::operator json::array&()                    { return boost::get<json::array>(val); }
 
 
-value& value::operator = ( null_t v )             { val = v; }
-value& value::operator = ( bool v )               { val = v; }
-value& value::operator = ( double v )             { val = v; }
-value& value::operator = ( int64_t v )            { val = (double)v; }
-value& value::operator = ( uint64_t v )           { val = (double)v; }
-value& value::operator = ( int32_t v )            { val = (double)v; }
-value& value::operator = ( uint32_t v )           { val = (double)v; }
-value& value::operator = ( int16_t v )            { val = (double)v; }
-value& value::operator = ( uint16_t v )           { val = (double)v; }
-value& value::operator = ( int8_t v )             { val = (double)v; }
-value& value::operator = ( uint8_t v )            { val = (double)v; }
-value& value::operator = ( const std::string& v ) { val = v; }
-value& value::operator = ( const json::object& v ){ val = v; }
-value& value::operator = ( const json::array& v ) { val = v; }
+value& value::operator = ( null_t v )             { val = v; return *this; }
+value& value::operator = ( bool v )               { val = v; return *this; }
+value& value::operator = ( double v )             { val = v; return *this;  }
+value& value::operator = ( int64_t v )            { val = (double)v; return *this;  }
+value& value::operator = ( uint64_t v )           { val = (double)v; return *this;  }
+value& value::operator = ( int32_t v )            { val = (double)v; return *this;  }
+value& value::operator = ( uint32_t v )           { val = (double)v; return *this;  }
+value& value::operator = ( int16_t v )            { val = (double)v; return *this;  }
+value& value::operator = ( uint16_t v )           { val = (double)v; return *this;  }
+value& value::operator = ( int8_t v )             { val = (double)v; return *this;  }
+value& value::operator = ( uint8_t v )            { val = (double)v; return *this;  }
+value& value::operator = ( const std::string& v ) { val = v; return *this;  }
+value& value::operator = ( const json::object& v ){ val = v; return *this;  }
+value& value::operator = ( const json::array& v ) { val = v; return *this;  }
 
 
  value&        value::operator[]( const char* index ) {

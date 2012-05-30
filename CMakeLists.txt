@@ -28,6 +28,10 @@ option( ENABLE_ARM "Build for ARM CPU" OFF )
 #ADD_DEFINITIONS( -D_XOPEN_SOURCE )
 
 IF( WIN32 )
+	ADD_DEFINITIONS( -DBOOST_CONTEXT_NO_LIB )
+	ADD_DEFINITIONS( -D_SCL_SECURE_NO_WARNINGS )
+	ADD_DEFINITIONS( -D_WIN32_WINNT=0x0501 )
+	ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS )
 ELSE(WIN32)
    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 #    INCLUDE(CheckCCompilerFlag)
@@ -41,9 +45,11 @@ ENDIF(WIN32)
 
 if( UNIX ) 
   if( NOT APPLE )  
-    set(rt_library rt ) 
+    set(rt_library rt )
+	set(pthread_library pthread) 
   endif() 
 endif()
+
 
 add_subdirectory(libs)
 add_subdirectory(examples)

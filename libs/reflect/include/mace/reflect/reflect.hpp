@@ -80,7 +80,9 @@ struct reflector{
   mace::reflect::reflector<base>::visit( visitor );
 
 #define MACE_REFLECT_VISIT_MEMBER( r, visitor, elem ) \
-  visitor.template operator()<BOOST_TYPEOF(&type::elem), &type::elem>( BOOST_PP_STRINGIZE(elem) );
+  visitor.operator()<BOOST_TYPEOF(&type::elem), &type::elem>( BOOST_PP_STRINGIZE(elem) );
+
+ // visitor.template operator()<BOOST_TYPEOF(&type::elem), &type::elem>( BOOST_PP_STRINGIZE(elem) );
 
 #define MACE_REFLECT_BASE_MEMBER_COUNT( r, OP, elem ) \
   OP mace::reflect::reflector<elem>::member_count

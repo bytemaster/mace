@@ -5,7 +5,7 @@
 
 namespace mace { namespace reflect {
   namespace detail {
-    class place_holder;
+    struct place_holder;
   };
 
 class iterator;

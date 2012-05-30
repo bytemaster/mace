@@ -35,7 +35,7 @@ void async_post_http_request(
          int64_t code = 0;
          std::string data = "";
          if( err.contains("message") ) msg = (std::string)err["message"];
-         if( err.contains("code") ) code = (double)err["code"];
+         if( err.contains("code") ) code = (int64_t)err["code"];
          if( err.contains("data") ) data = (std::string)err["data"];
 
          rs->handle_error( boost::copy_exception( 
@@ -45,8 +45,6 @@ void async_post_http_request(
                                << rpc::err_msg(msg) ) );
       }
     }
-  } catch( const boost::exception& e ) {
-    if( rs ) rs->handle_error( boost::current_exception() );
   } catch ( ... ) {
     if( rs ) rs->handle_error( boost::current_exception() );
   }
