@@ -18,8 +18,7 @@ namespace mace { namespace cmt {  namespace asio {
                 delete acc;
                 if( listen_done.valid() )
                     listen_done.wait();
-            } catch ( const boost::exception& e ) {
-                
+            } catch ( const boost::exception& ) {
             }
           }
 

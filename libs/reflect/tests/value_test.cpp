@@ -117,7 +117,7 @@ void test_stdmap() {
   slog( "hello.b = %1%", mv["hello"]["b"].as<std::string>() );
   slog( "goodbye.b = %1%", mv["goodbye"]["b"].as<std::string>() );
 
-  mvr["new_field"]["b"].set_as<std::string>("Howdy Partner");
+  mvr["new_field"]["b"].set_as<std::string>(std::string("Howdy Partner"));
   slog( "new_field.b = %1%", mv["new_field"]["b"].as<std::string>() );
   slog( "new_field.b = %1%", mvr["new_field"]["b"].as<std::string>() );
 

@@ -9,8 +9,9 @@ namespace mace { namespace rpc { namespace json {
   namespace detail {
     namespace cmt = mace::cmt;
 
-    struct tcp_server_base_private {
-      typedef cmt::asio::tcp::socket socket_t;
+    class tcp_server_base_private {
+	  public:
+	  typedef cmt::asio::tcp::socket socket_t;
 
       cmt::thread*                                       _thread;
       tcp_server_base::session_creator*                  _sc;

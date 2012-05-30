@@ -28,6 +28,8 @@ namespace cmt {
             virtual void notify( const promise_base::ptr& p ) = 0;
    };
    priority current_priority();
+   inline void usleep( uint64_t us );
+   inline void sleep_until( const system_clock::time_point& tp );
 
    /**
     * @brief manages cooperative scheduling of tasks within a single operating system thread.
@@ -109,7 +111,7 @@ namespace cmt {
 
             void set_boost_thread( boost::thread* t );
         protected:
-            friend struct thread_private;
+            friend class thread_private;
             friend void mace::cmt::yield();
             friend void mace::cmt::usleep( uint64_t );
             friend void mace::cmt::sleep_until( const system_clock::time_point& );

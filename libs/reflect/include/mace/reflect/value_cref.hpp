@@ -12,7 +12,7 @@ class value_cref : public value_base {
     public:
         template<typename T> value_cref( const T& v );
         template<typename T> value_cref( const T&& t ); 
-        value_cref( const struct value& t ); 
+        value_cref( const class value& t ); 
 
         value_cref( const value_cref& c ); 
         value_cref( value_cref&& t ); 
