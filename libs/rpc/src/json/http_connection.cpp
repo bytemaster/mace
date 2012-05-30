@@ -62,7 +62,6 @@ class http_connection_private {
       }
 
       std::map<std::string,std::string>                m_headers;
-      // thread that does the actual work... 
       std::string                                      m_url;
       boost::shared_ptr<boost::network::http::client>  m_client;
 };
@@ -106,5 +105,27 @@ void http_connection::send( const json::value& msg ) {
                   connection::pending_result::ptr() ) );
 }
   
+void http_connection::set_url( const std::string& url ){
+}
+
+void http_connection::set_http_method( const std::string& method ){
+}
+ // POST / GET 
+void http_connection::set_path( const std::string& path ){
+}
+
+void http_connection::set_args( const std::string& args ){
+}
+
+void http_connection::set_header( const std::string key, const std::string& value ){
+  my->m_headers[key] = value;
+}
+
+boost::optional<std::string> http_connection::get_header( const std::string& key ){
+  std::map<std::string,std::string>::const_iterator itr = my->m_headers.begin();
+  if( itr != my->m_headers.end() ) return itr->second;
+
+  return boost::optional<std::string>();
+}
 
 } } }  // mace::rpc::json

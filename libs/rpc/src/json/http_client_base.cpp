@@ -1,4 +1,6 @@
 #include <mace/rpc/json/http_client_base.hpp>
+#include <mace/rpc/json/http_connection.hpp>
+
 namespace mace { namespace rpc { namespace json {
 
 http_client_base::http_client_base( const std::string& url )
@@ -29,7 +31,4 @@ void http_client_base::set_header( const std::string key, const std::string& val
 boost::optional<std::string> http_client_base::get_header( const std::string& key ){
     return boost::dynamic_pointer_cast<http_connection>(m_con)->get_header(key);
 }
-
-
-
 } } } // mace::rpc::json

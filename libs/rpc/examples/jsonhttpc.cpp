@@ -11,7 +11,7 @@ int main( int argc, char** argv ) {
     return -1; 
   }
   try {
-    json::http_client<bitcoin::client> bcd( argv[1] );
+    mace::rpc::json::http_client<bitcoin::client> bcd( argv[1] );
     bcd.set_header( "Authorization", "Basic "  + mace::rpc::base64_encode(argv[2]) );
 
     cli  m_cli(bcd);

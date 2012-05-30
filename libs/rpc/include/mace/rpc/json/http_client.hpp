@@ -22,11 +22,11 @@ namespace mace { namespace rpc {  namespace json {
       typedef boost::shared_ptr<http_client>   ptr;
 
       http_client( const std::string& url )
-      :http_client_base( boost::make_shared<http_connection>(url) ) {
+      :http_client_base( url ) {
          mace::rpc::json::client_interface::set( *this );
       }
 
-      http_client( const http_client& c ):client_base(c) {
+      http_client( const http_client& c ):http_client_base(c) {
         mace::rpc::json::client_interface::set( *this );
       }
 

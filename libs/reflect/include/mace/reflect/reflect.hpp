@@ -79,10 +79,14 @@ struct reflector{
 #define MACE_REFLECT_VISIT_BASE(r, visitor, base) \
   mace::reflect::reflector<base>::visit( visitor );
 
-#define MACE_REFLECT_VISIT_MEMBER( r, visitor, elem ) \
-  visitor.operator()<BOOST_TYPEOF(&type::elem), &type::elem>( BOOST_PP_STRINGIZE(elem) );
 
- // visitor.template operator()<BOOST_TYPEOF(&type::elem), &type::elem>( BOOST_PP_STRINGIZE(elem) );
+#ifndef WIN32
+  #define TEMPLATE template
+#endif
+
+#define MACE_REFLECT_VISIT_MEMBER( r, visitor, elem ) \
+  visitor.TEMPLATE operator()<BOOST_TYPEOF(&type::elem), &type::elem>( BOOST_PP_STRINGIZE(elem) );
+
 
 #define MACE_REFLECT_BASE_MEMBER_COUNT( r, OP, elem ) \
   OP mace::reflect::reflector<elem>::member_count
