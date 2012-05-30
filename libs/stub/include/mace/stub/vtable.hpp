@@ -73,6 +73,8 @@ namespace mace { namespace stub {
 
 #ifndef WIN32
   #define TEMPLATE template
+#else
+  #define TEMPLATE
 #endif
 
 #define MACE_STUB_VTABLE_VISIT_MEMBER( r, visitor, elem ) \

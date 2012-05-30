@@ -136,7 +136,7 @@ class const_iterator_impl : public detail::const_iterator_impl_base {
          return itr == get_field_map<T>().end();
 
       if( type() == other->type() ) {
-          return itr == static_cast<const const_iterator_impl<T>*>(other)->itr;
+          return itr == static_cast<const const_iterator_impl<T>*>(other)->itr ||
                 &val == &static_cast<const const_iterator_impl<T>*>(other)->val;
       }
     }
@@ -166,7 +166,7 @@ class iterator_impl : public detail::iterator_impl_base {
          return itr == get_field_map<T>().end();
 
       if( type() == other->type() ) {
-          return itr == static_cast<const iterator_impl<T>*>(other)->itr;
+          return itr == static_cast<const iterator_impl<T>*>(other)->itr ||
                 &val == &static_cast<const iterator_impl<T>*>(other)->val;
       }
     }

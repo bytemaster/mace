@@ -30,3 +30,15 @@ libs/stub/examples/Makefile
 libs/stub/examples/cmake_install.cmake
 libs/stub/examples/stub_rpc_client
 libs/stub/examples/stub_rpc_server
+*.vcxproj*
+*.exe*
+*.pdb
+*.ilk
+*.lib
+*.exp
+*.dir
+*.sln
+*.suo
+Win32
+*.sdf
+*.opensdf

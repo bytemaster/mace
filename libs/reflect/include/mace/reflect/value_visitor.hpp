@@ -73,6 +73,24 @@ namespace mace { namespace reflect {
       set_visitor( const T& v ):m_val(v){}
 
       virtual void operator()( std::string& s ) { s = boost::lexical_cast<std::string>(m_val); }
+      virtual void operator()( uint64_t& s )    { s = static_cast<uint64_t>(m_val);    }
+      virtual void operator()( int64_t& s )     { s = static_cast<int64_t>(m_val);     }
+      virtual void operator()( uint32_t& s )    { s = static_cast<uint32_t>(m_val);    }
+      virtual void operator()( int32_t& s )     { s = static_cast<int32_t>(m_val);     }
+      virtual void operator()( uint16_t& s )    { s = static_cast<uint16_t>(m_val);    }
+      virtual void operator()( int16_t& s )     { s = static_cast<int16_t>(m_val);     }
+      virtual void operator()( uint8_t& s )     { s = static_cast<uint8_t>(m_val);     }
+      virtual void operator()( int8_t& s )      { s = static_cast<int8_t>(m_val);      }
+      virtual void operator()( double& s )      { s = static_cast<double>(m_val);      }
+      virtual void operator()( float& s )       { s = static_cast<float>(m_val);       }
+      virtual void operator()( bool& s )        { s = static_cast<bool>(m_val);        }
+  };
+   template<>
+  struct set_visitor<std::string> : write_value_visitor {
+      const std::string& m_val;
+      set_visitor( const std::string& v ):m_val(v){}
+
+      virtual void operator()( std::string& s ) { s = m_val; }
       virtual void operator()( uint64_t& s )    { s = boost::lexical_cast<uint64_t>(m_val);    }
       virtual void operator()( int64_t& s )     { s = boost::lexical_cast<int64_t>(m_val);     }
       virtual void operator()( uint32_t& s )    { s = boost::lexical_cast<uint32_t>(m_val);    }

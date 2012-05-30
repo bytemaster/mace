@@ -243,7 +243,11 @@ namespace mace { namespace cmt {
               } else { // all contexts are blocked, create a new context 
                        // that will process posted tasks...
                 if( reschedule ) { 
-                    BOOST_ASSERT(current);
+					if( !current ) {
+						elog( "current = new cmt context" );
+						current = new cmt_context();
+					}
+                   // BOOST_ASSERT(current);
                     ready_push_back(current);
                 }
 

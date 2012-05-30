@@ -472,29 +472,32 @@ namespace mace { namespace reflect { namespace detail {
       virtual const_iterator_impl_base* begin()const { return new sequence_iterator_impl<const Seq&>( 0,this->get_val());}
   };
 
-  template<typename Seq, bool StackAllocate = true> 
+  template<typename Seq, bool StackAllocate = true, bool is_seq = true> 
   struct select_sequence_holder: public place_holder_sequence<Seq, place_holder_impl<Seq,StackAllocate > > {
     select_sequence_holder( const Seq& v ):place_holder_sequence<Seq, place_holder_impl<Seq,StackAllocate > >(v){}
     select_sequence_holder( Seq&& v ):place_holder_sequence<Seq, place_holder_impl<Seq,StackAllocate > >(std::forward<Seq >(v)){}
     typedef select_sequence_holder type;
   };
-  template<typename Seq>
-  struct select_sequence_holder<Seq& > : public place_holder_sequence<Seq, place_holder_impl<Seq& > > {
+  template<typename T, bool StackAllocate> 
+  struct select_sequence_holder<T,StackAllocate,false>{ typedef typename select_place_holder<T, sizeof(typename select_place_holder<T,true>::type ) <= 3*sizeof(void*)>::type type; };
+
+  template<typename Seq, bool StackAllocate>
+  struct select_sequence_holder<Seq&,StackAllocate,true> : public place_holder_sequence<Seq, place_holder_impl<Seq& > > {
     select_sequence_holder(  Seq& v ):place_holder_sequence<Seq, place_holder_impl<Seq& > >(v){};
     typedef select_sequence_holder type;
   };
-  template<typename Seq>
-  struct select_sequence_holder<const Seq& > : public  place_holder_sequence<const Seq&, place_holder_impl<const Seq& > > {
+  template<typename Seq, bool StackAllocate>
+  struct select_sequence_holder<const Seq&,StackAllocate,true> : public  place_holder_sequence<const Seq&, place_holder_impl<const Seq& > > {
     select_sequence_holder( const Seq& v ):place_holder_sequence<const Seq&, place_holder_impl<const Seq& > >(v){};
     typedef select_sequence_holder type;
   };
 
-
+ 
   template<typename T>
   struct select_holder {
     typedef typename boost::mpl::if_c<
         boost::fusion::traits::is_sequence<typename boost::fusion::traits::deduce<T>::type >::value,
-        typename select_sequence_holder<T, sizeof(typename select_sequence_holder<T,true>::type ) <= 3*sizeof(void*)>::type,
+        typename select_sequence_holder<T, sizeof(T) <= sizeof(void*), false >::type,
         typename select_place_holder   <T, sizeof(typename select_place_holder   <T,true>::type ) <= 3*sizeof(void*)>::type 
         >::type type;
   };

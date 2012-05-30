@@ -82,6 +82,8 @@ struct reflector{
 
 #ifndef WIN32
   #define TEMPLATE template
+#else
+  #define TEMPLATE
 #endif
 
 #define MACE_REFLECT_VISIT_MEMBER( r, visitor, elem ) \

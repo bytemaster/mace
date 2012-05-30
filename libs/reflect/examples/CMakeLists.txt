@@ -6,8 +6,8 @@ SET( libraries
     #/usr/local/lib/tcmalloc/libtcmalloc.a
     mace_cmt
     boost_context 
-    pthread
-    rt
+    ${pthread_library}
+    ${rt_library}
     ${Boost_THREAD_LIBRARY} 
     ${Boost_ASIO_LIBRARY} 
     ${Boost_SYSTEM_LIBRARY} 
