@@ -142,8 +142,10 @@ Namespaces</h2></td></tr>
 Defines</h2></td></tr>
 <tr class="memitem:ab2b32c20439c3c0339a1da7214ce97be"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab2b32c20439c3c0339a1da7214ce97be"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>MACE_REFLECT_VISIT_BASE</b>(r, visitor, base)&#160;&#160;&#160;<a class="el" href="structmace_1_1reflect_1_1reflector.html">mace::reflect::reflector</a>&lt;base&gt;::visit( visitor );</td></tr>
+<tr class="memitem:a491ddbf322aef9661794e38b7ff82c02"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a491ddbf322aef9661794e38b7ff82c02"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>TEMPLATE</b>&#160;&#160;&#160;template</td></tr>
 <tr class="memitem:a811d06f644ee0a4b685bbafec2511dd5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a811d06f644ee0a4b685bbafec2511dd5"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MACE_REFLECT_VISIT_MEMBER</b>(r, visitor, elem)&#160;&#160;&#160;visitor.template operator()&lt;BOOST_TYPEOF(&amp;type::elem), &amp;type::elem&gt;( BOOST_PP_STRINGIZE(elem) );</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>MACE_REFLECT_VISIT_MEMBER</b>(r, visitor, elem)&#160;&#160;&#160;visitor.TEMPLATE operator()&lt;BOOST_TYPEOF(&amp;type::elem), &amp;type::elem&gt;( BOOST_PP_STRINGIZE(elem) );</td></tr>
 <tr class="memitem:a44835517390d59981029b67d2cc95aa1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a44835517390d59981029b67d2cc95aa1"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>MACE_REFLECT_BASE_MEMBER_COUNT</b>(r, OP, elem)&#160;&#160;&#160;OP <a class="el" href="structmace_1_1reflect_1_1reflector.html">mace::reflect::reflector</a>&lt;elem&gt;::member_count</td></tr>
 <tr class="memitem:a6bc56f24e1844106bf5bf3a0ff697275"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>MACE_REFLECT_DERIVED_IMPL_INLINE</b>(TYPE, INHERITS, MEMBERS)</td></tr>
@@ -195,7 +197,7 @@ Defines</h2></td></tr>
 <dl class="section see"><dt>See also:</dt><dd><a class="el" href="reflect_8hpp.html#abd8fdad6c0ae68a1c7346e164673c3bc" title="Specializes mace::reflect::reflector for TYPE where type inherits other reflected classes...">MACE_REFLECT_DERIVED</a> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="examples_2reflect_to_json_8cpp-example.html#a2">examples/reflect_to_json.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00135">135</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
+<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00143">143</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
 
 </div>
 </div>
@@ -248,7 +250,7 @@ template&lt;&gt; <span class="keyword">struct </span>reflector&lt;TYPE&gt; {\
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00113">113</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
+<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00121">121</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
 
 </div>
 </div>
@@ -288,7 +290,7 @@ void <a class="code" href="structmace_1_1reflect_1_1reflector.html#a81da747b21b8
     BOOST_PP_SEQ_FOR_EACH( MACE_REFLECT_VISIT_MEMBER, v, MEMBERS ) \
 }
 </pre></div>
-<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00095">95</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
+<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00103">103</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
 
 </div>
 </div>
@@ -328,7 +330,7 @@ static <span class="keyword">inline</span> <span class="keywordtype">void</span>
     BOOST_PP_SEQ_FOR_EACH( MACE_REFLECT_VISIT_MEMBER, v, MEMBERS ) \
 }
 </pre></div>
-<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00088">88</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
+<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00096">96</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
 
 </div>
 </div>
@@ -359,7 +361,7 @@ template&lt;&gt; <span class="keyword">struct </span>reflector&lt;TYPE&gt; {\
     template&lt;typename Visitor&gt; <span class="keyword">static</span> <span class="keywordtype">void</span> visit( <span class="keyword">const</span> Visitor&amp; v ); \
 }; } }
 </pre></div>
-<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00138">138</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
+<p>Definition at line <a class="el" href="reflect_8hpp_source.html#l00146">146</a> of file <a class="el" href="reflect_8hpp_source.html">reflect.hpp</a>.</p>
 
 </div>
 </div>

@@ -151,44 +151,51 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00071"></a>00071 <span class="preprocessor">#define MACE_STUB_VTABLE_VISIT_BASE( r, visitor, name ) \</span>
 <a name="l00072"></a>00072 <span class="preprocessor">  vtable_reflector&lt;name,InterfaceDelegate&gt;::visit( visitor );</span>
 <a name="l00073"></a>00073 <span class="preprocessor"></span>
-<a name="l00074"></a>00074 <span class="preprocessor">#define MACE_STUB_VTABLE_VISIT_MEMBER( r, visitor, elem ) \</span>
-<a name="l00075"></a>00075 <span class="preprocessor">  visitor.template operator()&lt;BOOST_TYPEOF(&amp;vtable_type::elem),&amp;vtable_type::elem&gt;( BOOST_PP_STRINGIZE(elem) );</span>
-<a name="l00076"></a>00076 <span class="preprocessor"></span>
-<a name="l00077"></a>00077 <span class="comment">// example of how to convert enumerate any BOOST_PP_SEQ, including BOOST_PP_SEQ_NIL</span>
-<a name="l00078"></a>00078 <span class="preprocessor">#define MACE_STUB_SEQ_ENUM(X) \</span>
-<a name="l00079"></a>00079 <span class="preprocessor">BOOST_PP_LIST_ENUM( \</span>
-<a name="l00080"></a>00080 <span class="preprocessor">  BOOST_PP_LIST_REST( \</span>
-<a name="l00081"></a>00081 <span class="preprocessor">    BOOST_PP_TUPLE_TO_LIST( BOOST_PP_INC(BOOST_PP_SEQ_SIZE(X)), BOOST_PP_SEQ_TO_TUPLE( \</span>
-<a name="l00082"></a>00082 <span class="preprocessor">    BOOST_PP_SEQ_TRANSFORM( MACE_STUB_VTABLE_PUBLIC_BASE, InterfaceDelegate, BOOST_PP_SEQ_PUSH_FRONT(X,(null)) ) ) )  \</span>
-<a name="l00083"></a>00083 <span class="preprocessor">  ) \</span>
-<a name="l00084"></a>00084 <span class="preprocessor">)</span>
-<a name="l00085"></a>00085 <span class="preprocessor"></span>
-<a name="l00086"></a>00086 <span class="preprocessor">#endif  // not DOXYGEN</span>
-<a name="l00087"></a>00087 <span class="preprocessor"></span>
-<a name="l00097"></a><a class="code" href="vtable_8hpp.html#ac6eb8257e3b54944a8d5b8b6dc849cff">00097</a> <span class="preprocessor">#define MACE_STUB_DERIVED( NAME, INHERITS, MEMBERS ) \</span>
-<a name="l00098"></a>00098 <span class="preprocessor">namespace mace { namespace stub { \</span>
-<a name="l00099"></a>00099 <span class="preprocessor">template&lt;typename InterfaceDelegate &gt; \</span>
-<a name="l00100"></a>00100 <span class="preprocessor">struct vtable&lt;NAME,InterfaceDelegate&gt; : BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_PUBLIC_BASE, InterfaceDelegate, INHERITS ) private vtable_base&lt;NAME&gt; { \</span>
-<a name="l00101"></a>00101 <span class="preprocessor">    typedef NAME interface_type; \</span>
-<a name="l00102"></a>00102 <span class="preprocessor">    typedef InterfaceDelegate delegate_type; \</span>
-<a name="l00103"></a>00103 <span class="preprocessor">    BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_DEFINE_MEMBER, NAME, MEMBERS ) \</span>
-<a name="l00104"></a>00104 <span class="preprocessor">}; \</span>
-<a name="l00105"></a>00105 <span class="preprocessor">template&lt;typename InterfaceDelegate&gt; struct vtable_reflector&lt;NAME,InterfaceDelegate&gt; { \</span>
-<a name="l00106"></a>00106 <span class="preprocessor">    typedef NAME interface_type; \</span>
-<a name="l00107"></a>00107 <span class="preprocessor">    template&lt;typename Visitor&gt; \</span>
-<a name="l00108"></a>00108 <span class="preprocessor">    static void visit( const Visitor&amp; visitor ) { \</span>
-<a name="l00109"></a>00109 <span class="preprocessor">        typedef mace::stub::vtable&lt;NAME,InterfaceDelegate&gt; vtable_type; \</span>
-<a name="l00110"></a>00110 <span class="preprocessor">        BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_VISIT_BASE, visitor, INHERITS ) \</span>
-<a name="l00111"></a>00111 <span class="preprocessor">        BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_VISIT_MEMBER, visitor, MEMBERS ) \</span>
-<a name="l00112"></a>00112 <span class="preprocessor">    } \</span>
-<a name="l00113"></a>00113 <span class="preprocessor">};\</span>
-<a name="l00114"></a>00114 <span class="preprocessor">\</span>
-<a name="l00115"></a>00115 <span class="preprocessor">} } </span>
-<a name="l00116"></a>00116 <span class="preprocessor"></span>
-<a name="l00125"></a><a class="code" href="vtable_8hpp.html#aed33615d027e291eefa9dfd06f78acff">00125</a> <span class="preprocessor">#define MACE_STUB( NAME, MEMBERS ) \</span>
-<a name="l00126"></a>00126 <span class="preprocessor">    MACE_STUB_DERIVED( NAME, BOOST_PP_SEQ_NIL, MEMBERS )</span>
-<a name="l00127"></a>00127 <span class="preprocessor"></span>
-<a name="l00128"></a>00128 <span class="preprocessor">#endif</span>
+<a name="l00074"></a>00074 <span class="preprocessor">#ifndef WIN32</span>
+<a name="l00075"></a>00075 <span class="preprocessor"></span><span class="preprocessor">  #define TEMPLATE template</span>
+<a name="l00076"></a>00076 <span class="preprocessor"></span><span class="preprocessor">#else</span>
+<a name="l00077"></a>00077 <span class="preprocessor"></span><span class="preprocessor">  #define TEMPLATE</span>
+<a name="l00078"></a>00078 <span class="preprocessor"></span><span class="preprocessor">#endif</span>
+<a name="l00079"></a>00079 <span class="preprocessor"></span>
+<a name="l00080"></a>00080 <span class="preprocessor">#define MACE_STUB_VTABLE_VISIT_MEMBER( r, visitor, elem ) \</span>
+<a name="l00081"></a>00081 <span class="preprocessor">  visitor.TEMPLATE operator()&lt;BOOST_TYPEOF(&amp;vtable_type::elem),&amp;vtable_type::elem&gt;( BOOST_PP_STRINGIZE(elem) );</span>
+<a name="l00082"></a>00082 <span class="preprocessor"></span> <span class="comment">//visitor.template operator()&lt;BOOST_TYPEOF(&amp;vtable_type::elem),&amp;vtable_type::elem&gt;( BOOST_PP_STRINGIZE(elem) );</span>
+<a name="l00083"></a>00083 
+<a name="l00084"></a>00084 <span class="comment">// example of how to convert enumerate any BOOST_PP_SEQ, including BOOST_PP_SEQ_NIL</span>
+<a name="l00085"></a>00085 <span class="preprocessor">#define MACE_STUB_SEQ_ENUM(X) \</span>
+<a name="l00086"></a>00086 <span class="preprocessor">BOOST_PP_LIST_ENUM( \</span>
+<a name="l00087"></a>00087 <span class="preprocessor">  BOOST_PP_LIST_REST( \</span>
+<a name="l00088"></a>00088 <span class="preprocessor">    BOOST_PP_TUPLE_TO_LIST( BOOST_PP_INC(BOOST_PP_SEQ_SIZE(X)), BOOST_PP_SEQ_TO_TUPLE( \</span>
+<a name="l00089"></a>00089 <span class="preprocessor">    BOOST_PP_SEQ_TRANSFORM( MACE_STUB_VTABLE_PUBLIC_BASE, InterfaceDelegate, BOOST_PP_SEQ_PUSH_FRONT(X,(null)) ) ) )  \</span>
+<a name="l00090"></a>00090 <span class="preprocessor">  ) \</span>
+<a name="l00091"></a>00091 <span class="preprocessor">)</span>
+<a name="l00092"></a>00092 <span class="preprocessor"></span>
+<a name="l00093"></a>00093 <span class="preprocessor">#endif  // not DOXYGEN</span>
+<a name="l00094"></a>00094 <span class="preprocessor"></span>
+<a name="l00104"></a><a class="code" href="vtable_8hpp.html#ac6eb8257e3b54944a8d5b8b6dc849cff">00104</a> <span class="preprocessor">#define MACE_STUB_DERIVED( NAME, INHERITS, MEMBERS ) \</span>
+<a name="l00105"></a>00105 <span class="preprocessor">namespace mace { namespace stub { \</span>
+<a name="l00106"></a>00106 <span class="preprocessor">template&lt;typename InterfaceDelegate &gt; \</span>
+<a name="l00107"></a>00107 <span class="preprocessor">struct vtable&lt;NAME,InterfaceDelegate&gt; : BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_PUBLIC_BASE, InterfaceDelegate, INHERITS ) private vtable_base&lt;NAME&gt; { \</span>
+<a name="l00108"></a>00108 <span class="preprocessor">    typedef NAME interface_type; \</span>
+<a name="l00109"></a>00109 <span class="preprocessor">    typedef InterfaceDelegate delegate_type; \</span>
+<a name="l00110"></a>00110 <span class="preprocessor">    BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_DEFINE_MEMBER, NAME, MEMBERS ) \</span>
+<a name="l00111"></a>00111 <span class="preprocessor">}; \</span>
+<a name="l00112"></a>00112 <span class="preprocessor">template&lt;typename InterfaceDelegate&gt; struct vtable_reflector&lt;NAME,InterfaceDelegate&gt; { \</span>
+<a name="l00113"></a>00113 <span class="preprocessor">    typedef NAME interface_type; \</span>
+<a name="l00114"></a>00114 <span class="preprocessor">    template&lt;typename Visitor&gt; \</span>
+<a name="l00115"></a>00115 <span class="preprocessor">    static void visit( const Visitor&amp; visitor ) { \</span>
+<a name="l00116"></a>00116 <span class="preprocessor">        typedef mace::stub::vtable&lt;NAME,InterfaceDelegate&gt; vtable_type; \</span>
+<a name="l00117"></a>00117 <span class="preprocessor">        BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_VISIT_BASE, visitor, INHERITS ) \</span>
+<a name="l00118"></a>00118 <span class="preprocessor">        BOOST_PP_SEQ_FOR_EACH( MACE_STUB_VTABLE_VISIT_MEMBER, visitor, MEMBERS ) \</span>
+<a name="l00119"></a>00119 <span class="preprocessor">    } \</span>
+<a name="l00120"></a>00120 <span class="preprocessor">};\</span>
+<a name="l00121"></a>00121 <span class="preprocessor">\</span>
+<a name="l00122"></a>00122 <span class="preprocessor">} } </span>
+<a name="l00123"></a>00123 <span class="preprocessor"></span>
+<a name="l00132"></a><a class="code" href="vtable_8hpp.html#aed33615d027e291eefa9dfd06f78acff">00132</a> <span class="preprocessor">#define MACE_STUB( NAME, MEMBERS ) \</span>
+<a name="l00133"></a>00133 <span class="preprocessor">    MACE_STUB_DERIVED( NAME, BOOST_PP_SEQ_NIL, MEMBERS )</span>
+<a name="l00134"></a>00134 <span class="preprocessor"></span>
+<a name="l00135"></a>00135 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 <script type="text/javascript">
 

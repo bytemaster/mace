@@ -123,14 +123,17 @@ Introduction to MACE</h2>
 </ul>
 <ul>
 <li><a class="el" href="group__mace__rpc.html">Remote Procedure Call Library</a><ul>
+<li><a class="el" href="group__mace__rpc__json.html">JSON-RPC</a><ul>
 <li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_tcp_client">JSON-RPC Client over TCP</a></li>
 <li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_notice">Sending Notices</a></li>
 <li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_named_param">Named Parameters</a></li>
 <li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_callbacks">RPC Callbacks</a></li>
 <li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_type_erasure">Type Erasure</a></li>
 <li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_tcp_server">JSON-RPC Server over TCP</a></li>
-<li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_http_client">JSON-RPC Client over HTTP</a></li>
+<li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_http_client">JSON-RPC Client over HTTP (Bitcoin Client)</a></li>
 <li><a class="el" href="group__mace__rpc__json.html#mace_rpc_json_http_server">JSON-RPC Server over HTTP</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -140,24 +143,49 @@ Introduction to MACE</h2>
 <p>All of these libraries are being developed as a proposal for inclusion with Boost and therefore use the boost namespace.</p>
 <h2><a class="anchor" id="mace_install"></a>
 Installing MACE</h2>
+<p>MACE has been tested on Linux, Mac OS X, and Windows 7.</p>
+<h3><a class="anchor" id="mace_windows7"></a>
+Windows 7 Install</h3>
+<p>In order to build Boost.Context, which uses ASM files, you must run the following commands from the Visual Studio Command Prompt. This has been tested and known to work with Visual Studio 2010 Express.</p>
+<div class="fragment"><pre class="fragment">    cd mace
+    cmake -G <span class="stringliteral">&quot;NMake Makefiles&quot;</span> 
+    nmake 
+    nmake install
+</pre></div><h3><a class="anchor" id="mace_unix"></a>
+Mac OS X / Linux Instructions</h3>
 <p>On Linux/Mac OS X MACE will install to <code>/usr/local/mace/include</code> and <code>/usr/local/mace/lib</code> so you will need to add those directories to your include and library search paths.</p>
-<h3><a class="anchor" id="mace_dependencies"></a>
-Dependencies</h3>
-<ul>
-<li>CMake </li>
-<li>boost 1.47 or newer </li>
-<li>boost.context (included) </li>
-<li>boost.atomic (included) </li>
-<li>boost.move (included) </li>
-<li>boost.network (inclued, from cpp-netlib)</li>
-</ul>
-<p>When Boost 1.50 is released it should include some of these libraries (like Boost.Context) and they will no longer be included.</p>
-<h3><a class="anchor" id="mace_download"></a>
-Download</h3>
-<p>The current version is <a href="">mace-1.0.0</a>.</p>
-<p>Version numbers have the following meaning: MAJOR.MINOR.PATCH where Major version is bumped anytime the API breaks, minor version is bumped any time new methods are added, and patch is updated for bug fixes.</p>
-<p>You can clone the latest version from github and initilize it as follows.</p>
-<div class="fragment"><pre class="fragment">    git clone https:<span class="comment">//github.com/bytemaster/mace</span>
+<div class="fragment"><pre class="fragment">    cd mace
+    cmake .
+    make -j2
+    make install
+  @code
+
+  Simple as pie.
+
+  @subsection mace_dependencies Dependencies 
+
+    @li CMake
+    @li boost 1.47 or newer
+    @li boost.context (included)
+    @li boost.atomic (included)
+    @li boost.move (included)
+    @li boost.network (inclued, from cpp-netlib)
+
+  When Boost 1.50 is released it should include some of these libraries (like Boost.Context) and they will
+  no longer be included.
+
+  @subsection mace_download  Download 
+
+  The current version is  &lt;a href=&quot;&quot;&gt;mace-1.0.0&lt;/a&gt;.
+
+  Version numbers have the following meaning: MAJOR.MINOR.PATCH where Major version 
+  is bumped anytime the API breaks, minor version is bumped any time new methods are added, 
+  and patch is updated for bug fixes.
+
+  You can clone the latest version from github and initilize it as follows.
+
+  @code
+    git clone https:<span class="comment">//github.com/bytemaster/mace</span>
     cd mace
     git submodule init
     git submodule update

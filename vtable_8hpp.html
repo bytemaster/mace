@@ -129,8 +129,10 @@ Defines</h2></td></tr>
 <tr class="memitem:a96c92118c88bf5bf07974a01a4afa3cc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>MACE_STUB_VTABLE_DEFINE_MEMBER</b>(r, data, elem)</td></tr>
 <tr class="memitem:a55f8916a72a6335dbb6bad7cc71a7239"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a55f8916a72a6335dbb6bad7cc71a7239"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>MACE_STUB_VTABLE_VISIT_BASE</b>(r, visitor, name)&#160;&#160;&#160;vtable_reflector&lt;name,InterfaceDelegate&gt;::visit( visitor );</td></tr>
+<tr class="memitem:a491ddbf322aef9661794e38b7ff82c02"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a491ddbf322aef9661794e38b7ff82c02"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>TEMPLATE</b>&#160;&#160;&#160;template</td></tr>
 <tr class="memitem:a5bcbbae75f4303453d7db988c047f4f3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5bcbbae75f4303453d7db988c047f4f3"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MACE_STUB_VTABLE_VISIT_MEMBER</b>(r, visitor, elem)&#160;&#160;&#160;visitor.template operator()&lt;BOOST_TYPEOF(&amp;vtable_type::elem),&amp;vtable_type::elem&gt;( BOOST_PP_STRINGIZE(elem) );</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>MACE_STUB_VTABLE_VISIT_MEMBER</b>(r, visitor, elem)&#160;&#160;&#160;visitor.TEMPLATE operator()&lt;BOOST_TYPEOF(&amp;vtable_type::elem),&amp;vtable_type::elem&gt;( BOOST_PP_STRINGIZE(elem) );</td></tr>
 <tr class="memitem:a25750575a33a9fc2d66954fc4abb0f1a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>MACE_STUB_SEQ_ENUM</b>(X)</td></tr>
 <tr class="memitem:ac6eb8257e3b54944a8d5b8b6dc849cff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="vtable_8hpp.html#ac6eb8257e3b54944a8d5b8b6dc849cff">MACE_STUB_DERIVED</a>(NAME, INHERITS, MEMBERS)</td></tr>
 <tr class="memitem:aed33615d027e291eefa9dfd06f78acff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="vtable_8hpp.html#aed33615d027e291eefa9dfd06f78acff">MACE_STUB</a>(NAME, MEMBERS)&#160;&#160;&#160;<a class="el" href="vtable_8hpp.html#ac6eb8257e3b54944a8d5b8b6dc849cff">MACE_STUB_DERIVED</a>( NAME, BOOST_PP_SEQ_NIL, MEMBERS )</td></tr>
@@ -173,7 +175,7 @@ Defines</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="vtable_8hpp_source.html#l00125">125</a> of file <a class="el" href="vtable_8hpp_source.html">vtable.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vtable_8hpp_source.html#l00132">132</a> of file <a class="el" href="vtable_8hpp_source.html">vtable.hpp</a>.</p>
 
 </div>
 </div>
@@ -235,7 +237,7 @@ template&lt;typename InterfaceDelegate&gt; <span class="keyword">struct </span>v
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="vtable_8hpp_source.html#l00097">97</a> of file <a class="el" href="vtable_8hpp_source.html">vtable.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vtable_8hpp_source.html#l00104">104</a> of file <a class="el" href="vtable_8hpp_source.html">vtable.hpp</a>.</p>
 
 </div>
 </div>
@@ -260,7 +262,7 @@ template&lt;typename InterfaceDelegate&gt; <span class="keyword">struct </span>v
   ) \
 )
 </pre></div>
-<p>Definition at line <a class="el" href="vtable_8hpp_source.html#l00078">78</a> of file <a class="el" href="vtable_8hpp_source.html">vtable.hpp</a>.</p>
+<p>Definition at line <a class="el" href="vtable_8hpp_source.html#l00085">85</a> of file <a class="el" href="vtable_8hpp_source.html">vtable.hpp</a>.</p>
 
 </div>
 </div>

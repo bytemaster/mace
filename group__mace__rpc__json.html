@@ -175,8 +175,10 @@ Type Erasure</h2>
 </pre></div><h2><a class="anchor" id="mace_rpc_json_tcp_server"></a>
 JSON-RPC Server over TCP</h2>
 <h2><a class="anchor" id="mace_rpc_json_http_client"></a>
-JSON-RPC Client over HTTP</h2>
-<h2><a class="anchor" id="mace_rpc_json_http_server"></a>
+JSON-RPC Client over HTTP  (Bitcoin Client)</h2>
+<p>The default HTTP client will open a new HTTP connection for each call and uses cpp-netlib's network library to peform the HTTP request. You use it like the TCP client except that certain features, like callbacks, are not supported.</p>
+<p>In this example the client should interface with your local <a href="http://bitcoin.org">bitcoin</a> server using the <a href="https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_Calls_list">Bitcoin API</a></p>
+<div class="fragment"><pre class="fragment"></pre></div><h2><a class="anchor" id="mace_rpc_json_http_server"></a>
 JSON-RPC Server over HTTP</h2>
 </div><!-- contents -->
 <script type="text/javascript">

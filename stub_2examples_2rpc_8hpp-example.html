@@ -118,6 +118,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
    <span class="keywordtype">bool</span> connect_to( <span class="keyword">const</span> std::string&amp; host, uint16_t port ) {
        m_sock.open(boost::asio::ip::udp::v4());
        m_ep = boost::asio::ip::udp::endpoint( boost::asio::ip::address::from_string(host), port );
+           <span class="keywordflow">return</span> <span class="keyword">true</span>;
    }
 
    std::string invoke( <span class="keyword">const</span> <span class="keywordtype">char</span>* name, <span class="keyword">const</span> std::string&amp; params ) {

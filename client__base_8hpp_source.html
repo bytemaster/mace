@@ -126,12 +126,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00027"></a>00027       m_con-&gt;notice_fused( method, param );
 <a name="l00028"></a>00028     }
 <a name="l00029"></a>00029 
-<a name="l00030"></a>00030   <span class="keyword">protected</span>:
-<a name="l00031"></a>00031       mace::rpc::json::connection::ptr m_con;
-<a name="l00032"></a>00032 };
-<a name="l00033"></a>00033 
-<a name="l00034"></a>00034 }}} <span class="comment">// namespace mace::rpc::json</span>
-<a name="l00035"></a>00035 <span class="preprocessor">#endif //  _MACE_RPC_CLIENT_BASE_HPP</span>
+<a name="l00030"></a>00030     mace::rpc::json::connection::ptr get_connection()<span class="keyword">const </span>{ <span class="keywordflow">return</span> m_con; }
+<a name="l00031"></a>00031 
+<a name="l00032"></a>00032   <span class="keyword">protected</span>:
+<a name="l00033"></a>00033       mace::rpc::json::connection::ptr m_con;
+<a name="l00034"></a>00034 };
+<a name="l00035"></a>00035 
+<a name="l00036"></a>00036 }}} <span class="comment">// namespace mace::rpc::json</span>
+<a name="l00037"></a>00037 <span class="preprocessor">#endif //  _MACE_RPC_CLIENT_BASE_HPP</span>
 </pre></div></div><!-- contents -->
 <script type="text/javascript">
 
