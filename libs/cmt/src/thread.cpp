@@ -37,25 +37,23 @@ namespace mace { namespace cmt {
         bc::fcontext_t      my_context;
         cmt_context*        caller_context;
 
-        void (*start_func)(intptr_t);
-
         cmt_context( void (*sf)(intptr_t), bc::stack_allocator& alloc )
         : caller_context(0),
-          start_func(sf), 
-          next_blocked(0), next(0),
-          prom(0), canceled(false), m_complete(false)
+          m_complete(false),
+          prom(0), next_blocked(0), next(0), canceled(false)
         {
             my_context.fc_stack.base = alloc.allocate( bc::minimum_stacksize() );
             my_context.fc_stack.limit = 
               static_cast<char*>( my_context.fc_stack.base) - bc::minimum_stacksize();
-            make_fcontext( &my_context, start_func );
+            make_fcontext( &my_context, sf );
         }
 
         cmt_context()
         :caller_context(0),
-          start_func(0),
-          next_blocked(0), next(0),
-          prom(0), canceled(false), m_complete(false)
+          m_complete(false),
+          prom(0),
+          next_blocked(0), 
+          next(0), canceled(false)
         {}
         
         /**
@@ -102,28 +100,33 @@ namespace mace { namespace cmt {
 
     class thread_private {
         public:
-           boost::thread* boost_thread;
            thread_private(cmt::thread& s)
             :self(s), boost_thread(0),
+             task_in_queue(0),
+             task_in_queue_size(0),
+             done(false),
              current(0),
              ready_head(0),
              ready_tail(0),
-             blocked(0),
-             task_in_queue(0),
-             done(false)
+             blocked(0)
             { 
               name = boost::lexical_cast<std::string>(uint64_t(this));
             }
+           cmt::thread&             self;
+           boost::thread* boost_thread;
            bc::stack_allocator              stack_alloc;
            boost::mutex                     task_ready_mutex;
+           boost::mutex                     task_mutex;
            boost::condition_variable        task_ready;
 
-           boost::atomic<task*>             task_in_queue;
+           std::vector<task*>   test_stack;
+         //  boost::atomic<task*>             task_in_queue;
+           task*              task_in_queue;
+           boost::atomic<int>               task_in_queue_size;
            std::vector<task*>               task_pqueue;
            std::vector<task*>               task_sch_queue;
            std::vector<cmt_context*>        sleep_pqueue;
 
-           cmt::thread&             self;
            bool                      done;
            std::string               name;
            cmt_context*              current;
@@ -177,6 +180,7 @@ namespace mace { namespace cmt {
            };
 
            void enqueue( const task::ptr& t ) {
+                std::cerr<< "enqueue "<<t<<std::endl;
                 system_clock::time_point now = system_clock::now();
                 task::ptr cur = t;
                 while( cur ) {
@@ -186,15 +190,31 @@ namespace mace { namespace cmt {
                                     task_sch_queue.end(), task_when_less()   );
                   } else {
                     task_pqueue.push_back(cur);
+                    BOOST_ASSERT( this == thread::current().my );
+                    slog( "p_queue size: %1%  thread: %2%", task_pqueue.size(), name );
                     std::push_heap( task_pqueue.begin(),
                                     task_pqueue.end(), task_priority_less()   );
                   }
                     cur = cur->next;
                 }
            }
-           task::ptr dequeue() {
+           task* dequeue() {
                 // get a new task
-                task::ptr pending = task_in_queue.exchange(0,boost::memory_order_consume);
+                BOOST_ASSERT( this == thread::current().my );
+                
+                task* pending = 0; 
+                {
+                  boost::unique_lock<boost::mutex> lock(task_mutex);
+                  if( test_stack.size() ) {
+                    pending = test_stack.back();
+                    test_stack.pop_back();
+                  }
+                 // std::cout<<"dequeue "<<name<<" "<<pending<<"\n";
+                  return pending;
+                }
+                //pending = task_in_queue.exchange(0,boost::memory_order_consume);
+                return pending;
+                //std::cerr<<"pending: "<<task_in_queue.load()<<" "<<name<<std::endl;
                 if( pending ) { enqueue( pending ); }
 
                 task::ptr p(0);
@@ -203,14 +223,18 @@ namespace mace { namespace cmt {
                         p = task_sch_queue.front();
                         std::pop_heap(task_sch_queue.begin(), task_sch_queue.end(), task_when_less() );
                         task_sch_queue.pop_back();
+                    if( !p ) { elog( "!p!!" ); ::exit(1); }
                         return p;
                     }
                 }
                 if( task_pqueue.size() ) {
+                 // std::cerr<< "task_pqueue.size: "<< task_pqueue.size()<<std::endl;
                     p = task_pqueue.front();
                     std::pop_heap(task_pqueue.begin(), task_pqueue.end(), task_priority_less() );
                     task_pqueue.pop_back();
+                    if( !p ) { elog( "!p!!" ); ::exit(1); }
                 }
+                std::cerr<<name<<" dequeue "<<p<<std::endl;
                 return p;
            }
            
@@ -222,12 +246,17 @@ namespace mace { namespace cmt {
            bool start_next_task( bool reschedule = false ) {
               check_for_timeouts();
 
+
               // check to see if any other contexts are ready
               if( ready_head ) { 
                 cmt_context* next = ready_pop_front();
 
                 BOOST_ASSERT( next != current ); 
                 if( reschedule ) { 
+               if( !current ) {
+                 elog( "current = 0" );
+                  ::exit(1);
+               }
                     BOOST_ASSERT(current);
                     ready_push_back(current);
                 }
@@ -238,6 +267,7 @@ namespace mace { namespace cmt {
                 current = next;
                 bc::jump_fcontext( &prev->my_context, &next->my_context, 0 );
                 current = prev;
+                if( !current ) { elog( "!prev!!" ); }
 
                 // restore current context
               } else { // all contexts are blocked, create a new context 
@@ -254,6 +284,7 @@ namespace mace { namespace cmt {
                 current = next;
                 bc::jump_fcontext( &prev->my_context, &next->my_context, (intptr_t)this );
                 current = prev;
+                if( !current ) { elog( "!prev!!" ); }
                // slog( "back to %1%", current );
               }
 
@@ -270,21 +301,24 @@ namespace mace { namespace cmt {
 
            /**
             * Process tasks until everything is done...
-            */
            void process_tasks( ) {
-              system_clock::time_point timeout_time;
-              task::ptr next = dequeue();
 
+              system_clock::time_point timeout_time;
+              task* next = dequeue();
+              std::cout<<__LINE__<<" "<<name<<" " <<(int64_t)next<<std::endl;
               while( !done ) {
                 timeout_time = check_for_timeouts();
 
+                //std::cout<<__LINE__<<" "<<name<<" " <<(int64_t)next<<std::endl;
                 while( next ) {
                     next->set_active_context( current );
                     next->run();
+                    std::cout<<"run "<<name<<" "<<(int64_t)next <<std::endl;
                     next->set_active_context( 0 );
                     next->release();
                     timeout_time = check_for_timeouts();
                     next = dequeue();
+                    std::cout<<__LINE__<<" "<<name<<" " <<(int64_t)next<<std::endl;
                 }
 
                 if( !blocked && done ) { 
@@ -296,29 +330,72 @@ namespace mace { namespace cmt {
                     continue;
                 }
 
-                bool block_wait = false;
-
                 if( ready_head ) { 
+                  if( next ) { elog( "NEXT" ); exit(1); }
                   start_next_task(true);
-                  if( !(next = dequeue()) )  {
-                    block_wait = true;
-                  }
-                } else { block_wait = true; }
+                  if( next ) { elog( "NEXT" ); exit(1); }
+                  next = dequeue();
+                  std::cout<<__LINE__<<" "<<name<<" " <<(int64_t)next<<std::endl;
+                  if( next ) 
+                    continue;
+                } 
 
-                if( block_wait ) {
-               //   wlog( "%2% no task to run, block until task posted or %1%", 
-               //                 timeout_time - system_clock::now(), current );
-                  boost::unique_lock<boost::mutex> lock(task_ready_mutex);
-                  if( !(next = dequeue())) {
-                    if( timeout_time == system_clock::time_point::max() ) {
-                        task_ready.wait( lock );
-                    } else {
-                        task_ready.timed_wait( lock, to_system_time(timeout_time) );
-                    }
+                boost::unique_lock<boost::mutex> lock(task_ready_mutex);
+                if( next ) { elog( "NEXT" ); exit(1); }
+                next = dequeue();
+                std::cout<<__LINE__<<" "<<name<<" " <<(int64_t)next<<"  "<<(int64_t)current<<std::endl;
+                if( !next ) {
+                 // wlog( "%2% no task to run, block until task posted or %1%   next: %3% size %4%", 
+                 //               timeout_time - system_clock::now(), current, next, task_in_queue_size );
+                  if( timeout_time == system_clock::time_point::max() ) {
+                  //    std::cout<<name<<" wait "<<test_stack.size()<<std::endl;
+                      task_ready.wait( lock );
+                  } else {
+                      task_ready.timed_wait( lock, to_system_time(timeout_time) );
                   }
+                  next = dequeue();
+                  std::cout<<__LINE__<<" "<<name<<" " <<(int64_t)next<<std::endl;
                 }
               }
+              
              elog( "exit process tasks blocked %1%  !done %2%", blocked, !done );
+           }
+            */
+           bool run_next_task() {
+                system_clock::time_point timeout_time = check_for_timeouts();
+                task* next = dequeue();
+                if( next ) {
+                    next->set_active_context( current );
+                    next->run();
+                    next->set_active_context(0);
+                    next->release();
+                    return true;
+                }
+                return false;
+           }
+           bool has_next_task() {
+             boost::unique_lock<boost::mutex> lock(task_mutex);
+             if( test_stack.size() ) {
+               return true;
+             }
+             return false;
+           }
+           void process_tasks() {
+              while( !done ) {
+                if( run_next_task() ) continue;
+                if( ready_head ) {
+                  start_next_task(true);
+                  continue;
+                }
+                boost::unique_lock<boost::mutex> lock(task_ready_mutex);
+                if( has_next_task() ) continue;
+                system_clock::time_point timeout_time = check_for_timeouts();
+                if( timeout_time == system_clock::time_point::max() ) {
+                  task_ready.wait( lock );
+                } else if( timeout_time != system_clock::time_point::min() ) {
+                  task_ready.timed_wait( lock, to_system_time(timeout_time) );
+                }
+              }
            }
 
     };
@@ -380,11 +457,13 @@ namespace mace { namespace cmt {
         //slog( "starting cmt::thread %1%", n );
         p->set_value( &thread::current() );
         thread::current().set_name(n);
+        slog( "exec()" );
         exec();
         //wlog( "exiting cmt::thread" );
     }
 
     thread* thread::create( const char* n ) {
+      slog( "staring thread %1%", n );
         //if( current().my->current ) {
           promise<thread*>::ptr p(new promise<thread*>());
           boost::thread* t = new boost::thread( boost::bind(start_thread,p,n) );
@@ -499,11 +578,10 @@ namespace mace { namespace cmt {
         
         BOOST_ASSERT(p->ready());
         if( &current() != this )  {
-            async( boost::bind( &thread::notify, this, p ) );
+            //slog( "post notify to %1% from %2%", name(), current().name() );
+            this->async( boost::bind( &thread::notify, this, p ) );
             return;
         }
-     //   slog( "notify!" );
-
         // TODO: store a list of blocked contexts with the promise 
         //  to accelerate the lookup.... unless it introduces contention...
         
@@ -523,7 +601,7 @@ namespace mace { namespace cmt {
                     my->blocked = cur_blocked->next_blocked; 
                 }
                 cur_blocked->next_blocked = 0;
-               // slog( "ready push front %1%", cur_blocked );
+                //slog( "ready push front %1%", cur_blocked );
                 my->ready_push_front( cur_blocked );
                 cur_blocked =  cur_blocked->next_blocked;
             } else { // goto the next blocked task
@@ -550,7 +628,11 @@ namespace mace { namespace cmt {
      *  If a current context exists, process tasks until the queue is
      *  empty and then block.
      */
-    void thread::exec() { my->process_tasks(); }
+    void thread::exec() { 
+         slog( "process tasks current %1%", current );
+         if( !my->current ) my->current = new cmt_context();
+         my->process_tasks(); 
+    }
 
     bool thread::is_running()const {
       return my->current != NULL;
@@ -618,17 +700,27 @@ namespace mace { namespace cmt {
        async(task::ptr( new vtask(t,prio) ) );
     }
     void thread::async( const task::ptr& t ) {
-        //slog( "async..." );
-        task::ptr stale_head = my->task_in_queue.load(boost::memory_order_relaxed);
-        do {
-            t->next = stale_head;
-        }while( !my->task_in_queue.compare_exchange_weak( stale_head, t, boost::memory_order_release ) );
+        boost::unique_lock<boost::mutex> lock(my->task_ready_mutex);
+        {
+          boost::unique_lock<boost::mutex> lock(my->task_mutex);
+          my->test_stack.push_back(t);
+         // std::cout<<"enqueue "<<my->name<<" "<<(int64_t)t<<"\n";
+          /*
+          t->next = my->task_in_queue;
+          my->task_in_queue = t;
+          */
+          /*
+          task::ptr stale_head = my->task_in_queue.load(boost::memory_order_relaxed);
+          do { t->next = stale_head;
+          }while( !my->task_in_queue.compare_exchange_weak( stale_head, t, boost::memory_order_release ) );
+          */
+
+          //slog("posted task %1% to thread %2% task_in_queue %3%", t, name(), my->task_in_queue);
+        }
 
         if( this != &current() ) {
-            boost::unique_lock<boost::mutex> lock(my->task_ready_mutex);
             my->task_ready.notify_all();
         }
-        //slog( "return.." );
     }
     void yield() { thread::current().yield(); }
 
