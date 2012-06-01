@@ -71,8 +71,15 @@ namespace mace { namespace stub {
 #define MACE_STUB_VTABLE_VISIT_BASE( r, visitor, name ) \
   vtable_reflector<name,InterfaceDelegate>::visit( visitor );
 
+#ifndef WIN32
+  #define TEMPLATE template
+#else
+  #define TEMPLATE
+#endif
+
 #define MACE_STUB_VTABLE_VISIT_MEMBER( r, visitor, elem ) \
-  visitor.template operator()<BOOST_TYPEOF(&vtable_type::elem),&vtable_type::elem>( BOOST_PP_STRINGIZE(elem) );
+  visitor.TEMPLATE operator()<BOOST_TYPEOF(&vtable_type::elem),&vtable_type::elem>( BOOST_PP_STRINGIZE(elem) );
+ //visitor.template operator()<BOOST_TYPEOF(&vtable_type::elem),&vtable_type::elem>( BOOST_PP_STRINGIZE(elem) );
 
 // example of how to convert enumerate any BOOST_PP_SEQ, including BOOST_PP_SEQ_NIL
 #define MACE_STUB_SEQ_ENUM(X) \

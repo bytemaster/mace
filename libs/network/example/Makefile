@@ -8,7 +8,7 @@ default_target: all
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canonical targets will work.
+# Disable implicit rules so canoncical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -30,19 +30,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /opt/local/bin/cmake
+CMAKE_COMMAND = /usr/local/bin/cmake
 
 # The command to remove a file.
-RM = /opt/local/bin/cmake -E remove -f
+RM = /usr/local/bin/cmake -E remove -f
 
 # The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
+CMAKE_EDIT_COMMAND = /usr/local/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/dlarimer/projects/mace
+CMAKE_SOURCE_DIR = /root/mace
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/dlarimer/projects/mace
+CMAKE_BINARY_DIR = /root/mace
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -50,7 +50,7 @@ CMAKE_BINARY_DIR = /Users/dlarimer/projects/mace
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/opt/local/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/local/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -60,19 +60,19 @@ edit_cache/fast: edit_cache
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/opt/local/bin/cmake -P cmake_install.cmake
+	/usr/local/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/opt/local/bin/cmake -P cmake_install.cmake
+	/usr/local/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/opt/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/usr/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
@@ -82,7 +82,7 @@ install/local/fast: install/local
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/opt/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/usr/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
@@ -101,7 +101,7 @@ list_install_components/fast: list_install_components
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/opt/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -110,14 +110,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/dlarimer/projects/mace && $(CMAKE_COMMAND) -E cmake_progress_start /Users/dlarimer/projects/mace/CMakeFiles /Users/dlarimer/projects/mace/libs/network/example/CMakeFiles/progress.marks
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/dlarimer/projects/mace/CMakeFiles 0
+	cd /root/mace && $(CMAKE_COMMAND) -E cmake_progress_start /root/mace/CMakeFiles /root/mace/libs/network/example/CMakeFiles/progress.marks
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/mace/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/clean
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/clean
 .PHONY : clean
 
 # The main clean target
@@ -126,22 +126,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/preinstall
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/preinstall
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/dlarimer/projects/mace && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /root/mace && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 libs/network/example/CMakeFiles/atom_reader.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/atom_reader.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/atom_reader.dir/rule
 .PHONY : libs/network/example/CMakeFiles/atom_reader.dir/rule
 
 # Convenience name for target.
@@ -150,12 +150,12 @@ atom_reader: libs/network/example/CMakeFiles/atom_reader.dir/rule
 
 # fast build rule for target.
 atom_reader/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/build
 .PHONY : atom_reader/fast
 
 # Convenience name for target.
 libs/network/example/CMakeFiles/fileserver.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/fileserver.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/fileserver.dir/rule
 .PHONY : libs/network/example/CMakeFiles/fileserver.dir/rule
 
 # Convenience name for target.
@@ -164,12 +164,12 @@ fileserver: libs/network/example/CMakeFiles/fileserver.dir/rule
 
 # fast build rule for target.
 fileserver/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/fileserver.dir/build.make libs/network/example/CMakeFiles/fileserver.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/fileserver.dir/build.make libs/network/example/CMakeFiles/fileserver.dir/build
 .PHONY : fileserver/fast
 
 # Convenience name for target.
 libs/network/example/CMakeFiles/hello_world_client.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/hello_world_client.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/hello_world_client.dir/rule
 .PHONY : libs/network/example/CMakeFiles/hello_world_client.dir/rule
 
 # Convenience name for target.
@@ -178,12 +178,12 @@ hello_world_client: libs/network/example/CMakeFiles/hello_world_client.dir/rule
 
 # fast build rule for target.
 hello_world_client/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_client.dir/build.make libs/network/example/CMakeFiles/hello_world_client.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_client.dir/build.make libs/network/example/CMakeFiles/hello_world_client.dir/build
 .PHONY : hello_world_client/fast
 
 # Convenience name for target.
 libs/network/example/CMakeFiles/hello_world_server.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/hello_world_server.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/hello_world_server.dir/rule
 .PHONY : libs/network/example/CMakeFiles/hello_world_server.dir/rule
 
 # Convenience name for target.
@@ -192,12 +192,12 @@ hello_world_server: libs/network/example/CMakeFiles/hello_world_server.dir/rule
 
 # fast build rule for target.
 hello_world_server/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_server.dir/build.make libs/network/example/CMakeFiles/hello_world_server.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_server.dir/build.make libs/network/example/CMakeFiles/hello_world_server.dir/build
 .PHONY : hello_world_server/fast
 
 # Convenience name for target.
 libs/network/example/CMakeFiles/http_client.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/http_client.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/http_client.dir/rule
 .PHONY : libs/network/example/CMakeFiles/http_client.dir/rule
 
 # Convenience name for target.
@@ -206,12 +206,12 @@ http_client: libs/network/example/CMakeFiles/http_client.dir/rule
 
 # fast build rule for target.
 http_client/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/http_client.dir/build.make libs/network/example/CMakeFiles/http_client.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/http_client.dir/build.make libs/network/example/CMakeFiles/http_client.dir/build
 .PHONY : http_client/fast
 
 # Convenience name for target.
 libs/network/example/CMakeFiles/rss_reader.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/rss_reader.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/rss_reader.dir/rule
 .PHONY : libs/network/example/CMakeFiles/rss_reader.dir/rule
 
 # Convenience name for target.
@@ -220,12 +220,12 @@ rss_reader: libs/network/example/CMakeFiles/rss_reader.dir/rule
 
 # fast build rule for target.
 rss_reader/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/build
 .PHONY : rss_reader/fast
 
 # Convenience name for target.
 libs/network/example/CMakeFiles/simple_wget.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/simple_wget.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/simple_wget.dir/rule
 .PHONY : libs/network/example/CMakeFiles/simple_wget.dir/rule
 
 # Convenience name for target.
@@ -234,12 +234,12 @@ simple_wget: libs/network/example/CMakeFiles/simple_wget.dir/rule
 
 # fast build rule for target.
 simple_wget/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/simple_wget.dir/build.make libs/network/example/CMakeFiles/simple_wget.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/simple_wget.dir/build.make libs/network/example/CMakeFiles/simple_wget.dir/build
 .PHONY : simple_wget/fast
 
 # Convenience name for target.
 libs/network/example/CMakeFiles/twitter_search.dir/rule:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/twitter_search.dir/rule
+	cd /root/mace && $(MAKE) -f CMakeFiles/Makefile2 libs/network/example/CMakeFiles/twitter_search.dir/rule
 .PHONY : libs/network/example/CMakeFiles/twitter_search.dir/rule
 
 # Convenience name for target.
@@ -248,7 +248,7 @@ twitter_search: libs/network/example/CMakeFiles/twitter_search.dir/rule
 
 # fast build rule for target.
 twitter_search/fast:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/twitter_search.dir/build.make libs/network/example/CMakeFiles/twitter_search.dir/build
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/twitter_search.dir/build.make libs/network/example/CMakeFiles/twitter_search.dir/build
 .PHONY : twitter_search/fast
 
 atom/atom.o: atom/atom.cpp.o
@@ -256,7 +256,7 @@ atom/atom.o: atom/atom.cpp.o
 
 # target to build an object file
 atom/atom.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/atom.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/atom.cpp.o
 .PHONY : atom/atom.cpp.o
 
 atom/atom.i: atom/atom.cpp.i
@@ -264,7 +264,7 @@ atom/atom.i: atom/atom.cpp.i
 
 # target to preprocess a source file
 atom/atom.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/atom.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/atom.cpp.i
 .PHONY : atom/atom.cpp.i
 
 atom/atom.s: atom/atom.cpp.s
@@ -272,7 +272,7 @@ atom/atom.s: atom/atom.cpp.s
 
 # target to generate assembly for a file
 atom/atom.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/atom.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/atom.cpp.s
 .PHONY : atom/atom.cpp.s
 
 atom/main.o: atom/main.cpp.o
@@ -280,7 +280,7 @@ atom/main.o: atom/main.cpp.o
 
 # target to build an object file
 atom/main.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/main.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/main.cpp.o
 .PHONY : atom/main.cpp.o
 
 atom/main.i: atom/main.cpp.i
@@ -288,7 +288,7 @@ atom/main.i: atom/main.cpp.i
 
 # target to preprocess a source file
 atom/main.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/main.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/main.cpp.i
 .PHONY : atom/main.cpp.i
 
 atom/main.s: atom/main.cpp.s
@@ -296,7 +296,7 @@ atom/main.s: atom/main.cpp.s
 
 # target to generate assembly for a file
 atom/main.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/main.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/atom_reader.dir/build.make libs/network/example/CMakeFiles/atom_reader.dir/atom/main.cpp.s
 .PHONY : atom/main.cpp.s
 
 http/fileserver.o: http/fileserver.cpp.o
@@ -304,7 +304,7 @@ http/fileserver.o: http/fileserver.cpp.o
 
 # target to build an object file
 http/fileserver.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/fileserver.dir/build.make libs/network/example/CMakeFiles/fileserver.dir/http/fileserver.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/fileserver.dir/build.make libs/network/example/CMakeFiles/fileserver.dir/http/fileserver.cpp.o
 .PHONY : http/fileserver.cpp.o
 
 http/fileserver.i: http/fileserver.cpp.i
@@ -312,7 +312,7 @@ http/fileserver.i: http/fileserver.cpp.i
 
 # target to preprocess a source file
 http/fileserver.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/fileserver.dir/build.make libs/network/example/CMakeFiles/fileserver.dir/http/fileserver.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/fileserver.dir/build.make libs/network/example/CMakeFiles/fileserver.dir/http/fileserver.cpp.i
 .PHONY : http/fileserver.cpp.i
 
 http/fileserver.s: http/fileserver.cpp.s
@@ -320,7 +320,7 @@ http/fileserver.s: http/fileserver.cpp.s
 
 # target to generate assembly for a file
 http/fileserver.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/fileserver.dir/build.make libs/network/example/CMakeFiles/fileserver.dir/http/fileserver.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/fileserver.dir/build.make libs/network/example/CMakeFiles/fileserver.dir/http/fileserver.cpp.s
 .PHONY : http/fileserver.cpp.s
 
 http/hello_world_client.o: http/hello_world_client.cpp.o
@@ -328,7 +328,7 @@ http/hello_world_client.o: http/hello_world_client.cpp.o
 
 # target to build an object file
 http/hello_world_client.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_client.dir/build.make libs/network/example/CMakeFiles/hello_world_client.dir/http/hello_world_client.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_client.dir/build.make libs/network/example/CMakeFiles/hello_world_client.dir/http/hello_world_client.cpp.o
 .PHONY : http/hello_world_client.cpp.o
 
 http/hello_world_client.i: http/hello_world_client.cpp.i
@@ -336,7 +336,7 @@ http/hello_world_client.i: http/hello_world_client.cpp.i
 
 # target to preprocess a source file
 http/hello_world_client.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_client.dir/build.make libs/network/example/CMakeFiles/hello_world_client.dir/http/hello_world_client.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_client.dir/build.make libs/network/example/CMakeFiles/hello_world_client.dir/http/hello_world_client.cpp.i
 .PHONY : http/hello_world_client.cpp.i
 
 http/hello_world_client.s: http/hello_world_client.cpp.s
@@ -344,7 +344,7 @@ http/hello_world_client.s: http/hello_world_client.cpp.s
 
 # target to generate assembly for a file
 http/hello_world_client.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_client.dir/build.make libs/network/example/CMakeFiles/hello_world_client.dir/http/hello_world_client.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_client.dir/build.make libs/network/example/CMakeFiles/hello_world_client.dir/http/hello_world_client.cpp.s
 .PHONY : http/hello_world_client.cpp.s
 
 http/hello_world_server.o: http/hello_world_server.cpp.o
@@ -352,7 +352,7 @@ http/hello_world_server.o: http/hello_world_server.cpp.o
 
 # target to build an object file
 http/hello_world_server.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_server.dir/build.make libs/network/example/CMakeFiles/hello_world_server.dir/http/hello_world_server.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_server.dir/build.make libs/network/example/CMakeFiles/hello_world_server.dir/http/hello_world_server.cpp.o
 .PHONY : http/hello_world_server.cpp.o
 
 http/hello_world_server.i: http/hello_world_server.cpp.i
@@ -360,7 +360,7 @@ http/hello_world_server.i: http/hello_world_server.cpp.i
 
 # target to preprocess a source file
 http/hello_world_server.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_server.dir/build.make libs/network/example/CMakeFiles/hello_world_server.dir/http/hello_world_server.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_server.dir/build.make libs/network/example/CMakeFiles/hello_world_server.dir/http/hello_world_server.cpp.i
 .PHONY : http/hello_world_server.cpp.i
 
 http/hello_world_server.s: http/hello_world_server.cpp.s
@@ -368,7 +368,7 @@ http/hello_world_server.s: http/hello_world_server.cpp.s
 
 # target to generate assembly for a file
 http/hello_world_server.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_server.dir/build.make libs/network/example/CMakeFiles/hello_world_server.dir/http/hello_world_server.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/hello_world_server.dir/build.make libs/network/example/CMakeFiles/hello_world_server.dir/http/hello_world_server.cpp.s
 .PHONY : http/hello_world_server.cpp.s
 
 http_client.o: http_client.cpp.o
@@ -376,7 +376,7 @@ http_client.o: http_client.cpp.o
 
 # target to build an object file
 http_client.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/http_client.dir/build.make libs/network/example/CMakeFiles/http_client.dir/http_client.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/http_client.dir/build.make libs/network/example/CMakeFiles/http_client.dir/http_client.cpp.o
 .PHONY : http_client.cpp.o
 
 http_client.i: http_client.cpp.i
@@ -384,7 +384,7 @@ http_client.i: http_client.cpp.i
 
 # target to preprocess a source file
 http_client.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/http_client.dir/build.make libs/network/example/CMakeFiles/http_client.dir/http_client.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/http_client.dir/build.make libs/network/example/CMakeFiles/http_client.dir/http_client.cpp.i
 .PHONY : http_client.cpp.i
 
 http_client.s: http_client.cpp.s
@@ -392,7 +392,7 @@ http_client.s: http_client.cpp.s
 
 # target to generate assembly for a file
 http_client.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/http_client.dir/build.make libs/network/example/CMakeFiles/http_client.dir/http_client.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/http_client.dir/build.make libs/network/example/CMakeFiles/http_client.dir/http_client.cpp.s
 .PHONY : http_client.cpp.s
 
 rss/main.o: rss/main.cpp.o
@@ -400,7 +400,7 @@ rss/main.o: rss/main.cpp.o
 
 # target to build an object file
 rss/main.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/main.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/main.cpp.o
 .PHONY : rss/main.cpp.o
 
 rss/main.i: rss/main.cpp.i
@@ -408,7 +408,7 @@ rss/main.i: rss/main.cpp.i
 
 # target to preprocess a source file
 rss/main.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/main.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/main.cpp.i
 .PHONY : rss/main.cpp.i
 
 rss/main.s: rss/main.cpp.s
@@ -416,7 +416,7 @@ rss/main.s: rss/main.cpp.s
 
 # target to generate assembly for a file
 rss/main.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/main.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/main.cpp.s
 .PHONY : rss/main.cpp.s
 
 rss/rss.o: rss/rss.cpp.o
@@ -424,7 +424,7 @@ rss/rss.o: rss/rss.cpp.o
 
 # target to build an object file
 rss/rss.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/rss.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/rss.cpp.o
 .PHONY : rss/rss.cpp.o
 
 rss/rss.i: rss/rss.cpp.i
@@ -432,7 +432,7 @@ rss/rss.i: rss/rss.cpp.i
 
 # target to preprocess a source file
 rss/rss.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/rss.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/rss.cpp.i
 .PHONY : rss/rss.cpp.i
 
 rss/rss.s: rss/rss.cpp.s
@@ -440,7 +440,7 @@ rss/rss.s: rss/rss.cpp.s
 
 # target to generate assembly for a file
 rss/rss.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/rss.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/rss_reader.dir/build.make libs/network/example/CMakeFiles/rss_reader.dir/rss/rss.cpp.s
 .PHONY : rss/rss.cpp.s
 
 simple_wget.o: simple_wget.cpp.o
@@ -448,7 +448,7 @@ simple_wget.o: simple_wget.cpp.o
 
 # target to build an object file
 simple_wget.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/simple_wget.dir/build.make libs/network/example/CMakeFiles/simple_wget.dir/simple_wget.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/simple_wget.dir/build.make libs/network/example/CMakeFiles/simple_wget.dir/simple_wget.cpp.o
 .PHONY : simple_wget.cpp.o
 
 simple_wget.i: simple_wget.cpp.i
@@ -456,7 +456,7 @@ simple_wget.i: simple_wget.cpp.i
 
 # target to preprocess a source file
 simple_wget.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/simple_wget.dir/build.make libs/network/example/CMakeFiles/simple_wget.dir/simple_wget.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/simple_wget.dir/build.make libs/network/example/CMakeFiles/simple_wget.dir/simple_wget.cpp.i
 .PHONY : simple_wget.cpp.i
 
 simple_wget.s: simple_wget.cpp.s
@@ -464,7 +464,7 @@ simple_wget.s: simple_wget.cpp.s
 
 # target to generate assembly for a file
 simple_wget.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/simple_wget.dir/build.make libs/network/example/CMakeFiles/simple_wget.dir/simple_wget.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/simple_wget.dir/build.make libs/network/example/CMakeFiles/simple_wget.dir/simple_wget.cpp.s
 .PHONY : simple_wget.cpp.s
 
 twitter/search.o: twitter/search.cpp.o
@@ -472,7 +472,7 @@ twitter/search.o: twitter/search.cpp.o
 
 # target to build an object file
 twitter/search.cpp.o:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/twitter_search.dir/build.make libs/network/example/CMakeFiles/twitter_search.dir/twitter/search.cpp.o
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/twitter_search.dir/build.make libs/network/example/CMakeFiles/twitter_search.dir/twitter/search.cpp.o
 .PHONY : twitter/search.cpp.o
 
 twitter/search.i: twitter/search.cpp.i
@@ -480,7 +480,7 @@ twitter/search.i: twitter/search.cpp.i
 
 # target to preprocess a source file
 twitter/search.cpp.i:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/twitter_search.dir/build.make libs/network/example/CMakeFiles/twitter_search.dir/twitter/search.cpp.i
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/twitter_search.dir/build.make libs/network/example/CMakeFiles/twitter_search.dir/twitter/search.cpp.i
 .PHONY : twitter/search.cpp.i
 
 twitter/search.s: twitter/search.cpp.s
@@ -488,7 +488,7 @@ twitter/search.s: twitter/search.cpp.s
 
 # target to generate assembly for a file
 twitter/search.cpp.s:
-	cd /Users/dlarimer/projects/mace && $(MAKE) -f libs/network/example/CMakeFiles/twitter_search.dir/build.make libs/network/example/CMakeFiles/twitter_search.dir/twitter/search.cpp.s
+	cd /root/mace && $(MAKE) -f libs/network/example/CMakeFiles/twitter_search.dir/build.make libs/network/example/CMakeFiles/twitter_search.dir/twitter/search.cpp.s
 .PHONY : twitter/search.cpp.s
 
 # Help Target
@@ -552,6 +552,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/dlarimer/projects/mace && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /root/mace && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

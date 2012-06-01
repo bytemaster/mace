@@ -1,0 +1,2 @@
+1) construct value_ref and value_cref from value
+2) added functor support to values
