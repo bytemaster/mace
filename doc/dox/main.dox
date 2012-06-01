@@ -43,8 +43,33 @@
 
   @section mace_install Installing MACE
 
+  MACE has been tested on Linux, Mac OS X, and Windows 7.
+
+  @subsection mace_windows7 Windows 7 Install
+
+  In order to build Boost.Context, which uses ASM files, you must run the following commands from
+  the Visual Studio Command Prompt.  This has been tested and known to work with Visual Studio 2010 Express.
+
+  @code
+    cd mace
+    cmake -G "NMake Makefiles" 
+    nmake 
+    nmake install
+  @endcode
+
+  @subsection mace_unix Mac OS X / Linux Instructions
+
   On Linux/Mac OS X MACE will install to <code>/usr/local/mace/include</code> and <code>/usr/local/mace/lib</code> so
   you will need to add those directories to your include and library search paths.
+
+  @code
+    cd mace
+    cmake .
+    make -j2
+    make install
+  @code
+
+  Simple as pie.
 
   @subsection mace_dependencies Dependencies 
 
