@@ -158,34 +158,24 @@ Mac OS X / Linux Instructions</h3>
     cmake .
     make -j2
     make install
-  @code
-
-  Simple as pie.
-
-  @subsection mace_dependencies Dependencies 
-
-    @li CMake
-    @li boost 1.47 or newer
-    @li boost.context (included)
-    @li boost.atomic (included)
-    @li boost.move (included)
-    @li boost.network (inclued, from cpp-netlib)
-
-  When Boost 1.50 is released it should include some of these libraries (like Boost.Context) and they will
-  no longer be included.
-
-  @subsection mace_download  Download 
-
-  The current version is  &lt;a href=&quot;&quot;&gt;mace-1.0.0&lt;/a&gt;.
-
-  Version numbers have the following meaning: MAJOR.MINOR.PATCH where Major version 
-  is bumped anytime the API breaks, minor version is bumped any time new methods are added, 
-  and patch is updated for bug fixes.
-
-  You can clone the latest version from github and initilize it as follows.
-
-  @code
-    git clone https:<span class="comment">//github.com/bytemaster/mace</span>
+</pre></div><p>Simple as pie.</p>
+<h3><a class="anchor" id="mace_dependencies"></a>
+Dependencies</h3>
+<ul>
+<li>CMake </li>
+<li>boost 1.47 or newer </li>
+<li>boost.context (included) </li>
+<li>boost.atomic (included) </li>
+<li>boost.move (included) </li>
+<li>boost.network (inclued, from cpp-netlib)</li>
+</ul>
+<p>When Boost 1.50 is released it should include some of these libraries (like Boost.Context) and they will no longer be included.</p>
+<h3><a class="anchor" id="mace_download"></a>
+Download</h3>
+<p>The current version is <a href="">mace-1.0.0</a>.</p>
+<p>Version numbers have the following meaning: MAJOR.MINOR.PATCH where Major version is bumped anytime the API breaks, minor version is bumped any time new methods are added, and patch is updated for bug fixes.</p>
+<p>You can clone the latest version from github and initilize it as follows.</p>
+<div class="fragment"><pre class="fragment">    git clone https:<span class="comment">//github.com/bytemaster/mace</span>
     cd mace
     git submodule init
     git submodule update
