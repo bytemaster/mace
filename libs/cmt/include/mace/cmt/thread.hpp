@@ -42,8 +42,8 @@ namespace cmt {
     * maximum number of simultaniously waiting asynchronous operations.  
     *
     * @todo perform 'garbage collection' on idle stacks, perhaps before entering a blocking wait.
-    * @todo ensure all stacks get 'unwound' 
-    * @todo free all stacks when thread is deleted.
+    *   Idle stacks would be any stack that is 'ready' and not blocking and would simply take
+    *   turns processing new tasks.  
     *
     * These todo items may be ignored so long as you use 'long-lived' threads and
     * keep the maximum number of simultanous 'blocked' tasks to something reasonable.  
@@ -89,7 +89,7 @@ namespace cmt {
                                 priority prio = priority(), const char* n= "" ) {
                    typename promise<T>::ptr p(new promise<T>());
                    task::ptr tsk( new rtask<T>(f,p,when,std::max(current_priority(),prio),n) );
-                   async(tsk);
+                   async_task(tsk);
                    return p;
             }
             /**
@@ -105,7 +105,7 @@ namespace cmt {
             void schedule( const boost::function<void()>& f, const system_clock::time_point& when, 
                                                     priority prio = priority(), const char* n= "" ) {
                    task::ptr tsk( new vtask(f,when,std::max(current_priority(),prio),n) );
-                   async(tsk);
+                   async_task(tsk);
             }
 
             /**
@@ -116,12 +116,13 @@ namespace cmt {
              *  @param prio the priority relative to other tasks
              *  @param n a debut name to associate with this task.
              */
-            template<typename T>
-            future<T> async( const boost::function<T()>& f, priority prio = priority(), const char* n= "" ) {
-                   typename promise<T>::ptr p(new promise<T>());
-                   task::ptr tsk( new rtask<T>(f,p,std::max(current_priority(),prio),n) );
-                   async(tsk);
-                   return p;
+            template<typename Functor>
+            auto async( const Functor& f, priority prio = priority(), const char* n= "" ) -> future<decltype(f())> {
+               typedef decltype(f()) Result;
+               typename promise<Result>::ptr p(new promise<Result>());
+               task::ptr tsk( new rtask<Result>(f,p,std::max(current_priority(),prio),n) );
+               async_task(tsk);
+               return p;
             }
 
             /**
@@ -131,7 +132,7 @@ namespace cmt {
              *  @param p - the priority of a task.
              *  @param t - the task to be run.
              */
-            void async( const boost::function<void()>& t, priority p = priority() );
+            //void async( const boost::function<void()>& t, priority p = priority() );
             
             /**
              *  This method will cancel all pending tasks causing them to throw cmt::error::thread_quit.
@@ -181,17 +182,17 @@ namespace cmt {
             thread();
 
             friend class promise_base;
-            void async( const task::ptr& t );
+            void async_task( const task::ptr& t );
             class thread_private* my;
    };
 
    template<typename T>
    future<T> async( const boost::function<T()>& t, const char* n, priority prio=priority()) {
-        return cmt::thread::current().async<T>(t,(std::max)(current_priority(),prio),n);
+        return cmt::thread::current().async(t,(std::max)(current_priority(),prio),n);
    }
    template<typename T>
    future<T> async( const boost::function<T()>& t, priority prio=priority(), const char* n = "") {
-        return cmt::thread::current().async<T>(t,(std::max)(current_priority(),prio),n);
+        return cmt::thread::current().async(t,(std::max)(current_priority(),prio),n);
    }
    template<typename T>
    T sync( const boost::function<T()>& t, const char* n, priority prio = current_priority(), const microseconds& timeout_us = microseconds::max()) {

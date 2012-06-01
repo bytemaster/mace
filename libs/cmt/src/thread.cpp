@@ -36,13 +36,18 @@ namespace mace { namespace cmt {
 
         bc::fcontext_t      my_context;
         cmt_context*        caller_context;
+        cmt_context*        exit_context;
+        bc::stack_allocator* stack_alloc;
 
-        cmt_context( void (*sf)(intptr_t), bc::stack_allocator& alloc )
+        cmt_context( void (*sf)(intptr_t), bc::stack_allocator& alloc, cmt_context* on_exit )
         : caller_context(0),
+          exit_context(on_exit),
+          stack_alloc(&alloc),
           m_complete(false),
           prom(0), next_blocked(0), next(0), canceled(false)
         {
             my_context.fc_stack.base = alloc.allocate( bc::minimum_stacksize() );
+            slog( "new stack %1% bytes at %2%", bc::minimum_stacksize(), my_context.fc_stack.base );
             my_context.fc_stack.limit = 
               static_cast<char*>( my_context.fc_stack.base) - bc::minimum_stacksize();
             make_fcontext( &my_context, sf );
@@ -50,11 +55,20 @@ namespace mace { namespace cmt {
 
         cmt_context()
         :caller_context(0),
+         exit_context(0),
+          stack_alloc(0),
           m_complete(false),
           prom(0),
           next_blocked(0), 
           next(0), canceled(false)
         {}
+
+        ~cmt_context() {
+          if(stack_alloc) {
+              stack_alloc->deallocate( my_context.fc_stack.base, bc::minimum_stacksize() );
+              slog("deallocate stack" );
+          }
+        }
         
         /**
          *  @todo Have a list of promises so that we can wait for
@@ -122,6 +136,7 @@ namespace mace { namespace cmt {
            std::vector<task*>               task_pqueue;
            std::vector<task*>               task_sch_queue;
            std::vector<cmt_context*>        sleep_pqueue;
+           std::vector<cmt_context*>        free_list;
 
            bool                      done;
            std::string               name;
@@ -223,9 +238,9 @@ namespace mace { namespace cmt {
             *   If none are available then create a new context and
             *   have it wait for something to do.
             */
-           bool start_next_task( bool reschedule = false ) {
+           bool start_next_fiber( bool reschedule = false ) {
               check_for_timeouts();
-              BOOST_ASSERT(current);
+              if( !current ) current = new cmt_context();
 
               // check to see if any other contexts are ready
               if( ready_head ) { 
@@ -243,7 +258,7 @@ namespace mace { namespace cmt {
                        // that will process posted tasks...
                 if( reschedule )  ready_push_back(current);
 
-                cmt_context* next = new cmt_context( &thread_private::start_process_tasks, stack_alloc );
+                cmt_context* next = new cmt_context( &thread_private::start_process_tasks, stack_alloc, current );
                 cmt_context* prev = current;
                 current = next;
                 bc::jump_fcontext( &prev->my_context, &next->my_context, (intptr_t)this );
@@ -259,7 +274,18 @@ namespace mace { namespace cmt {
 
            static void start_process_tasks( intptr_t my ) {
               thread_private* self = (thread_private*)my;
-              self->process_tasks();
+              try {
+                self->process_tasks();
+              } catch ( ... ) {
+                //elog( "Unhandled fiber exception!" );
+              }
+              //elog( "exit fiber!" );
+              cmt_context* prev = self->current;
+              cmt_context* current = prev->exit_context;
+              // TODO: move prev to 'free list'
+              // jump to the exit context... 
+              self->free_list.push_back(prev);
+              bc::jump_fcontext( &prev->my_context, &current->my_context, 0 );
            }
 
            bool run_next_task() {
@@ -281,15 +307,23 @@ namespace mace { namespace cmt {
                   return true;
              return false;
            }
+           void clear_free_list() {
+              for( uint32_t i = 0; i < free_list.size(); ++i ) {
+                delete free_list[i];
+              }
+              free_list.clear();
+           }
            void process_tasks() {
               while( !done || blocked ) {
                 if( run_next_task() ) continue;
-                if( ready_head ) { start_next_task(true); continue; }
+                if( ready_head ) { start_next_fiber(true); continue; }
+
+                clear_free_list();
 
                 boost::unique_lock<boost::mutex> lock(task_ready_mutex);
                 if( has_next_task() ) continue;
-
                 system_clock::time_point timeout_time = check_for_timeouts();
+
                 if( timeout_time == system_clock::time_point::max() ) {
                   task_ready.wait( lock );
                 } else if( timeout_time != system_clock::time_point::min() ) {
@@ -354,9 +388,13 @@ namespace mace { namespace cmt {
     }
 
     void start_thread( const promise<thread*>::ptr p, const char* n  ) {
-      p->set_value( &thread::current() );
-      thread::current().set_name(n);
-      exec();
+      try {
+        p->set_value( &thread::current() );
+        thread::current().set_name(n);
+        exec();
+      } catch ( ... ) {
+        elog( "Caught unhandled exception" );
+      }
     }
 
     thread* thread::create( const char* n ) {
@@ -401,7 +439,7 @@ namespace mace { namespace cmt {
       std::push_heap( my->sleep_pqueue.begin(),
                       my->sleep_pqueue.end(), sleep_priority_less()   );
 
-      my->start_next_task();
+      my->start_next_fiber();
 
       my->current->resume_time = system_clock::time_point::max();
       
@@ -439,7 +477,7 @@ namespace mace { namespace cmt {
       }
       //slog( "blocking %1%", my->current );
       my->add_to_blocked( my->current );
-      my->start_next_task();
+      my->start_next_fiber();
       //slog( "resuming %1%", my->current );
 
       my->current->remove_blocking_promise(p.get());
@@ -532,12 +570,12 @@ namespace mace { namespace cmt {
      *   tasks have yielded at least once.
      */
     void thread::yield() {
-        my->start_next_task(true);
+        my->start_next_fiber(true);
     }
 
     void thread::quit() {
         if( &current() != this ) {
-            async<void>( boost::bind( &thread::quit, this ) ).wait();
+            async( boost::bind( &thread::quit, this ) ).wait();
             if( my->boost_thread ) {
               //slog("%2% joining thread... %1%", this->name(), current().name() );
               my->boost_thread->join();
@@ -553,6 +591,7 @@ namespace mace { namespace cmt {
             //cur = my->blocked;
             cur = cur->next;
         }
+        my->blocked = 0;
         cur = my->ready_head;
         while( cur ) {
           cur->canceled = true;
@@ -565,15 +604,22 @@ namespace mace { namespace cmt {
         }
         my->sleep_pqueue.clear();
 
-        my->done = true;
-        my->task_ready.notify_all();
+        {
+          boost::unique_lock<boost::mutex> lock(my->task_ready_mutex);
+          my->done = true;
+          my->task_ready.notify_all();
+        }
+        // now that we have poked all fibers... switch to the next one and
+        // let them all quit.
+        if( my->ready_head ) { my->start_next_fiber(true); }
+        my->clear_free_list();
     }
 
 
-    void thread::async( const boost::function<void()>& t, priority prio ) {
-       async(task::ptr( new vtask(t,prio) ) );
-    }
-    void thread::async( const task::ptr& t ) {
+    //void thread::async( const boost::function<void()>& t, priority prio ) {
+    //   async(task::ptr( new vtask(t,prio) ) );
+    //}
+    void thread::async_task( const task::ptr& t ) {
         task::ptr stale_head = my->task_in_queue.load(boost::memory_order_relaxed);
         do { t->next = stale_head;
         }while( !my->task_in_queue.compare_exchange_weak( stale_head, t, boost::memory_order_release ) );
