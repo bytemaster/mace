@@ -6,13 +6,27 @@
 <title>MACE: mace::cmt::thread Class Reference</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="style.css" rel="stylesheet" type="text/css" />
 
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
   $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-32339400-1']);
+      _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                      })();
+
 </script>
 
 </head>
@@ -219,7 +233,7 @@ template&lt;typename T &gt; </div>
 <p>Calls function </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">f</td><td>in this thread and returns a future&lt;T&gt; that can be used to wait on the result. If async is called from a thread not currently calling exec() then the future will block on a mutex/wait condition. If async is called from a thread running exec() then it will block 'cooperatively' and allow other tasks to run in that thread until this thread has returned a result.</td></tr>
+    <tr><td class="paramname">f</td><td>in this thread and returns a future&lt;T&gt; that can be used to wait on the result.</td></tr>
     <tr><td class="paramname">f</td><td></td></tr>
     <tr><td class="paramname">prio</td><td></td></tr>
     <tr><td class="paramname">n</td><td>a human readable string to associate with this task. </td></tr>
@@ -227,7 +241,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00097">97</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00087">87</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
 </div>
 </div>
@@ -272,13 +286,7 @@ template&lt;typename T &gt; </div>
 <p>Calls function </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">f</td><td>in this thread and returns a future&lt;T&gt; that can be used to wait on the result. If async is called from a thread not currently calling exec() then the future will block on a mutex/wait condition. If async is called from a thread running exec() then it will block 'cooperatively' and allow other tasks to run in that thread until this thread has returned a result.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note:</dt><dd>Calling mace::cmt::async(...).wait() in a thread before calling exec will block that thread forever because the thread will not get a chance to process the call before blocking the thread.</dd></dl>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
+    <tr><td class="paramname">f</td><td>in this thread and returns a future&lt;T&gt; that can be used to wait on the result.</td></tr>
     <tr><td class="paramname">f</td><td>the method to be called </td></tr>
     <tr><td class="paramname">prio</td><td>the priority of this method relative to others </td></tr>
     <tr><td class="paramname">when</td><td>- determines when this call will happen, as soon as possible after <code>when</code> </td></tr>
@@ -286,7 +294,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00071">71</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00065">65</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
 </div>
 </div>
@@ -294,16 +302,13 @@ template&lt;typename T &gt; </div>
 <li>libs/cmt/include/mace/cmt/<a class="el" href="thread_8hpp_source.html">thread.hpp</a></li>
 </ul>
 </div><!-- contents -->
-<script type="text/javascript">
 
-  var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-2423876-2']);
-      _gaq.push(['_trackPageview']);
 
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                      })();
+<hr class="footer"/><address class="footer"><small>
+Generated on Fri Jun 1 2012 10:20:40 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.0
+</small></address>
 
-                      </script>
+</body>
+</html>

@@ -6,13 +6,27 @@
 <title>MACE: libs/cmt/include/mace/cmt/thread.hpp Source File</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="style.css" rel="stylesheet" type="text/css" />
 
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
   $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-32339400-1']);
+      _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                      })();
+
 </script>
 
 </head>
@@ -137,107 +151,103 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00052"></a>00052             <span class="keyword">static</span> <a class="code" href="classmace_1_1cmt_1_1thread.html" title="manages cooperative scheduling of tasks within a single operating system thread.">thread</a>* create( <span class="keyword">const</span> <span class="keywordtype">char</span>* name = <span class="stringliteral">&quot;&quot;</span>  );
 <a name="l00053"></a>00053 
 <a name="l00054"></a>00054 
-<a name="l00070"></a>00070             <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00071"></a><a class="code" href="classmace_1_1cmt_1_1thread.html#a748e326554562464be7aabb3f3c458e0">00071</a>             <a class="code" href="classmace_1_1cmt_1_1future.html" title="placeholder for the result of an asynchronous operation.">future&lt;T&gt;</a> <a class="code" href="classmace_1_1cmt_1_1thread.html#a748e326554562464be7aabb3f3c458e0">schedule</a>( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; f, <span class="keyword">const</span> system_clock::time_point&amp; when, priority prio = priority(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n= <span class="stringliteral">&quot;&quot;</span> ) {
-<a name="l00072"></a>00072                    <span class="keyword">typename</span> promise&lt;T&gt;::ptr p(<span class="keyword">new</span> <a class="code" href="classmace_1_1cmt_1_1promise.html">promise&lt;T&gt;</a>());
-<a name="l00073"></a>00073                    task::ptr tsk( <span class="keyword">new</span> rtask&lt;T&gt;(f,p,when,std::max(current_priority(),prio),n) );
-<a name="l00074"></a>00074                    async(tsk);
-<a name="l00075"></a>00075                    <span class="keywordflow">return</span> p;
+<a name="l00064"></a>00064             <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00065"></a><a class="code" href="classmace_1_1cmt_1_1thread.html#a748e326554562464be7aabb3f3c458e0">00065</a>             <a class="code" href="classmace_1_1cmt_1_1future.html" title="placeholder for the result of an asynchronous operation.">future&lt;T&gt;</a> <a class="code" href="classmace_1_1cmt_1_1thread.html#a748e326554562464be7aabb3f3c458e0">schedule</a>( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; f, <span class="keyword">const</span> system_clock::time_point&amp; when, 
+<a name="l00066"></a>00066                                 priority prio = priority(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n= <span class="stringliteral">&quot;&quot;</span> ) {
+<a name="l00067"></a>00067                    <span class="keyword">typename</span> promise&lt;T&gt;::ptr p(<span class="keyword">new</span> <a class="code" href="classmace_1_1cmt_1_1promise.html">promise&lt;T&gt;</a>());
+<a name="l00068"></a>00068                    task::ptr tsk( <span class="keyword">new</span> rtask&lt;T&gt;(f,p,when,std::max(current_priority(),prio),n) );
+<a name="l00069"></a>00069                    async(tsk);
+<a name="l00070"></a>00070                    <span class="keywordflow">return</span> p;
+<a name="l00071"></a>00071             }
+<a name="l00072"></a>00072             <span class="keywordtype">void</span> <a class="code" href="classmace_1_1cmt_1_1thread.html#a748e326554562464be7aabb3f3c458e0">schedule</a>( <span class="keyword">const</span> boost::function&lt;<span class="keywordtype">void</span>()&gt;&amp; f, <span class="keyword">const</span> system_clock::time_point&amp; when, 
+<a name="l00073"></a>00073                                                     priority prio = priority(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n= <span class="stringliteral">&quot;&quot;</span> ) {
+<a name="l00074"></a>00074                    task::ptr tsk( <span class="keyword">new</span> vtask(f,when,std::max(current_priority(),prio),n) );
+<a name="l00075"></a>00075                    async(tsk);
 <a name="l00076"></a>00076             }
-<a name="l00077"></a>00077             <span class="keywordtype">void</span> <a class="code" href="classmace_1_1cmt_1_1thread.html#a748e326554562464be7aabb3f3c458e0">schedule</a>( <span class="keyword">const</span> boost::function&lt;<span class="keywordtype">void</span>()&gt;&amp; f, <span class="keyword">const</span> system_clock::time_point&amp; when, priority prio = priority(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n= <span class="stringliteral">&quot;&quot;</span> ) {
-<a name="l00078"></a>00078                    task::ptr tsk( <span class="keyword">new</span> vtask(f,when,std::max(current_priority(),prio),n) );
-<a name="l00079"></a>00079                    async(tsk);
-<a name="l00080"></a>00080             }
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082 
-<a name="l00083"></a>00083 
-<a name="l00084"></a>00084 
-<a name="l00096"></a>00096             <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00097"></a><a class="code" href="classmace_1_1cmt_1_1thread.html#a0171ce213bf51017128240a1292b77a7">00097</a>             <a class="code" href="classmace_1_1cmt_1_1future.html" title="placeholder for the result of an asynchronous operation.">future&lt;T&gt;</a> <a class="code" href="classmace_1_1cmt_1_1thread.html#a0171ce213bf51017128240a1292b77a7">async</a>( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; f, priority prio = priority(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n= <span class="stringliteral">&quot;&quot;</span> ) {
-<a name="l00098"></a>00098                    <span class="keyword">typename</span> promise&lt;T&gt;::ptr p(<span class="keyword">new</span> <a class="code" href="classmace_1_1cmt_1_1promise.html">promise&lt;T&gt;</a>());
-<a name="l00099"></a>00099                    task::ptr tsk( <span class="keyword">new</span> rtask&lt;T&gt;(f,p,std::max(current_priority(),prio),n) );
-<a name="l00100"></a>00100                    async(tsk);
-<a name="l00101"></a>00101                    <span class="keywordflow">return</span> p;
-<a name="l00102"></a>00102             }
-<a name="l00103"></a>00103 
-<a name="l00104"></a>00104             <span class="keywordtype">void</span> quit();
-<a name="l00105"></a>00105             <span class="keywordtype">void</span> exec();
-<a name="l00106"></a>00106 
-<a name="l00107"></a>00107             <span class="keywordtype">bool</span> is_running()<span class="keyword">const</span>;
+<a name="l00077"></a>00077 
+<a name="l00086"></a>00086             <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00087"></a><a class="code" href="classmace_1_1cmt_1_1thread.html#a0171ce213bf51017128240a1292b77a7">00087</a>             <a class="code" href="classmace_1_1cmt_1_1future.html" title="placeholder for the result of an asynchronous operation.">future&lt;T&gt;</a> <a class="code" href="classmace_1_1cmt_1_1thread.html#a0171ce213bf51017128240a1292b77a7">async</a>( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; f, priority prio = priority(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n= <span class="stringliteral">&quot;&quot;</span> ) {
+<a name="l00088"></a>00088                    <span class="keyword">typename</span> promise&lt;T&gt;::ptr p(<span class="keyword">new</span> <a class="code" href="classmace_1_1cmt_1_1promise.html">promise&lt;T&gt;</a>());
+<a name="l00089"></a>00089                    task::ptr tsk( <span class="keyword">new</span> rtask&lt;T&gt;(f,p,std::max(current_priority(),prio),n) );
+<a name="l00090"></a>00090                    async(tsk);
+<a name="l00091"></a>00091                    <span class="keywordflow">return</span> p;
+<a name="l00092"></a>00092             }
+<a name="l00093"></a>00093 
+<a name="l00094"></a>00094             <span class="keywordtype">void</span> quit();
+<a name="l00095"></a>00095             <span class="keywordtype">void</span> exec();
+<a name="l00096"></a>00096 
+<a name="l00097"></a>00097             <span class="keywordtype">bool</span> is_running()<span class="keyword">const</span>;
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099             priority current_priority()<span class="keyword">const</span>;
+<a name="l00100"></a>00100             ~<a class="code" href="classmace_1_1cmt_1_1thread.html" title="manages cooperative scheduling of tasks within a single operating system thread.">thread</a>();
+<a name="l00101"></a>00101 
+<a name="l00102"></a>00102             <span class="keywordtype">void</span> set_boost_thread( boost::thread* t );
+<a name="l00103"></a>00103         <span class="keyword">protected</span>:
+<a name="l00104"></a>00104             <span class="keyword">friend</span> <span class="keyword">class </span>thread_private;
+<a name="l00105"></a>00105             <span class="keyword">friend</span> <span class="keywordtype">void</span> <a class="code" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="cmt::thread::current().yield()">mace::cmt::yield</a>();
+<a name="l00106"></a>00106             <span class="keyword">friend</span> <span class="keywordtype">void</span> <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">mace::cmt::usleep</a>( uint64_t );
+<a name="l00107"></a>00107             <span class="keyword">friend</span> <span class="keywordtype">void</span> mace::cmt::sleep_until( <span class="keyword">const</span> system_clock::time_point&amp; );
 <a name="l00108"></a>00108 
-<a name="l00109"></a>00109             priority current_priority()<span class="keyword">const</span>;
-<a name="l00110"></a>00110             ~<a class="code" href="classmace_1_1cmt_1_1thread.html" title="manages cooperative scheduling of tasks within a single operating system thread.">thread</a>();
-<a name="l00111"></a>00111 
-<a name="l00112"></a>00112             <span class="keywordtype">void</span> set_boost_thread( boost::thread* t );
-<a name="l00113"></a>00113         <span class="keyword">protected</span>:
-<a name="l00114"></a>00114             <span class="keyword">friend</span> <span class="keyword">class </span>thread_private;
-<a name="l00115"></a>00115             <span class="keyword">friend</span> <span class="keywordtype">void</span> <a class="code" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="cmt::thread::current().yield()">mace::cmt::yield</a>();
-<a name="l00116"></a>00116             <span class="keyword">friend</span> <span class="keywordtype">void</span> <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">mace::cmt::usleep</a>( uint64_t );
-<a name="l00117"></a>00117             <span class="keyword">friend</span> <span class="keywordtype">void</span> mace::cmt::sleep_until( <span class="keyword">const</span> system_clock::time_point&amp; );
+<a name="l00109"></a>00109             <span class="comment">// these methods may only be called from the current thread</span>
+<a name="l00110"></a>00110             <span class="keywordtype">void</span> yield();
+<a name="l00111"></a>00111             <span class="keywordtype">void</span> <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">usleep</a>( uint64_t us );
+<a name="l00112"></a>00112             <span class="keywordtype">void</span> sleep_until( <span class="keyword">const</span> system_clock::time_point&amp; tp );
+<a name="l00113"></a>00113 
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115             <span class="keywordtype">void</span> wait( <span class="keyword">const</span> promise_base::ptr&amp; p, <span class="keyword">const</span> microseconds&amp; timeout_us );
+<a name="l00116"></a>00116             <span class="keywordtype">void</span> wait( <span class="keyword">const</span> promise_base::ptr&amp; p, <span class="keyword">const</span> system_clock::time_point&amp; timeout );
+<a name="l00117"></a>00117             <span class="keywordtype">void</span> notify( <span class="keyword">const</span> promise_base::ptr&amp; p );
 <a name="l00118"></a>00118 
-<a name="l00119"></a>00119             <span class="comment">// these methods may only be called from the current thread</span>
-<a name="l00120"></a>00120             <span class="keywordtype">void</span> yield();
-<a name="l00121"></a>00121             <span class="keywordtype">void</span> <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">usleep</a>( uint64_t us );
-<a name="l00122"></a>00122             <span class="keywordtype">void</span> sleep_until( <span class="keyword">const</span> system_clock::time_point&amp; tp );
-<a name="l00123"></a>00123 
-<a name="l00124"></a>00124 
-<a name="l00125"></a>00125             <span class="keywordtype">void</span> wait( <span class="keyword">const</span> promise_base::ptr&amp; p, <span class="keyword">const</span> microseconds&amp; timeout_us );
-<a name="l00126"></a>00126             <span class="keywordtype">void</span> wait( <span class="keyword">const</span> promise_base::ptr&amp; p, <span class="keyword">const</span> system_clock::time_point&amp; timeout );
-<a name="l00127"></a>00127             <span class="keywordtype">void</span> notify( <span class="keyword">const</span> promise_base::ptr&amp; p );
-<a name="l00128"></a>00128 
-<a name="l00129"></a>00129         <span class="keyword">private</span>:
-<a name="l00130"></a>00130             <a class="code" href="classmace_1_1cmt_1_1thread.html" title="manages cooperative scheduling of tasks within a single operating system thread.">thread</a>();
-<a name="l00131"></a>00131 
-<a name="l00132"></a>00132             <span class="keyword">friend</span> <span class="keyword">class </span>promise_base;
-<a name="l00133"></a>00133             <span class="keywordtype">void</span> async( <span class="keyword">const</span> task::ptr&amp; t );
-<a name="l00134"></a>00134             <span class="keyword">class </span>thread_private* my;
-<a name="l00135"></a>00135    };
-<a name="l00136"></a>00136 
-<a name="l00137"></a>00137    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00138"></a>00138    future&lt;T&gt; async( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; t, <span class="keyword">const</span> <span class="keywordtype">char</span>* n, priority prio=priority()) {
-<a name="l00139"></a>00139         <span class="keywordflow">return</span> cmt::thread::current().async&lt;T&gt;(t,(std::max)(current_priority(),prio),n);
-<a name="l00140"></a>00140    }
-<a name="l00141"></a>00141    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00142"></a>00142    future&lt;T&gt; async( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; t, priority prio=priority(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n = <span class="stringliteral">&quot;&quot;</span>) {
-<a name="l00143"></a>00143         <span class="keywordflow">return</span> cmt::thread::current().async&lt;T&gt;(t,(std::max)(current_priority(),prio),n);
-<a name="l00144"></a>00144    }
-<a name="l00145"></a>00145    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00146"></a>00146    T sync( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; t, <span class="keyword">const</span> <span class="keywordtype">char</span>* n, priority prio = current_priority(), <span class="keyword">const</span> microseconds&amp; timeout_us = microseconds::max()) {
-<a name="l00147"></a>00147         <span class="keywordflow">return</span> cmt::thread::current().sync&lt;T&gt;(t,prio,timeout_us,n);
-<a name="l00148"></a>00148    }
-<a name="l00149"></a>00149    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00150"></a>00150    T sync( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; t, priority prio, <span class="keyword">const</span> microseconds&amp; timeout_us = microseconds::max(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n = <span class="stringliteral">&quot;&quot;</span>) {
-<a name="l00151"></a>00151         <span class="keywordflow">return</span> cmt::thread::current().sync&lt;T&gt;(t,(std::max)(current_priority(),prio),timeout_us,n);
-<a name="l00152"></a>00152    }
-<a name="l00153"></a>00153    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
-<a name="l00154"></a>00154    T sync( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; t, <span class="keyword">const</span> microseconds&amp; timeout_us = microseconds::max(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n = <span class="stringliteral">&quot;&quot;</span>) {
-<a name="l00155"></a>00155         <span class="keywordflow">return</span> cmt::thread::current().sync&lt;T&gt;(t,current_priority(),timeout_us,n);
-<a name="l00156"></a>00156    }
-<a name="l00157"></a>00157    <span class="keywordtype">void</span> async( <span class="keyword">const</span> boost::function&lt;<span class="keywordtype">void</span>()&gt;&amp; t, priority prio=priority() ); 
-<a name="l00158"></a>00158    <span class="keywordtype">int</span>  exec();
+<a name="l00119"></a>00119         <span class="keyword">private</span>:
+<a name="l00120"></a>00120             <a class="code" href="classmace_1_1cmt_1_1thread.html" title="manages cooperative scheduling of tasks within a single operating system thread.">thread</a>();
+<a name="l00121"></a>00121 
+<a name="l00122"></a>00122             <span class="keyword">friend</span> <span class="keyword">class </span>promise_base;
+<a name="l00123"></a>00123             <span class="keywordtype">void</span> async( <span class="keyword">const</span> task::ptr&amp; t );
+<a name="l00124"></a>00124             <span class="keyword">class </span>thread_private* my;
+<a name="l00125"></a>00125    };
+<a name="l00126"></a>00126 
+<a name="l00127"></a>00127    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00128"></a>00128    future&lt;T&gt; async( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; t, <span class="keyword">const</span> <span class="keywordtype">char</span>* n, priority prio=priority()) {
+<a name="l00129"></a>00129         <span class="keywordflow">return</span> cmt::thread::current().async&lt;T&gt;(t,(std::max)(current_priority(),prio),n);
+<a name="l00130"></a>00130    }
+<a name="l00131"></a>00131    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00132"></a>00132    future&lt;T&gt; async( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; t, priority prio=priority(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n = <span class="stringliteral">&quot;&quot;</span>) {
+<a name="l00133"></a>00133         <span class="keywordflow">return</span> cmt::thread::current().async&lt;T&gt;(t,(std::max)(current_priority(),prio),n);
+<a name="l00134"></a>00134    }
+<a name="l00135"></a>00135    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00136"></a>00136    T sync( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; t, <span class="keyword">const</span> <span class="keywordtype">char</span>* n, priority prio = current_priority(), <span class="keyword">const</span> microseconds&amp; timeout_us = microseconds::max()) {
+<a name="l00137"></a>00137         <span class="keywordflow">return</span> cmt::thread::current().sync&lt;T&gt;(t,prio,timeout_us,n);
+<a name="l00138"></a>00138    }
+<a name="l00139"></a>00139    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00140"></a>00140    T sync( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; t, priority prio, <span class="keyword">const</span> microseconds&amp; timeout_us = microseconds::max(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n = <span class="stringliteral">&quot;&quot;</span>) {
+<a name="l00141"></a>00141         <span class="keywordflow">return</span> cmt::thread::current().sync&lt;T&gt;(t,(std::max)(current_priority(),prio),timeout_us,n);
+<a name="l00142"></a>00142    }
+<a name="l00143"></a>00143    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00144"></a>00144    T sync( <span class="keyword">const</span> boost::function&lt;T()&gt;&amp; t, <span class="keyword">const</span> microseconds&amp; timeout_us = microseconds::max(), <span class="keyword">const</span> <span class="keywordtype">char</span>* n = <span class="stringliteral">&quot;&quot;</span>) {
+<a name="l00145"></a>00145         <span class="keywordflow">return</span> cmt::thread::current().sync&lt;T&gt;(t,current_priority(),timeout_us,n);
+<a name="l00146"></a>00146    }
+<a name="l00147"></a>00147    <span class="keywordtype">void</span> async( <span class="keyword">const</span> boost::function&lt;<span class="keywordtype">void</span>()&gt;&amp; t, priority prio=priority() ); 
+<a name="l00148"></a>00148    <span class="keywordtype">int</span>  exec();
+<a name="l00149"></a>00149 
+<a name="l00153"></a><a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">00153</a>    <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">usleep</a>( uint64_t us ) {
+<a name="l00154"></a>00154         mace::cmt::thread::current().usleep(us);
+<a name="l00155"></a>00155    }
+<a name="l00156"></a>00156    <span class="keyword">inline</span> <span class="keywordtype">void</span> sleep_until( <span class="keyword">const</span> system_clock::time_point&amp; tp ) {
+<a name="l00157"></a>00157         mace::cmt::thread::current().sleep_until(tp);
+<a name="l00158"></a>00158    }
 <a name="l00159"></a>00159 
-<a name="l00163"></a><a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">00163</a>    <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">usleep</a>( uint64_t us ) {
-<a name="l00164"></a>00164         mace::cmt::thread::current().usleep(us);
-<a name="l00165"></a>00165    }
-<a name="l00166"></a>00166    <span class="keyword">inline</span> <span class="keywordtype">void</span> sleep_until( <span class="keyword">const</span> system_clock::time_point&amp; tp ) {
-<a name="l00167"></a>00167         mace::cmt::thread::current().sleep_until(tp);
-<a name="l00168"></a>00168    }
-<a name="l00169"></a>00169 
-<a name="l00170"></a>00170    <span class="keywordtype">void</span> <a class="code" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="cmt::thread::current().yield()">yield</a>();
-<a name="l00171"></a>00171 } } <span class="comment">// mace::cmt</span>
-<a name="l00172"></a>00172 
-<a name="l00173"></a>00173 <span class="preprocessor">#endif // MACE_CMT_THREAD_HPP</span>
+<a name="l00160"></a>00160    <span class="keywordtype">void</span> <a class="code" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="cmt::thread::current().yield()">yield</a>();
+<a name="l00161"></a>00161 } } <span class="comment">// mace::cmt</span>
+<a name="l00162"></a>00162 
+<a name="l00163"></a>00163 <span class="preprocessor">#endif // MACE_CMT_THREAD_HPP</span>
 </pre></div></div><!-- contents -->
-<script type="text/javascript">
 
-  var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-2423876-2']);
-      _gaq.push(['_trackPageview']);
 
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                      })();
+<hr class="footer"/><address class="footer"><small>
+Generated on Fri Jun 1 2012 10:20:38 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.0
+</small></address>
 
-                      </script>
+</body>
+</html>

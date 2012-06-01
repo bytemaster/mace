@@ -6,13 +6,27 @@
 <title>MACE: CMT (Cooperative Multi-Tasking) Library</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="style.css" rel="stylesheet" type="text/css" />
 
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
   $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-32339400-1']);
+      _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                      })();
+
 </script>
 
 </head>
@@ -288,16 +302,13 @@ Cooperative Threading vs Qt-like Event Loops</h2>
 <p>This complexity becomes obvious when you have many asynchronous operations that must be performed synchrously or have some non-trivial dependency. Suppose you need to invoke 3 remote procedure calls on 3 different servers and that you need the return value from 1 of the calls before you can invoke the other two and that you need all three values before you can do your final calculations. This task is creates a mess of speghetti code with callbacks, state machine variables, etc unless you are willing to accept the performance hit of blocking an entire "heavy weight", preemitvely multi-tasked, operating system thread.</p>
 <p>This same problem becomes trivial with the use of the MACE.CMT library. Simply asynchronously invoke each method which will return a future object. Then pass the futures into the other methods which will automatically run when the data is available. A complex asynchronous mess turns into what looks like synchronous code. </p>
 </div><!-- contents -->
-<script type="text/javascript">
 
-  var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-2423876-2']);
-      _gaq.push(['_trackPageview']);
 
-        (function() {
-            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                      })();
+<hr class="footer"/><address class="footer"><small>
+Generated on Fri Jun 1 2012 10:20:39 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.0
+</small></address>
 
-                      </script>
+</body>
+</html>
