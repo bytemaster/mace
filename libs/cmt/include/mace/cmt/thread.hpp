@@ -33,12 +33,28 @@ namespace cmt {
 
    /**
     * @brief manages cooperative scheduling of tasks within a single operating system thread.
+    *
+    * When ever a task must wait, a new stack is created that continues to process events. These
+    * stacks will not be deallocated, but instead stand ready to be re-used the next time a
+    * new stack is required.   
+    *
+    * This means that the total number of stacks in use for a given thread will grow to the
+    * maximum number of simultaniously waiting asynchronous operations.  
+    *
+    * @todo perform 'garbage collection' on idle stacks, perhaps before entering a blocking wait.
+    * @todo ensure all stacks get 'unwound' 
+    * @todo free all stacks when thread is deleted.
+    *
+    * These todo items may be ignored so long as you use 'long-lived' threads and
+    * keep the maximum number of simultanous 'blocked' tasks to something reasonable.  
     */
    class thread : public abstract_thread {
         public:
+            /**
+             *  Returns the current thread.
+             */
             static thread& current();
 
-            void async( const boost::function<void()>& t, priority p = priority() );
 
             /**
              *  @brief returns the name given by @ref set_name() for this thread
@@ -49,49 +65,56 @@ namespace cmt {
              */
             void        set_name( const char* n );
 
+            /**
+             *  Creates a new thread with the given name.
+             *
+             *  @todo this method currently blocks the calling thread while a new
+             *        thread is created.  It should return a future<thread*> instead.
+             */
             static thread* create( const char* name = ""  );
 
 
             /**
-             *  Calls function @param f in this thread and returns a future<T> that can
-             *  be used to wait on the result.   If async is called from a thread not currently
-             *  calling exec() then the future will block on a mutex/wait condition.  If async is
-             *  called from a thread running exec() then it will block 'cooperatively' and allow
-             *  other tasks to run in that thread until this thread has returned a result.
-             *
-             *  @note Calling mace::cmt::async(...).wait() in a thread before calling exec will
-             *  block that thread forever because the thread will not get a chance to process
-             *  the call before blocking the thread.
+             *  Calls function <code>f</code> in this thread and returns a future<T> that can
+             *  be used to wait on the result.
              *
              *  @param f the method to be called
              *  @param prio the priority of this method relative to others
-             *  @param when - determines when this call will happen, as soon as possible after <code>when</code>
+             *  @param when determines when this call will happen, as soon as 
+             *              possible after <code>when</code>
+             *  @param n a debug name to be associated with this task. 
              */
             template<typename T>
-            future<T> schedule( const boost::function<T()>& f, const system_clock::time_point& when, priority prio = priority(), const char* n= "" ) {
+            future<T> schedule( const boost::function<T()>& f, const system_clock::time_point& when, 
+                                priority prio = priority(), const char* n= "" ) {
                    typename promise<T>::ptr p(new promise<T>());
                    task::ptr tsk( new rtask<T>(f,p,when,std::max(current_priority(),prio),n) );
                    async(tsk);
                    return p;
             }
-            void schedule( const boost::function<void()>& f, const system_clock::time_point& when, priority prio = priority(), const char* n= "" ) {
+            /**
+             *  Performs <code>f()</code> asynchronously without returning a future.  This is slightly
+             *  more effecient as there is no need to allocate a promise object.
+             *
+             *  @param f the method to be called
+             *  @param prio the priority of this method relative to others
+             *  @param when - determines when this call will happen, as soon as 
+             *                possible after <code>when</code>
+             *  @param n a debug name to be associated with this task. 
+             */
+            void schedule( const boost::function<void()>& f, const system_clock::time_point& when, 
+                                                    priority prio = priority(), const char* n= "" ) {
                    task::ptr tsk( new vtask(f,when,std::max(current_priority(),prio),n) );
                    async(tsk);
             }
 
-
-
-
             /**
-             *  Calls function @param f in this thread and returns a future<T> that can
-             *  be used to wait on the result.   If async is called from a thread not currently
-             *  calling exec() then the future will block on a mutex/wait condition.  If async is
-             *  called from a thread running exec() then it will block 'cooperatively' and allow
-             *  other tasks to run in that thread until this thread has returned a result.
+             *  Calls function <code>f</code> in this thread and returns a future<T> that can
+             *  be used to wait on the result.  
              *
-             *  @param f
-             *  @param prio
-             *  @param n a human readable string to associate with this task.
+             *  @param f the operation to perform
+             *  @param prio the priority relative to other tasks
+             *  @param n a debut name to associate with this task.
              */
             template<typename T>
             future<T> async( const boost::function<T()>& f, priority prio = priority(), const char* n= "" ) {
@@ -101,16 +124,44 @@ namespace cmt {
                    return p;
             }
 
+            /**
+             *  Calls function <code>f</code> in this thread and returns a future<T> that can
+             *  be used to wait on the result.  
+             *
+             *  @param p - the priority of a task.
+             *  @param t - the task to be run.
+             */
+            void async( const boost::function<void()>& t, priority p = priority() );
+            
+            /**
+             *  This method will cancel all pending tasks causing them to throw cmt::error::thread_quit.
+             *
+             *  If the <i>current</i> thread is not <code>this</code> thread, then the <i>current</i> thread will
+             *  wait for <code>this</code> thread to exit.
+             *
+             *  This is a blocking wait via <code>boost::thread::join</code>
+             *  and other tasks in the <i>current</i> thread will not run while 
+             *  waiting for <code>this</code> thread to quit.
+             *
+             *  @todo make quit non-blocking of the calling thread by eliminating the call to <code>boost::thread::join</code>
+             */
             void quit();
-            void exec();
 
+            /**
+             *  Process tasks until thread::quit() is called.
+             */
+            void exec();
+            
+            /**
+             *  @return true unless quit() has been called.
+             */
             bool is_running()const;
 
             priority current_priority()const;
             ~thread();
 
-            void set_boost_thread( boost::thread* t );
         protected:
+            void set_boost_thread( boost::thread* t );
             friend class thread_private;
             friend void mace::cmt::yield();
             friend void mace::cmt::usleep( uint64_t );

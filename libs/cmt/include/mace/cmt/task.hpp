@@ -13,7 +13,10 @@ namespace mace { namespace cmt {
     using namespace boost::chrono;
 
      struct cmt_context;
-
+    /**
+     *  An integer value used to sort asynchronous tasks.  The higher the
+     *  prioirty the sooner it will be run.
+     */
      struct priority {
        explicit priority( int v = 0):value(v){}
        priority( const priority& p ):value(p.value){}

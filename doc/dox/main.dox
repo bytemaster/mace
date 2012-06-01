@@ -67,7 +67,7 @@
     cmake .
     make -j2
     make install
-  @code
+  @endcode
 
   Simple as pie.
 

@@ -354,19 +354,17 @@ namespace mace { namespace cmt {
     }
 
     void start_thread( const promise<thread*>::ptr p, const char* n  ) {
-        p->set_value( &thread::current() );
-        thread::current().set_name(n);
-        slog( "exec()" );
-        exec();
+      p->set_value( &thread::current() );
+      thread::current().set_name(n);
+      exec();
     }
 
     thread* thread::create( const char* n ) {
-      slog( "staring thread %1%", n );
-          promise<thread*>::ptr p(new promise<thread*>());
-          boost::thread* t = new boost::thread( boost::bind(start_thread,p,n) );
-          cmt::thread* ct = p->wait();
-          ct->set_boost_thread(t);
-          return ct;
+      promise<thread*>::ptr p(new promise<thread*>());
+      boost::thread* t = new boost::thread( boost::bind(start_thread,p,n) );
+      cmt::thread* ct = p->wait();
+      ct->set_boost_thread(t);
+      return ct;
     }
 
     void thread::set_boost_thread( boost::thread* t ) {
@@ -375,134 +373,131 @@ namespace mace { namespace cmt {
 
     int  exec() { cmt::thread::current().exec(); return 0; }
     void async( const boost::function<void()>& t, priority prio ) {
-       thread::current().async(t,prio);
+      thread::current().async(t,prio);
     }
 
     thread::thread() {
-        my = new thread_private(*this);
+      my = new thread_private(*this);
     }
 
     thread::~thread() {
-        delete my;
+      delete my;
     }
 
     void thread::sleep_until( const boost::chrono::system_clock::time_point& tp ) {
-        if( my->done )  {
-          BOOST_THROW_EXCEPTION( error::thread_quit() );
-        }
-        BOOST_ASSERT( &current() == this );
+      if( my->done )  {
+        BOOST_THROW_EXCEPTION( error::thread_quit() );
+      }
+      BOOST_ASSERT( &current() == this );
 
-        if( !my->current )  {
-          my->current = new cmt_context();
-        }
+      if( !my->current )  {
+        my->current = new cmt_context();
+      }
 
-        my->current->resume_time = tp;
-        my->current->clear_blocking_promises();
+      my->current->resume_time = tp;
+      my->current->clear_blocking_promises();
 
-        my->sleep_pqueue.push_back(my->current);
-        std::push_heap( my->sleep_pqueue.begin(),
-                        my->sleep_pqueue.end(), sleep_priority_less()   );
+      my->sleep_pqueue.push_back(my->current);
+      std::push_heap( my->sleep_pqueue.begin(),
+                      my->sleep_pqueue.end(), sleep_priority_less()   );
 
-        my->start_next_task();
+      my->start_next_task();
 
-        my->current->resume_time = system_clock::time_point::max();
-        
-        if( my->current->canceled ) {
-          BOOST_THROW_EXCEPTION( cmt::error::task_canceled() );
-        }
+      my->current->resume_time = system_clock::time_point::max();
+      
+      if( my->current->canceled ) {
+        BOOST_THROW_EXCEPTION( cmt::error::task_canceled() );
+      }
     }
     void thread::usleep( uint64_t timeout_us ) {
-        //slog( "usleep %1%", timeout_us );
-        BOOST_ASSERT( &current() == this );
-        //BOOST_ASSERT(my->current);
-        sleep_until( system_clock::now() + microseconds(timeout_us) );
+      //slog( "usleep %1%", timeout_us );
+      BOOST_ASSERT( &current() == this );
+      //BOOST_ASSERT(my->current);
+      sleep_until( system_clock::now() + microseconds(timeout_us) );
     }
 
     void thread::wait( const promise_base::ptr& p, const system_clock::time_point& timeout ) {
-        BOOST_ASSERT( &current() == this );
+      BOOST_ASSERT( &current() == this );
 
-        if( p->ready() ) return;
-        if( timeout < system_clock::now() ) 
-            BOOST_THROW_EXCEPTION( cmt::error::future_wait_timeout() );
-        
-        if( !my->current ) { 
-          slog( "new cmt context becaure current is 0" );
-          my->current = new cmt_context(); 
-        }
+      if( p->ready() ) return;
+      if( timeout < system_clock::now() ) 
+          BOOST_THROW_EXCEPTION( cmt::error::future_wait_timeout() );
+      
+      if( !my->current ) { 
+        my->current = new cmt_context(); 
+      }
 
-        my->current->add_blocking_promise(p.get(),true);
+      my->current->add_blocking_promise(p.get(),true);
 
-        // if not max timeout, added to sleep pqueue
-        if( timeout != system_clock::time_point::max() ) {
-            my->current->resume_time = timeout;
-            my->sleep_pqueue.push_back(my->current);
-            std::push_heap( my->sleep_pqueue.begin(),
-                            my->sleep_pqueue.end(), 
-                            sleep_priority_less()   );
-        }
-        //slog( "blocking %1%", my->current );
-        my->add_to_blocked( my->current );
-        my->start_next_task();
-        //slog( "resuming %1%", my->current );
+      // if not max timeout, added to sleep pqueue
+      if( timeout != system_clock::time_point::max() ) {
+          my->current->resume_time = timeout;
+          my->sleep_pqueue.push_back(my->current);
+          std::push_heap( my->sleep_pqueue.begin(),
+                          my->sleep_pqueue.end(), 
+                          sleep_priority_less()   );
+      }
+      //slog( "blocking %1%", my->current );
+      my->add_to_blocked( my->current );
+      my->start_next_task();
+      //slog( "resuming %1%", my->current );
 
-        my->current->remove_blocking_promise(p.get());
+      my->current->remove_blocking_promise(p.get());
 
-        if( my->current->canceled )
-            BOOST_THROW_EXCEPTION( cmt::error::task_canceled() );
+      if( my->current->canceled )
+          BOOST_THROW_EXCEPTION( cmt::error::task_canceled() );
     }
     void thread::wait( const promise_base::ptr& p, const boost::chrono::microseconds& timeout_us ) {
-       if( timeout_us == microseconds::max() ) 
-          wait( p, system_clock::time_point::max() ); 
-       else 
-          wait( p, system_clock::now() + timeout_us );
+      if( timeout_us == microseconds::max() ) 
+        wait( p, system_clock::time_point::max() ); 
+      else 
+        wait( p, system_clock::now() + timeout_us );
     }
 
     void thread::notify( const promise_base::ptr& p ) {
-        
-        BOOST_ASSERT(p->ready());
-        if( &current() != this )  {
-            //slog( "post notify to %1% from %2%", name(), current().name() );
-            this->async( boost::bind( &thread::notify, this, p ) );
-            return;
+      BOOST_ASSERT(p->ready());
+      if( &current() != this )  {
+        //slog( "post notify to %1% from %2%", name(), current().name() );
+        this->async( boost::bind( &thread::notify, this, p ) );
+        return;
+      }
+      // TODO: store a list of blocked contexts with the promise 
+      //  to accelerate the lookup.... unless it introduces contention...
+      
+      // iterate over all blocked contexts
+      cmt_context* cur_blocked  = my->blocked;
+      cmt_context* prev_blocked = 0;
+      while( cur_blocked ) {
+        // if the blocked context is waiting on this promise 
+        // TODO: what if multiple things are blocked sleeping on this promise??
+        if( cur_blocked->try_unblock( p.get() )  ) {
+          //slog( "unblock!" );
+          // remove it from the blocked list.
+          if( prev_blocked ) {  
+              prev_blocked->next_blocked = cur_blocked->next_blocked; 
+          } else { 
+              my->blocked = cur_blocked->next_blocked; 
+          }
+          cur_blocked->next_blocked = 0;
+          //slog( "ready push front %1%", cur_blocked );
+          my->ready_push_front( cur_blocked );
+          cur_blocked =  cur_blocked->next_blocked;
+        } else { // goto the next blocked task
+          prev_blocked  = cur_blocked;
+          cur_blocked   = cur_blocked->next_blocked;
         }
-        // TODO: store a list of blocked contexts with the promise 
-        //  to accelerate the lookup.... unless it introduces contention...
-        
-        // iterate over all blocked contexts
-        cmt_context* cur_blocked  = my->blocked;
-        cmt_context* prev_blocked = 0;
-        while( cur_blocked ) {
-
-            // if the blocked context is waiting on this promise 
-            // TODO: what if multiple things are blocked sleeping on this promise??
-            if( cur_blocked->try_unblock( p.get() )  ) {
-                //slog( "unblock!" );
-                // remove it from the blocked list.
-                if( prev_blocked ) {  
-                    prev_blocked->next_blocked = cur_blocked->next_blocked; 
-                } else { 
-                    my->blocked = cur_blocked->next_blocked; 
-                }
-                cur_blocked->next_blocked = 0;
-                //slog( "ready push front %1%", cur_blocked );
-                my->ready_push_front( cur_blocked );
-                cur_blocked =  cur_blocked->next_blocked;
-            } else { // goto the next blocked task
-                prev_blocked  = cur_blocked;
-                cur_blocked   = cur_blocked->next_blocked;
-            }
-        }
+      }
 
 
-        for( uint32_t i = 0; i < my->sleep_pqueue.size(); ++i ) {
-            if( my->sleep_pqueue[i]->prom == p.get() ) {
-                my->sleep_pqueue[i]->prom = 0;
-                my->sleep_pqueue[i] = my->sleep_pqueue.back();
-                my->sleep_pqueue.pop_back();
-                std::make_heap( my->sleep_pqueue.begin(),my->sleep_pqueue.end(), sleep_priority_less() );
-                break;
-            }
+      for( uint32_t i = 0; i < my->sleep_pqueue.size(); ++i ) {
+        if( my->sleep_pqueue[i]->prom == p.get() ) {
+          my->sleep_pqueue[i]->prom = 0;
+          my->sleep_pqueue[i] = my->sleep_pqueue.back();
+          my->sleep_pqueue.pop_back();
+          std::make_heap( my->sleep_pqueue.begin(),my->sleep_pqueue.end(), sleep_priority_less() );
+          break;
         }
+      }
     }
 
     /**
@@ -511,12 +506,14 @@ namespace mace { namespace cmt {
      *  empty and then block.
      */
     void thread::exec() { 
-         if( !my->current ) my->current = new cmt_context();
-         my->process_tasks(); 
+       if( !my->current ) my->current = new cmt_context();
+       my->process_tasks(); 
+       delete my->current;
+       my->current = 0;
     }
 
     bool thread::is_running()const {
-      return my->current != NULL;
+      return !my->done;
     }
 
     /**
