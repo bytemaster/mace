@@ -26,7 +26,7 @@ namespace mace { namespace cmt {
         public:
             typedef task* ptr;
             task(priority p=priority(),const system_clock::time_point& w = system_clock::time_point::min() )
-            :when(w),prio(p),next(0),active_context(0),canceled(false){
+            :when(w),canceled(false),prio(p),next(0),active_context(0){
                 static int64_t global_task_count=0;
                 posted_num = ++global_task_count;
             }
