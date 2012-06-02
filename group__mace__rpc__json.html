@@ -173,7 +173,7 @@ RPC Callbacks</h2>
   <span class="keywordtype">int</span> main( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv ) {
     <a class="code" href="classmace_1_1rpc_1_1json_1_1client.html">mace::rpc::json::client&lt;stock_ticker&gt;</a> c(argv[1],atoi(argv[2]));
     c-&gt;set_callback( print_stock );
-    mace::cmt::exec();
+    <a class="code" href="namespacemace_1_1cmt.html#affb5be33f34a8bd5c279e923349902b3" title="Same as cmt::current().exec()">mace::cmt::exec</a>();
   }
 </pre></div><h2><a class="anchor" id="mace_rpc_json_type_erasure"></a>
 Type Erasure</h2>
@@ -198,7 +198,7 @@ JSON-RPC Server over HTTP</h2>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 1 2012 10:20:39 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 2 2012 00:52:41 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

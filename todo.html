@@ -106,16 +106,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><dl class="reflist">
-<dt><a class="anchor" id="_todo000001"></a>Class <a class="el" href="classmace_1_1rpc_1_1json_1_1client.html">mace::rpc::json::client&lt; InterfaceType &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000001"></a>Class <a class="el" href="classmace_1_1cmt_1_1thread.html">mace::cmt::thread</a>  </dt>
+<dd>perform 'garbage collection' on idle stacks, perhaps before entering a blocking wait. Idle stacks would be any stack that is 'ready' and not blocking and would simply take turns processing new tasks.  </dd>
+<dt><a class="anchor" id="_todo000002"></a>Member <a class="el" href="classmace_1_1cmt_1_1thread.html#a4232900b8b55f4e039d8b4fda6fcd98d">mace::cmt::thread::create</a>  (const char *name="")</dt>
+<dd>this method currently blocks the calling thread while a new thread is created. It should return a future&lt;thread*&gt; instead.  </dd>
+<dt><a class="anchor" id="_todo000003"></a>Member <a class="el" href="classmace_1_1cmt_1_1thread.html#af23d8cbc8b46a348798088ed28238844">mace::cmt::thread::quit</a>  ()</dt>
+<dd>make quit non-blocking of the calling thread by eliminating the call to <code>boost::thread::join</code>  </dd>
+<dt><a class="anchor" id="_todo000004"></a>Class <a class="el" href="classmace_1_1rpc_1_1json_1_1client.html">mace::rpc::json::client&lt; InterfaceType &gt;</a>  </dt>
 <dd>- make client_interface take a pointer to client_base to enable the construction of one client&lt;Interface&gt; and then quickly change the connection object without having to iterate over the methods again.  </dd>
-<dt><a class="anchor" id="_todo000002"></a>Class <a class="el" href="classmace_1_1rpc_1_1json_1_1http__client.html">mace::rpc::json::http_client&lt; InterfaceType &gt;</a>  </dt>
+<dt><a class="anchor" id="_todo000005"></a>Class <a class="el" href="classmace_1_1rpc_1_1json_1_1http__client.html">mace::rpc::json::http_client&lt; InterfaceType &gt;</a>  </dt>
 <dd>- make client_interface take a pointer to client_base to enable the construction of one client&lt;Interface&gt; and then quickly change the connection object without having to iterate over the methods again. </dd>
 </dl>
 </div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 1 2012 10:20:39 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 2 2012 00:52:40 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

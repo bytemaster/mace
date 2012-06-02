@@ -127,7 +127,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="contents">
 
 <p>manages cooperative scheduling of tasks within a single operating system thread.  
-</p>
+ <a href="classmace_1_1cmt_1_1thread.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="thread_8hpp_source.html">thread.hpp</a>&gt;</code></p>
 
@@ -137,38 +137,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af515ae465d4357fdf6da4e18ec236fb6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af515ae465d4357fdf6da4e18ec236fb6"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>async</b> (const boost::function&lt; void()&gt; &amp;t, priority p=priority())</td></tr>
 <tr class="memitem:a3d750dd7a3c1738b81411e5c0798dc68"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d750dd7a3c1738b81411e5c0798dc68"></a>
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#a3d750dd7a3c1738b81411e5c0798dc68">name</a> () const </td></tr>
 <tr class="memdesc:a3d750dd7a3c1738b81411e5c0798dc68"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the name given by <a class="el" href="classmace_1_1cmt_1_1thread.html#adb26b9265cff9be405608456ff2ce3eb">set_name()</a> for this thread <br/></td></tr>
 <tr class="memitem:adb26b9265cff9be405608456ff2ce3eb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adb26b9265cff9be405608456ff2ce3eb"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#adb26b9265cff9be405608456ff2ce3eb">set_name</a> (const char *n)</td></tr>
 <tr class="memdesc:adb26b9265cff9be405608456ff2ce3eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">associates a name with this thread. <br/></td></tr>
-<tr class="memitem:a748e326554562464be7aabb3f3c458e0"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a748e326554562464be7aabb3f3c458e0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classmace_1_1cmt_1_1future.html">future</a>&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#a748e326554562464be7aabb3f3c458e0">schedule</a> (const boost::function&lt; T()&gt; &amp;f, const system_clock::time_point &amp;when, priority prio=priority(), const char *n=&quot;&quot;)</td></tr>
-<tr class="memitem:ab2731dde7a17e742ad7e00ecac5164ae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab2731dde7a17e742ad7e00ecac5164ae"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>schedule</b> (const boost::function&lt; void()&gt; &amp;f, const system_clock::time_point &amp;when, priority prio=priority(), const char *n=&quot;&quot;)</td></tr>
-<tr class="memitem:a0171ce213bf51017128240a1292b77a7"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a0171ce213bf51017128240a1292b77a7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classmace_1_1cmt_1_1future.html">future</a>&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#a0171ce213bf51017128240a1292b77a7">async</a> (const boost::function&lt; T()&gt; &amp;f, priority prio=priority(), const char *n=&quot;&quot;)</td></tr>
-<tr class="memitem:af23d8cbc8b46a348798088ed28238844"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af23d8cbc8b46a348798088ed28238844"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>quit</b> ()</td></tr>
-<tr class="memitem:a402092cd73fe5bad5d5850d644ea0f81"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a402092cd73fe5bad5d5850d644ea0f81"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>exec</b> ()</td></tr>
-<tr class="memitem:a8c6be42b5ed01f7bf7079d05f7ab58d1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8c6be42b5ed01f7bf7079d05f7ab58d1"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_running</b> () const </td></tr>
+<tr class="memitem:a1b70ffd7cf400cfc10daadb322ab62d5"><td class="memTemplParams" colspan="2">template&lt;typename Functor &gt; </td></tr>
+<tr class="memitem:a1b70ffd7cf400cfc10daadb322ab62d5"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#a1b70ffd7cf400cfc10daadb322ab62d5">schedule</a> (const Functor &amp;f, const system_clock::time_point &amp;when, priority prio=priority(), const char *n=&quot;&quot;)-&gt; <a class="el" href="classmace_1_1cmt_1_1future.html">future</a>&lt; decltype(f())&gt;</td></tr>
+<tr class="memitem:a4464f339b080bf26703429c453e2f68e"><td class="memTemplParams" colspan="2">template&lt;typename Functor &gt; </td></tr>
+<tr class="memitem:a4464f339b080bf26703429c453e2f68e"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#a4464f339b080bf26703429c453e2f68e">async</a> (const Functor &amp;f, priority prio=priority(), const char *n=&quot;&quot;)-&gt; <a class="el" href="classmace_1_1cmt_1_1future.html">future</a>&lt; decltype(f())&gt;</td></tr>
+<tr class="memitem:a5c1aca2d9c63845ab1c5c35221153d0b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#a5c1aca2d9c63845ab1c5c35221153d0b">post</a> (const boost::function&lt; void()&gt; &amp;f, const system_clock::time_point &amp;when, priority prio=priority(), const char *n=&quot;&quot;)</td></tr>
+<tr class="memitem:adf4fad3658e078475e2cdaf6e6d6d762"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#adf4fad3658e078475e2cdaf6e6d6d762">post</a> (const boost::function&lt; void()&gt; &amp;t, priority p=priority())</td></tr>
+<tr class="memitem:af23d8cbc8b46a348798088ed28238844"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#af23d8cbc8b46a348798088ed28238844">quit</a> ()</td></tr>
+<tr class="memitem:a402092cd73fe5bad5d5850d644ea0f81"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#a402092cd73fe5bad5d5850d644ea0f81">exec</a> ()</td></tr>
+<tr class="memitem:a8c6be42b5ed01f7bf7079d05f7ab58d1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#a8c6be42b5ed01f7bf7079d05f7ab58d1">is_running</a> () const </td></tr>
 <tr class="memitem:aefb328f31a826c5606b0c9269f3343d4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aefb328f31a826c5606b0c9269f3343d4"></a>
 priority&#160;</td><td class="memItemRight" valign="bottom"><b>current_priority</b> () const </td></tr>
-<tr class="memitem:a589d762064c33d7f220937ad516b635e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a589d762064c33d7f220937ad516b635e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_boost_thread</b> (boost::thread *t)</td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a40ad356d1c0bbc9bf0b0cbbdfafded15"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40ad356d1c0bbc9bf0b0cbbdfafded15"></a>
-static <a class="el" href="classmace_1_1cmt_1_1thread.html">thread</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>current</b> ()</td></tr>
-<tr class="memitem:a4232900b8b55f4e039d8b4fda6fcd98d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4232900b8b55f4e039d8b4fda6fcd98d"></a>
-static <a class="el" href="classmace_1_1cmt_1_1thread.html">thread</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> (const char *<a class="el" href="classmace_1_1cmt_1_1thread.html#a3d750dd7a3c1738b81411e5c0798dc68">name</a>=&quot;&quot;)</td></tr>
+<tr class="memitem:a40ad356d1c0bbc9bf0b0cbbdfafded15"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classmace_1_1cmt_1_1thread.html">thread</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#a40ad356d1c0bbc9bf0b0cbbdfafded15">current</a> ()</td></tr>
+<tr class="memitem:a4232900b8b55f4e039d8b4fda6fcd98d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classmace_1_1cmt_1_1thread.html">thread</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmace_1_1cmt_1_1thread.html#a4232900b8b55f4e039d8b4fda6fcd98d">create</a> (const char *<a class="el" href="classmace_1_1cmt_1_1thread.html#a3d750dd7a3c1738b81411e5c0798dc68">name</a>=&quot;&quot;)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
+<tr class="memitem:a589d762064c33d7f220937ad516b635e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a589d762064c33d7f220937ad516b635e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_boost_thread</b> (boost::thread *t)</td></tr>
 <tr class="memitem:a2e44dd6ac0c60f10705c8212c6cf312b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e44dd6ac0c60f10705c8212c6cf312b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>yield</b> ()</td></tr>
 <tr class="memitem:acae13646c2a92e8db0e63556ce346bd3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acae13646c2a92e8db0e63556ce346bd3"></a>
@@ -195,19 +188,23 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>mace::cmt::usleep</b>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>mace::cmt::sleep_until</b> (const system_clock::time_point &amp;)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock">
-<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00037">37</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<div class="textblock"><p>When ever a task must wait, a new stack is created that continues to process events. These stacks will not be deallocated, but instead stand ready to be re-used the next time a new stack is required.</p>
+<p>This means that the total number of stacks in use for a given thread will grow to the maximum number of simultaniously waiting asynchronous operations.</p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>perform 'garbage collection' on idle stacks, perhaps before entering a blocking wait. Idle stacks would be any stack that is 'ready' and not blocking and would simply take turns processing new tasks. </dd></dl>
+<p>These todo items may be ignored so long as you use 'long-lived' threads and keep the maximum number of simultanous 'blocked' tasks to something reasonable. </p>
+
+<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00051">51</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 </div><hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a0171ce213bf51017128240a1292b77a7"></a>
+<a class="anchor" id="a4464f339b080bf26703429c453e2f68e"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename T &gt; </div>
+template&lt;typename Functor &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classmace_1_1cmt_1_1future.html">future</a>&lt;T&gt; mace::cmt::thread::async </td>
+          <td class="memname">auto <a class="el" href="classmace_1_1cmt_1_1thread.html#a4464f339b080bf26703429c453e2f68e">mace::cmt::thread::async</a> </td>
           <td>(</td>
-          <td class="paramtype">const boost::function&lt; T()&gt; &amp;&#160;</td>
+          <td class="paramtype">const Functor &amp;&#160;</td>
           <td class="paramname"><em>f</em>, </td>
         </tr>
         <tr>
@@ -230,31 +227,98 @@ template&lt;typename T &gt; </div>
       </table>
 </div>
 <div class="memdoc">
-<p>Calls function </p>
+<p>Calls function <code>f</code> in this thread and returns a future&lt;T&gt; that can be used to wait on the result.</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">f</td><td>in this thread and returns a future&lt;T&gt; that can be used to wait on the result.</td></tr>
-    <tr><td class="paramname">f</td><td></td></tr>
-    <tr><td class="paramname">prio</td><td></td></tr>
-    <tr><td class="paramname">n</td><td>a human readable string to associate with this task. </td></tr>
+    <tr><td class="paramname">f</td><td>the operation to perform </td></tr>
+    <tr><td class="paramname">prio</td><td>the priority relative to other tasks </td></tr>
+    <tr><td class="paramname">n</td><td>a debut name to associate with this task. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00087">87</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00107">107</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a748e326554562464be7aabb3f3c458e0"></a>
+<a class="anchor" id="a4232900b8b55f4e039d8b4fda6fcd98d"></a>
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;typename T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classmace_1_1cmt_1_1future.html">future</a>&lt;T&gt; <a class="el" href="classmace_1_1cmt_1_1thread.html#a748e326554562464be7aabb3f3c458e0">mace::cmt::thread::schedule</a> </td>
+          <td class="memname">static <a class="el" href="classmace_1_1cmt_1_1thread.html">thread</a>* <a class="el" href="classmace_1_1cmt_1_1thread.html#a4232900b8b55f4e039d8b4fda6fcd98d">mace::cmt::thread::create</a> </td>
           <td>(</td>
-          <td class="paramtype">const boost::function&lt; T()&gt; &amp;&#160;</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em> = <code>&quot;&quot;</code></td><td>)</td>
+          <td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Creates a new thread with the given name.</p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>this method currently blocks the calling thread while a new thread is created. It should return a future&lt;thread*&gt; instead. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a40ad356d1c0bbc9bf0b0cbbdfafded15"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classmace_1_1cmt_1_1thread.html">thread</a>&amp; <a class="el" href="classmace_1_1cmt_1_1thread.html#a40ad356d1c0bbc9bf0b0cbbdfafded15">mace::cmt::thread::current</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Returns the current thread. </p>
+
+</div>
+</div>
+<a class="anchor" id="a402092cd73fe5bad5d5850d644ea0f81"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmace_1_1cmt_1_1thread.html#a402092cd73fe5bad5d5850d644ea0f81">mace::cmt::thread::exec</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Process tasks until <a class="el" href="classmace_1_1cmt_1_1thread.html#af23d8cbc8b46a348798088ed28238844">thread::quit()</a> is called. </p>
+
+</div>
+</div>
+<a class="anchor" id="a8c6be42b5ed01f7bf7079d05f7ab58d1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classmace_1_1cmt_1_1thread.html#a8c6be42b5ed01f7bf7079d05f7ab58d1">mace::cmt::thread::is_running</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<dl class="section return"><dt>Returns:</dt><dd>true unless <a class="el" href="classmace_1_1cmt_1_1thread.html#af23d8cbc8b46a348798088ed28238844">quit()</a> has been called. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5c1aca2d9c63845ab1c5c35221153d0b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmace_1_1cmt_1_1thread.html#a5c1aca2d9c63845ab1c5c35221153d0b">mace::cmt::thread::post</a> </td>
+          <td>(</td>
+          <td class="paramtype">const boost::function&lt; void()&gt; &amp;&#160;</td>
           <td class="paramname"><em>f</em>, </td>
         </tr>
         <tr>
@@ -283,18 +347,126 @@ template&lt;typename T &gt; </div>
       </table>
 </div>
 <div class="memdoc">
-<p>Calls function </p>
+<p>Performs <code>f()</code> asynchronously at the specified time without returning a future. This is slightly more effecient as there is no need to allocate a promise object.</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">f</td><td>in this thread and returns a future&lt;T&gt; that can be used to wait on the result.</td></tr>
     <tr><td class="paramname">f</td><td>the method to be called </td></tr>
     <tr><td class="paramname">prio</td><td>the priority of this method relative to others </td></tr>
     <tr><td class="paramname">when</td><td>- determines when this call will happen, as soon as possible after <code>when</code> </td></tr>
+    <tr><td class="paramname">n</td><td>a debug name to be associated with this task. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00065">65</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00126">126</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="adf4fad3658e078475e2cdaf6e6d6d762"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmace_1_1cmt_1_1thread.html#a5c1aca2d9c63845ab1c5c35221153d0b">mace::cmt::thread::post</a> </td>
+          <td>(</td>
+          <td class="paramtype">const boost::function&lt; void()&gt; &amp;&#160;</td>
+          <td class="paramname"><em>t</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">priority&#160;</td>
+          <td class="paramname"><em>p</em> = <code>priority()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Calls function <code>f</code> in this thread. Returns immediately.</p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">p</td><td>- the priority of a task. </td></tr>
+    <tr><td class="paramname">t</td><td>- the task to be run. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="af23d8cbc8b46a348798088ed28238844"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmace_1_1cmt_1_1thread.html#af23d8cbc8b46a348798088ed28238844">mace::cmt::thread::quit</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This method will cancel all pending tasks causing them to throw cmt::error::thread_quit.</p>
+<p>If the <em>current</em> thread is not <code>this</code> thread, then the <em>current</em> thread will wait for <code>this</code> thread to exit.</p>
+<p>This is a blocking wait via <code>boost::thread::join</code> and other tasks in the <em>current</em> thread will not run while waiting for <code>this</code> thread to quit.</p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>make quit non-blocking of the calling thread by eliminating the call to <code>boost::thread::join</code> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1b70ffd7cf400cfc10daadb322ab62d5"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Functor &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">auto <a class="el" href="classmace_1_1cmt_1_1thread.html#a1b70ffd7cf400cfc10daadb322ab62d5">mace::cmt::thread::schedule</a> </td>
+          <td>(</td>
+          <td class="paramtype">const Functor &amp;&#160;</td>
+          <td class="paramname"><em>f</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const system_clock::time_point &amp;&#160;</td>
+          <td class="paramname"><em>when</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">priority&#160;</td>
+          <td class="paramname"><em>prio</em> = <code>priority()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>n</em> = <code>&quot;&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Calls function <code>f</code> in this thread and returns a future&lt;T&gt; that can be used to wait on the result.</p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">f</td><td>the method to be called </td></tr>
+    <tr><td class="paramname">prio</td><td>the priority of this method relative to others </td></tr>
+    <tr><td class="paramname">when</td><td>determines when this call will happen, as soon as possible after <code>when</code> </td></tr>
+    <tr><td class="paramname">n</td><td>a debug name to be associated with this task. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00088">88</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
 
 </div>
 </div>
@@ -305,7 +477,7 @@ template&lt;typename T &gt; </div>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 1 2012 10:20:40 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 2 2012 00:52:41 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

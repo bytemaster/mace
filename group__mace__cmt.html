@@ -119,7 +119,7 @@ Single Threaded Benchmark</h2>
     boost::chrono::system_clock::time_point start = boost::chrono::system_clock::now();
     <span class="keywordtype">int</span> sum = 0;
     <span class="keywordflow">for</span>( uint32_t i = 0; i &lt; 1000000; ++i ) 
-        sum += mace::cmt::async&lt;int&gt;( std::bind(hello, i) ).wait();
+        sum += mace::cmt::async( std::bind(hello, i) ).wait();
     boost::chrono::system_clock::time_point end = boost::chrono::system_clock::now();
     slog( <span class="stringliteral">&quot;%1% calls/sec&quot;</span>, 
       (1000000.0/((end - start).count()/1000000000.0)) );
@@ -135,18 +135,27 @@ Multi-Threading with MACE.CMT</h2>
 <span class="keyword">namespace </span>cmt = mace::cmt;
 
 <span class="keywordtype">int</span> main( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv ) {
+  <span class="keywordflow">try</span>{ 
+   cmt::thread::current().set_name(<span class="stringliteral">&quot;main&quot;</span>);
    cmt::thread* t1 = cmt::thread::create( <span class="stringliteral">&quot;t1&quot;</span> );
    cmt::thread* t2 = cmt::thread::create( <span class="stringliteral">&quot;t2&quot;</span> );
 
-   cmt::future&lt;int&gt; f1 = t1-&gt;async&lt;<span class="keywordtype">int</span>&gt;( bind(hello,<span class="stringliteral">&quot;world1&quot;</span>) );
-   cmt::future&lt;int&gt; f2 = t2-&gt;async&lt;<span class="keywordtype">int</span>&gt;( bind(hello,<span class="stringliteral">&quot;world2&quot;</span>) );
-   cmt::future&lt;int&gt; f3 = cmt::async&lt;int&gt;( bind(hello,<span class="stringliteral">&quot;world3&quot;</span>) );
+   cmt::future&lt;int&gt; f1 = t1-&gt;async( bind(hello,<span class="stringliteral">&quot;world1&quot;</span>) );
+   <span class="keyword">auto</span> f2 = t2-&gt;async( bind(hello,<span class="stringliteral">&quot;world2&quot;</span>) );
+   <span class="keyword">auto</span> f3 = cmt::async( bind(hello,<span class="stringliteral">&quot;world3&quot;</span>) );
 
    <span class="comment">// world3 is processed in current thread, while waiting on f1 &amp; f2</span>
    std::cerr&lt;&lt;( f1.wait() + f2.wait() + f3.wait() ) &lt;&lt; std::endl;
 
    t1-&gt;quit(); <span class="comment">// cancel any tasks and join thread</span>
    t2-&gt;quit(); <span class="comment">// cancel any tasks and join thread</span>
+
+   cmt::thread::current().quit();
+ } <span class="keywordflow">catch</span> ( ... ) {
+    elog( <span class="stringliteral">&quot;Caught exception&quot;</span> );
+    <span class="keywordflow">return</span> 1; 
+ }
+ <span class="keywordflow">return</span> 0;
 }
 </pre></div><h2><a class="anchor" id="cmt_exception"></a>
 Exception Handling</h2>
@@ -154,7 +163,7 @@ Exception Handling</h2>
 <h2><a class="anchor" id="cmt_usleep"></a>
 Yielding and Sleeping</h2>
 <p>The current task can either yield and allow other tasks to run before returning or it can sleep for an specific amount of time while allowing other tasks to run.</p>
-<div class="fragment"><pre class="fragment">      <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">cmt::usleep</a>(100000<span class="comment">/*us*/</span>);
+<div class="fragment"><pre class="fragment">      <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee" title="Same as cmt::current().usleep()">cmt::usleep</a>(100000<span class="comment">/*us*/</span>);
       cmt::yield();
 
       <span class="comment">// or the more verbose...</span>
@@ -174,7 +183,7 @@ Boost.Signals Integration</h2>
 boost::signal&lt;void(std::string)&gt; test_signal;
 
 <span class="keywordtype">void</span> delay() {
-    <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">cmt::usleep</a>(2000000);
+    <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee" title="Same as cmt::current().usleep()">cmt::usleep</a>(2000000);
     test_signal(<span class="stringliteral">&quot;hello world!&quot;</span>);
 }
 
@@ -305,7 +314,7 @@ Cooperative Threading vs Qt-like Event Loops</h2>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 1 2012 10:20:39 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 2 2012 00:52:41 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

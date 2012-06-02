@@ -142,35 +142,29 @@ Classes</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a1856236b9367cc5723abc62c93ab4387"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1856236b9367cc5723abc62c93ab4387"></a>
 const char *&#160;</td><td class="memItemRight" valign="bottom"><b>thread_name</b> ()</td></tr>
-<tr class="memitem:af8f5129408ef43d58f02d75b101275a8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af8f5129408ef43d58f02d75b101275a8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8">yield</a> ()</td></tr>
-<tr class="memdesc:af8f5129408ef43d58f02d75b101275a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">cmt::thread::current().<a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="cmt::thread::current().yield()">yield()</a> <br/></td></tr>
+<tr class="memitem:af8f5129408ef43d58f02d75b101275a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8">yield</a> ()</td></tr>
+<tr class="memdesc:af8f5129408ef43d58f02d75b101275a8"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classmace_1_1cmt_1_1thread.html#a40ad356d1c0bbc9bf0b0cbbdfafded15">cmt::thread::current()</a>.<a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="cmt::thread::current().yield()">yield()</a>  <a href="#af8f5129408ef43d58f02d75b101275a8"></a><br/></td></tr>
 <tr class="memitem:ac1fad35f48cdd03aad9040c90ab508a0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac1fad35f48cdd03aad9040c90ab508a0"></a>
 boost::system_time&#160;</td><td class="memItemRight" valign="bottom"><b>to_system_time</b> (const boost::chrono::system_clock::time_point &amp;t)</td></tr>
 <tr class="memitem:a230ab540cfc5d49f7a0fcb749fd99bd5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a230ab540cfc5d49f7a0fcb749fd99bd5"></a>
 priority&#160;</td><td class="memItemRight" valign="bottom"><b>current_priority</b> ()</td></tr>
-<tr class="memitem:af4a6cb3372677000d4c35d1c377b9bee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">usleep</a> (uint64_t us)</td></tr>
+<tr class="memitem:af4a6cb3372677000d4c35d1c377b9bee"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af4a6cb3372677000d4c35d1c377b9bee"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">usleep</a> (uint64_t us)</td></tr>
+<tr class="memdesc:af4a6cb3372677000d4c35d1c377b9bee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as <code>cmt::current().<a class="el" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee" title="Same as cmt::current().usleep()">usleep()</a></code> <br/></td></tr>
 <tr class="memitem:ad3ac7122b84ba8e8ce08148739c5d065"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3ac7122b84ba8e8ce08148739c5d065"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>sleep_until</b> (const system_clock::time_point &amp;tp)</td></tr>
-<tr class="memitem:a24a86712c52e64ff417e5bf8824963fc"><td class="memTemplParams" colspan="2"><a class="anchor" id="a24a86712c52e64ff417e5bf8824963fc"></a>
-template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a24a86712c52e64ff417e5bf8824963fc"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classmace_1_1cmt_1_1future.html">future</a>&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>async</b> (const boost::function&lt; T()&gt; &amp;t, const char *n, priority prio=priority())</td></tr>
-<tr class="memitem:a4eedc35ee6499cb2aa092807e5e6ddad"><td class="memTemplParams" colspan="2"><a class="anchor" id="a4eedc35ee6499cb2aa092807e5e6ddad"></a>
-template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a4eedc35ee6499cb2aa092807e5e6ddad"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classmace_1_1cmt_1_1future.html">future</a>&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>async</b> (const boost::function&lt; T()&gt; &amp;t, priority prio=priority(), const char *n=&quot;&quot;)</td></tr>
-<tr class="memitem:a9434626907c11619ad52fa87baa96bff"><td class="memTemplParams" colspan="2"><a class="anchor" id="a9434626907c11619ad52fa87baa96bff"></a>
-template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a9434626907c11619ad52fa87baa96bff"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sync</b> (const boost::function&lt; T()&gt; &amp;t, const char *n, priority prio=current_priority(), const microseconds &amp;timeout_us=microseconds::max())</td></tr>
-<tr class="memitem:a19f4ea78a7e7cfd168bb9ac43fb6f134"><td class="memTemplParams" colspan="2"><a class="anchor" id="a19f4ea78a7e7cfd168bb9ac43fb6f134"></a>
-template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a19f4ea78a7e7cfd168bb9ac43fb6f134"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sync</b> (const boost::function&lt; T()&gt; &amp;t, priority prio, const microseconds &amp;timeout_us=microseconds::max(), const char *n=&quot;&quot;)</td></tr>
-<tr class="memitem:a170937d49fd2459e99af69948bfad939"><td class="memTemplParams" colspan="2"><a class="anchor" id="a170937d49fd2459e99af69948bfad939"></a>
-template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a170937d49fd2459e99af69948bfad939"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sync</b> (const boost::function&lt; T()&gt; &amp;t, const microseconds &amp;timeout_us=microseconds::max(), const char *n=&quot;&quot;)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#ad3ac7122b84ba8e8ce08148739c5d065">sleep_until</a> (const system_clock::time_point &amp;tp)</td></tr>
+<tr class="memdesc:ad3ac7122b84ba8e8ce08148739c5d065"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as <code>cmt::current().<a class="el" href="namespacemace_1_1cmt.html#ad3ac7122b84ba8e8ce08148739c5d065" title="Same as cmt::current().sleep_until()">sleep_until()</a></code> <br/></td></tr>
+<tr class="memitem:ac428192d0807b17852ccc812cb4678be"><td class="memTemplParams" colspan="2"><a class="anchor" id="ac428192d0807b17852ccc812cb4678be"></a>
+template&lt;typename Functor &gt; </td></tr>
+<tr class="memitem:ac428192d0807b17852ccc812cb4678be"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>async</b> (Functor &amp;&amp;f, const char *n, priority prio=priority())-&gt; cmt</td></tr>
+<tr class="memitem:a7987c0abcbbcd5644e93535195b7a804"><td class="memTemplParams" colspan="2"><a class="anchor" id="a7987c0abcbbcd5644e93535195b7a804"></a>
+template&lt;typename Functor &gt; </td></tr>
+<tr class="memitem:a7987c0abcbbcd5644e93535195b7a804"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>async</b> (Functor &amp;&amp;f, priority prio=priority(), const char *n=&quot;&quot;)-&gt; cmt</td></tr>
 <tr class="memitem:a1235a11cd88f39acf0d35d5a10c1789a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1235a11cd88f39acf0d35d5a10c1789a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>async</b> (const boost::function&lt; void()&gt; &amp;t, priority prio=priority())</td></tr>
 <tr class="memitem:affb5be33f34a8bd5c279e923349902b3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="affb5be33f34a8bd5c279e923349902b3"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>exec</b> ()</td></tr>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#affb5be33f34a8bd5c279e923349902b3">exec</a> ()</td></tr>
+<tr class="memdesc:affb5be33f34a8bd5c279e923349902b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as <code>cmt::current().<a class="el" href="namespacemace_1_1cmt.html#affb5be33f34a8bd5c279e923349902b3" title="Same as cmt::current().exec()">exec()</a></code> <br/></td></tr>
 <tr class="memitem:a27f5f82804bf9f50a6c9a7b79e964f01"><td class="memTemplParams" colspan="2"><a class="anchor" id="a27f5f82804bf9f50a6c9a7b79e964f01"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a27f5f82804bf9f50a6c9a7b79e964f01"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><b>wait</b> (boost::signal&lt; void(T)&gt; &amp;sig, const microseconds &amp;timeout_us=microseconds::max())</td></tr>
@@ -178,29 +172,20 @@ template&lt;typename T &gt; </td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>wait</b> (boost::signal&lt; void()&gt; &amp;sig, const microseconds &amp;timeout_us=microseconds::max())</td></tr>
 </table>
 <hr/><h2>Function Documentation</h2>
-<a class="anchor" id="af4a6cb3372677000d4c35d1c377b9bee"></a>
+<a class="anchor" id="af8f5129408ef43d58f02d75b101275a8"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee">mace::cmt::usleep</a> </td>
+          <td class="memname">void <a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8">mace::cmt::yield</a> </td>
           <td>(</td>
-          <td class="paramtype">uint64_t&#160;</td>
-          <td class="paramname"><em>us</em></td><td>)</td>
-          <td><code> [inline]</code></td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Sleeps the current stack for </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">us</td><td>microseconds. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="thread_8hpp_source.html#l00153">153</a> of file <a class="el" href="thread_8hpp_source.html">thread.hpp</a>.</p>
+<p>Same as <code>cmt::current().<a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="cmt::thread::current().yield()">yield()</a></code> </p>
 
 </div>
 </div>
@@ -208,7 +193,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>wait</b> (boost::sign
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 1 2012 10:20:39 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 2 2012 00:52:41 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

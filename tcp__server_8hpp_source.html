@@ -127,12 +127,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00025"></a>00025 
 <a name="l00026"></a>00026       <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SessionType&gt;
 <a name="l00027"></a>00027       <a class="code" href="classmace_1_1rpc_1_1json_1_1tcp__server.html">tcp_server</a>( <span class="keyword">const</span> boost::function&lt;boost::shared_ptr&lt;SessionType&gt;()&gt;&amp; sg, uint16_t port, 
-<a name="l00028"></a>00028                   <a class="code" href="classmace_1_1cmt_1_1thread.html" title="manages cooperative scheduling of tasks within a single operating system thread.">mace::cmt::thread</a>* t = &amp;mace::cmt::thread::current() )
+<a name="l00028"></a>00028                   <a class="code" href="classmace_1_1cmt_1_1thread.html" title="manages cooperative scheduling of tasks within a single operating system thread.">mace::cmt::thread</a>* t = &amp;<a class="code" href="classmace_1_1cmt_1_1thread.html#a40ad356d1c0bbc9bf0b0cbbdfafded15">mace::cmt::thread::current</a>() )
 <a name="l00029"></a>00029       :tcp_server_base( <span class="keyword">new</span> session_creator_impl&lt;SessionType&gt;(sg), port, t ){}
 <a name="l00030"></a>00030 
 <a name="l00031"></a>00031       <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SessionType&gt;
 <a name="l00032"></a>00032       <a class="code" href="classmace_1_1rpc_1_1json_1_1tcp__server.html">tcp_server</a>( <span class="keyword">const</span> boost::shared_ptr&lt;SessionType&gt;&amp; shared_session, uint16_t port,
-<a name="l00033"></a>00033                  <a class="code" href="classmace_1_1cmt_1_1thread.html" title="manages cooperative scheduling of tasks within a single operating system thread.">mace::cmt::thread</a>* t = &amp;mace::cmt::thread::current() ) 
+<a name="l00033"></a>00033                  <a class="code" href="classmace_1_1cmt_1_1thread.html" title="manages cooperative scheduling of tasks within a single operating system thread.">mace::cmt::thread</a>* t = &amp;<a class="code" href="classmace_1_1cmt_1_1thread.html#a40ad356d1c0bbc9bf0b0cbbdfafded15">mace::cmt::thread::current</a>() ) 
 <a name="l00034"></a>00034       :tcp_server_base( <span class="keyword">new</span> shared_session_creator&lt;SessionType&gt;(shared_session), port, t ){}
 <a name="l00035"></a>00035 
 <a name="l00036"></a>00036     <span class="keyword">private</span>:
@@ -171,7 +171,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 1 2012 10:20:39 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 2 2012 00:52:40 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>
