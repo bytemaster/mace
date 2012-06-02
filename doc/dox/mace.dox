@@ -1,0 +1,5 @@
+/**
+  @defgroup mace MACE - Massively Asynchronous Coding Environment
+
+  @brief A collection of libraries for developing asynchronous / distributed applications.
+*/
