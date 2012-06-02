@@ -33,28 +33,28 @@ int hello2(int cnt) {
 int hello(int cnt) {
     return cnt;
     slog( "%1%", cnt );    
-    mace::cmt::async<int>( boost::bind(hello2,cnt+10) );
-    mace::cmt::async<int>( boost::bind(hello2,cnt+1000) );
-    return mace::cmt::async<int>( boost::bind(hello2,cnt+10000) ).wait();
+    mace::cmt::async( boost::bind(hello2,cnt+10) );
+    mace::cmt::async( boost::bind(hello2,cnt+1000) );
+    return mace::cmt::async( boost::bind(hello2,cnt+10000) ).wait();
 }
 
 void main2() {
  //   slog( "%1%", *tmp );
     /*
-    future<int> rtn  = async<int>( boost::bind(hello, "world"), "hello_func" );
-    future<int> rtn2 = async<int>( boost::bind(hello, "world2"), "hello_func2" );
+    future<int> rtn  = async( boost::bind(hello, "world"), "hello_func" );
+    future<int> rtn2 = async( boost::bind(hello, "world2"), "hello_func2" );
     std::cerr<<"length: "<<rtn.wait()<<std::endl;
-    future<int> rtn3 = async<int>( boost::bind(hello, "world3"), "hello_func3" );
-    future<int> rtn4 = async<int>( boost::bind(hello, "world4____"), "hello_func4" );
+    future<int> rtn3 = async( boost::bind(hello, "world3"), "hello_func3" );
+    future<int> rtn4 = async( boost::bind(hello, "world4____"), "hello_func4" );
     std::cerr<<"length: "<<rtn4.wait()<<std::endl;
-    future<int> rtn5 = async<int>( boost::bind(hello, "world5"), "hello_func5" );
+    future<int> rtn5 = async( boost::bind(hello, "world5"), "hello_func5" );
     wlog( "main2 done" );
     */
 }
 
 void bench() {
   wlog( "waiting async delay" );
-    async<void_t>(delay).wait();
+    async(delay).wait();
   wlog( "delay returned!" );
     uint64_t cnt = 1000000;
     //uint64_t cnt = 10;
@@ -63,8 +63,8 @@ void bench() {
     std::string hellostr("hello");
     for( uint32_t i = 0; i < cnt; ++i ) {
         try {
-            async<int>( boost::bind(hello, i), "hello_func" ).wait(boost::chrono::seconds(1));
-           // async<int>( boost::bind(hello, "world"), "hello_func" ).wait();//2000000);
+            async( boost::bind(hello, i), "hello_func" ).wait(boost::chrono::seconds(1));
+           // async( boost::bind(hello, "world"), "hello_func" ).wait();//2000000);
         } catch( const boost::exception& e ) {
                 elog( "%1%", boost::diagnostic_information(e) );
         }
@@ -76,8 +76,8 @@ void bench() {
     start = boost::posix_time::microsec_clock::universal_time();
     for( uint32_t i = 0; i < cnt; ++i ) {
         try {
-           // async<int>( boost::bind(hello, "world"), "hello_func" ).wait(1000000);
-            async<int>( boost::bind(hello, i), "hello_func" ).wait();//2000000);
+           // async( boost::bind(hello, "world"), "hello_func" ).wait(1000000);
+            async( boost::bind(hello, i), "hello_func" ).wait();//2000000);
         } catch( const boost::exception& e ) {
                 elog( "%1%", boost::diagnostic_information(e) );
         }
@@ -89,7 +89,7 @@ void bench() {
     start = boost::posix_time::microsec_clock::universal_time();
     for( uint32_t i = 0; i < cnt; ++i ) {
         try {
-            async<int>( boost::bind(hello, int(5)) ).wait( boost::chrono::microseconds(1000000) );
+            async( boost::bind(hello, int(5)) ).wait( boost::chrono::microseconds(1000000) );
            // sync<int>( boost::bind(hello, i), "hello_func" );//2000000);
         } catch( const boost::exception& e ) {
                 elog( "%1%", boost::diagnostic_information(e) );
@@ -105,9 +105,9 @@ void bench() {
     start = boost::posix_time::microsec_clock::universal_time();
     for( uint32_t i = 0; i < cnt; ++i ) {
         try {
-           // async<int>( boost::bind(hello, "world"), "hello_func" ).wait(1000000);
+           // async( boost::bind(hello, "world"), "hello_func" ).wait(1000000);
            for( uint32_t f = 0; f < group_size; ++f ) {
-            futures[f] = async<int>( boost::bind(hello, i*group_size+f), "hello_func", mace::cmt::priority(f) );//2000000);
+            futures[f] = async( boost::bind(hello, i*group_size+f), "hello_func", mace::cmt::priority(f) );//2000000);
            }
            for( uint32_t f = 0; f < group_size; ++f ) {
             futures[f].wait();
@@ -123,9 +123,9 @@ void bench() {
     start = boost::posix_time::microsec_clock::universal_time();
     for( uint32_t i = 0; i < cnt; ++i ) {
         try {
-           // async<int>( boost::bind(hello, "world"), "hello_func" ).wait(1000000);
+           // async( boost::bind(hello, "world"), "hello_func" ).wait(1000000);
            for( uint32_t f = 0; f < group_size; ++f ) {
-            futures[f] = async<int>( boost::bind(hello, i*group_size+f), "hello_func" );//2000000);
+            futures[f] = async( boost::bind(hello, i*group_size+f), "hello_func" );//2000000);
            }
            for( uint32_t f = 0; f < group_size; ++f ) {
             futures[f].wait();

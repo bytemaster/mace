@@ -411,7 +411,7 @@ namespace mace { namespace cmt {
 
     int  exec() { cmt::thread::current().exec(); return 0; }
     void async( const boost::function<void()>& t, priority prio ) {
-      thread::current().async(t,prio);
+      thread::current().post(t,prio);
     }
 
     thread::thread() {
@@ -616,9 +616,10 @@ namespace mace { namespace cmt {
     }
 
 
-    //void thread::async( const boost::function<void()>& t, priority prio ) {
-    //   async(task::ptr( new vtask(t,prio) ) );
-    //}
+    void thread::post( const boost::function<void()>& t, priority prio ) {
+       async_task(task::ptr( new vtask(t,prio) ) );
+    }
+
     void thread::async_task( const task::ptr& t ) {
         task::ptr stale_head = my->task_in_queue.load(boost::memory_order_relaxed);
         do { t->next = stale_head;

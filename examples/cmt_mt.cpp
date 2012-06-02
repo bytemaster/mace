@@ -12,7 +12,7 @@ int main( int argc, char** argv ) {
 
    cmt::future<int> f1 = t1->async( bind(hello,"world1") );
    auto f2 = t2->async( bind(hello,"world2") );
-   auto f3 = cmt::async<int>( bind(hello,"world3") );
+   auto f3 = cmt::async( bind(hello,"world3") );
 
    // world3 is processed in current thread, while waiting on f1 & f2
    std::cerr<<( f1.wait() + f2.wait() + f3.wait() ) << std::endl;

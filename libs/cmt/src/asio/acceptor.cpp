@@ -61,7 +61,7 @@ namespace mace { namespace cmt {  namespace asio {
 
     void acceptor::listen( uint16_t port, const acceptor::handler& on_con ) {
         my->new_connection = on_con;
-        my->listen_done = cmt::async<void_t>( boost::bind( &acceptor_private::listen, my, port ) );
+        my->listen_done = cmt::async( boost::bind( &acceptor_private::listen, my, port ) );
     }
 
 

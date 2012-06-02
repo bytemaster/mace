@@ -29,9 +29,9 @@ int main( int argc, char** argv ) {
   mace::cmt::actor<calculator> act2(ap, at );
 
   mace::cmt::thread* tt = mace::cmt::thread::create( "test_thread" );
-  tt->async<void>( boost::bind(test, act) ).wait();
-  tt->async<void>( boost::bind(test, act2) ).wait();
-  at->async<void>( boost::bind(test, act2) ).wait();
+  tt->async( boost::bind(test, act) ).wait();
+  tt->async( boost::bind(test, act2) ).wait();
+  at->async( boost::bind(test, act2) ).wait();
 
   //test(act);
   test(act2);

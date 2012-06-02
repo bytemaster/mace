@@ -62,7 +62,7 @@ namespace mace { namespace rpc { namespace json {
       my->_thread = t;
       my->_port   = port;
 
-      my->_listen_done = t->async<void>( boost::bind( &detail::tcp_server_base_private::listen, my ) );
+      my->_listen_done = t->async( boost::bind( &detail::tcp_server_base_private::listen, my ) );
     }
 
 

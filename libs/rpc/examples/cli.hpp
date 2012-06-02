@@ -36,7 +36,7 @@ class cli {
        { return methods[name]; }
 
        void start() {  
-          read_done = mace::cmt::async<void>( boost::bind( &cli::read_loop, this ) );
+          read_done = mace::cmt::async( boost::bind( &cli::read_loop, this ) );
        }
 
    private:
@@ -49,7 +49,7 @@ class cli {
            {
                std::string cmd, line, args;
                std::cerr << "Enter Method: ";
-               line = getline_thread->async<std::string>( cin_getline );
+               line = getline_thread->async( cin_getline );
                cmd = line.substr( 0, line.find(' ') );
                args = line.substr( cmd.size(), line.size() );
                try {

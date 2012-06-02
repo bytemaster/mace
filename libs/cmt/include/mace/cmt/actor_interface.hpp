@@ -272,7 +272,7 @@ struct actor_member<R(Class::*)(PARAM_TYPES)> : public detail::actor_member_base
   }
   future_type operator() ( const fused_params& fp ) {
     if( this->m_actor && &mace::cmt::thread::current() != this->m_actor->m_thread ) {
-      return this->m_actor->m_thread->async<R>( boost::bind(m_delegate,fp) );
+      return this->m_actor->m_thread->async( boost::bind(m_delegate,fp) );
     }
     return m_delegate( fp );
   }

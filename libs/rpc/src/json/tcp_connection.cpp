@@ -12,7 +12,7 @@ class tcp_connection_private {
 
       tcp_connection_private( rpc::json::tcp_connection& s, const mace::cmt::asio::tcp::socket::ptr& c ) 
       :self( s ), sock( c ) {
-        read_done = self.get_thread()->async<void>( boost::bind(&tcp_connection_private::read_loop,this) );
+        read_done = self.get_thread()->async( boost::bind(&tcp_connection_private::read_loop,this) );
       }
 
       ~tcp_connection_private() {

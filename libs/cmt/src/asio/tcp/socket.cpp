@@ -191,7 +191,7 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
       memcpy( &(*cur_write_buf)[wpos], buffer, size );
 
       if( first ) {
-        write_complete = mace::cmt::async<void>( boost::bind( &socket::write_loop, this, cur_wbuf_idx ) );
+        write_complete = mace::cmt::async( boost::bind( &socket::write_loop, this, cur_wbuf_idx ) );
         cur_wbuf_idx = (cur_wbuf_idx+1)&0x01;
         cur_write_buf = &write_buf[cur_wbuf_idx];
       }

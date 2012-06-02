@@ -50,7 +50,7 @@ namespace mace { namespace rpc { namespace json {
   void connection::send( const json::value& msg, 
                          const connection::pending_result::ptr& pr  ) {
     if( &mace::cmt::thread::current() != my->m_thread ) {
-      my->m_thread->async<void>( 
+      my->m_thread->async( 
           boost::bind( &connection::send, this, boost::cref(msg), pr ) ).wait();
       return;
     }
@@ -61,7 +61,7 @@ namespace mace { namespace rpc { namespace json {
 
   std::string connection::add_method( const rpc_method& m ) {
     if( &mace::cmt::thread::current() != my->m_thread ) {
-      return my->m_thread->async<std::string>( boost::bind( (std::string (connection::*)(const rpc_method&))&connection::add_method, this, m ) );
+      return my->m_thread->async( boost::bind( (std::string (connection::*)(const rpc_method&))&connection::add_method, this, m ) );
     } else {
       std::string mid = "CB" + boost::lexical_cast<std::string>( ++my->next_callback_id );
       my->methods[mid] = m;
