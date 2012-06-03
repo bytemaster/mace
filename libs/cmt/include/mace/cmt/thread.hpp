@@ -86,10 +86,10 @@ namespace cmt {
      */
     template<typename Functor>
     auto schedule( Functor&& f, const system_clock::time_point& when, 
-                   priority prio = priority(), const char* n= "" ) -> future<decltype(f())> {
+                   priority prio = priority() ) -> future<decltype(f())> {
          typedef decltype(f()) Result;
          typename promise<Result>::ptr p(new promise<Result>());
-         task::ptr tsk( new rtask<Functor,Result>( std::forward<Functor>(f),p,when,std::max(current_priority(),prio),n) );
+         task::ptr tsk( new rtask<Functor,Result>( std::forward<Functor>(f),p,when,std::max(current_priority(),prio)) );
          async_task(tsk);
          return p;
     }
@@ -104,10 +104,10 @@ namespace cmt {
      *  @param n a debut name to associate with this task.
      */
     template<typename Functor>
-    auto async( Functor&& f, priority prio = priority(), const char* n= "" ) -> future<decltype(f())> {
+    auto async( Functor&& f, priority prio = priority()) -> future<decltype(f())> {
        typedef decltype(f()) Result;
        typename promise<Result>::ptr p(new promise<Result>());
-       task::ptr tsk( new rtask<Functor,Result>( std::forward<Functor>(f),p,std::max(current_priority(),prio),n) );
+       task::ptr tsk( new rtask<Functor,Result>( std::forward<Functor>(f),p,std::max(current_priority(),prio)) );
        async_task(tsk);
        return p;
     }
@@ -125,8 +125,8 @@ namespace cmt {
      */
     template<typename Functor>
     void post( Functor&& f, const system_clock::time_point& when, 
-                        priority prio = priority(), const char* n= "" ) {
-      task::ptr tsk( new vtask<Functor>(std::forward<Functor>(f),when,std::max(current_priority(),prio),n) );
+                        priority prio = priority()) {
+      task::ptr tsk( new vtask<Functor>(std::forward<Functor>(f),when,std::max(current_priority(),prio)) );
       async_task(tsk);
     }
 
@@ -195,12 +195,8 @@ namespace cmt {
    };
 
    template<typename Functor>
-   auto async( Functor&& f, const char* n, priority prio=priority()) -> cmt::future<decltype(f())> {
-    return cmt::thread::current().async(std::forward<Functor>(f),(std::max)(current_priority(),prio),n);
-   }
-   template<typename Functor>
-   auto async( Functor&& f, priority prio=priority(), const char* n = "") -> cmt::future<decltype(f())> {
-    return cmt::thread::current().async(std::forward<Functor>(f),(std::max)(current_priority(),prio),n);
+   auto async( Functor&& f, priority prio=priority()) -> cmt::future<decltype(f())> {
+    return cmt::thread::current().async(std::forward<Functor>(f),(std::max)(current_priority(),prio));
    }
    void async( const boost::function<void()>& t, priority prio=priority() ); 
 

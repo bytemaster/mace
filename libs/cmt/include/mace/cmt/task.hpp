@@ -26,6 +26,22 @@ namespace mace { namespace cmt {
      int value;
    };
 
+  /**
+   *  @todo 
+   *    Eliminate the need for virtual functions as the number of potential
+   *    functors involved would result in RTTI code bloat explosion.  The cost
+   *    would be implementing a 'manual' vtable for run() and destructor()
+   *
+   *  @todo
+   *    Convert a task into a promise!  This would eliminate another alloc per
+   *    async operation as only the task would require an alloc.  The downside 
+   *    is that extra memory would be kept around until no-one needed the 
+   *    task any more.
+   *
+   *  @todo Eliminate vtask as redundant once all tasks are promises and
+   *    there is no 'extra' overhead associated with returning a promise.
+   *
+   */
   class task {
     public:
       typedef task* ptr;
@@ -38,8 +54,8 @@ namespace mace { namespace cmt {
 
       virtual void run() = 0;
       /// implemented in thread.cpp
-      virtual void cancel();
-      virtual const char* name() { return "unknown"; }
+      void cancel();
+
     protected:
       void          set_active_context( cmt_context* c ) {
         boost::unique_lock<cmt::spin_lock> lock( active_context_lock );
@@ -62,12 +78,12 @@ namespace mace { namespace cmt {
   class rtask : public task {
     public:
       template<typename F>
-      rtask( F&& f, const typename promise<R>::ptr& p, const system_clock::time_point& tp, priority prio, const char* name = "" )
-      :task(prio,tp),m_functor(std::forward<F>(f)),m_prom(p),m_name(name){ m_prom->set_task(this); }
+      rtask( F&& f, const typename promise<R>::ptr& p, const system_clock::time_point& tp, priority prio )
+      :task(prio,tp),m_functor(std::forward<F>(f)),m_prom(p){ m_prom->set_task(this); }
 
       template<typename F>
-      rtask( F&& f, const typename promise<R>::ptr& p, priority prio, const char* name = "" )
-      :task(prio),m_functor(std::forward<F>(f)),m_prom(p),m_name(name){ m_prom->set_task(this); }
+      rtask( F&& f, const typename promise<R>::ptr& p, priority prio )
+      :task(prio),m_functor(std::forward<F>(f)),m_prom(p){ m_prom->set_task(this); }
       ~rtask(){ m_prom->set_task(0); }
 
       void run() {
@@ -80,23 +96,21 @@ namespace mace { namespace cmt {
           m_prom->set_exception(boost::current_exception());
         }
       }
-      const char* name() { return m_name; }
 
       Functor           m_functor;
       typename promise<R>::ptr  m_prom;
-      const char*         m_name;
   };
 
   template<typename Functor>
   class rtask<Functor,void> : public task {
     public:
       template<typename F>
-      rtask( F&& f, const promise<void>::ptr& p, const system_clock::time_point& tp, priority prio, const char* name = "" )
-      :task(prio,tp),m_functor(std::forward<F>(f)),m_prom(p),m_name(name){ m_prom->set_task(this); }
+      rtask( F&& f, const promise<void>::ptr& p, const system_clock::time_point& tp, priority prio )
+      :task(prio,tp),m_functor(std::forward<F>(f)),m_prom(p){ m_prom->set_task(this); }
 
       template<typename F>
-      rtask( F&& f, const  promise<void>::ptr& p, priority prio=priority(), const char* name = "" )
-      :task(prio),m_functor(std::forward<F>(f)),m_prom(p),m_name(name){ m_prom->set_task(this); }
+      rtask( F&& f, const  promise<void>::ptr& p, priority prio=priority() )
+      :task(prio),m_functor(std::forward<F>(f)),m_prom(p){ m_prom->set_task(this); }
       ~rtask() { m_prom->set_task(0); }
 
       void run() {
@@ -110,24 +124,21 @@ namespace mace { namespace cmt {
           m_prom->set_exception(boost::current_exception());
         }
       }
-      const char* name() { return m_name; }
     
       Functor       m_functor;
       promise<void>::ptr  m_prom;
-      const char*     m_name;
   };
 
   template<typename Functor>
   class vtask : public task {
     public:
     template<typename F>
-    vtask( F&& f, priority prio = priority(), const char* n="" )
-    :task(prio),m_functor(std::forward<F>(f)),m_name(n){ }
+    vtask( F&& f, priority prio = priority() )
+    :task(prio),m_functor(std::forward<F>(f)){ }
     template<typename F>
-    vtask( F&& f, const system_clock::time_point& when, priority prio = priority(), const char* n="" )
-    :task(prio,when),m_functor(std::forward<F>(f)),m_name(n){ }
+    vtask( F&& f, const system_clock::time_point& when, priority prio = priority() )
+    :task(prio,when),m_functor(std::forward<F>(f)){ }
 
-    void cancel() {}
     void run() {
       try {
         if( !canceled )
@@ -140,9 +151,7 @@ namespace mace { namespace cmt {
         BOOST_ASSERT(!"unhandled exception");
       }
     }
-    virtual const char* name() { return m_name; }
     Functor           m_functor;
-    const char*         m_name;
   };
 
 } } // namespace mace::cmt
