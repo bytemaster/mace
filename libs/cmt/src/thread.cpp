@@ -631,12 +631,18 @@ namespace mace { namespace cmt {
         do { t->next = stale_head;
         }while( !my->task_in_queue.compare_exchange_weak( stale_head, t, boost::memory_order_release ) );
 
-        // we must make sure thany any 'read' of notify_thread happens *AFTER* the write
-        // we could use memory_order_acquire, but this provides a stronger guarantee than is required
-        // since the only operations depending on the value of the state need to be ordered.
-        if( this != &current() && notify_thread.load(boost::memory_order_consume)  ) {
-          boost::unique_lock<boost::mutex> lock(my->task_ready_mutex);
-          my->task_ready.notify_one();
+        // we can avoid waking and an atomic test on notify_thread if stale_head is not 0 because
+        // we know that either this thread is not blocking or another thread will be responsible
+        // for waking this thread.
+       
+        if( this != &current() &&  !stale_head ) { 
+          // we must make sure that any 'read' of notify_thread happens *AFTER* the write.
+          // we could use memory_order_acquire, but this provides a stronger guarantee than is required
+          // since the only operations depending on the value of the state need to be ordered.
+          if( my->notify_thread.load(boost::memory_order_consume)  ) {
+            boost::unique_lock<boost::mutex> lock(my->task_ready_mutex);
+            my->task_ready.notify_one();
+          }
         }
     }
     void yield() { thread::current().yield(); }
