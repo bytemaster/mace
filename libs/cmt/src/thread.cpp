@@ -116,7 +116,6 @@ namespace mace { namespace cmt {
         public:
            thread_private(cmt::thread& s)
             :self(s), boost_thread(0),
-             notify_thread(0),
              task_in_queue(0),
              done(false),
              current(0),
@@ -131,7 +130,6 @@ namespace mace { namespace cmt {
            bc::stack_allocator              stack_alloc;
            boost::mutex                     task_ready_mutex;
            boost::condition_variable        task_ready;
-           boost::atomic<bool>              notify_thread;
 
            boost::atomic<task*>             task_in_queue;
            std::vector<task*>               task_pqueue;
@@ -321,9 +319,6 @@ namespace mace { namespace cmt {
 
                 clear_free_list();
 
-                // any dereference of notify_thread must happen *AFTER* this store
-                notify_thread.store(true,boost::memory_order_release);
-
                 { // lock scope
                   boost::unique_lock<boost::mutex> lock(task_ready_mutex);
                   if( has_next_task() ) continue;
@@ -335,10 +330,6 @@ namespace mace { namespace cmt {
                     task_ready.timed_wait( lock, to_system_time(timeout_time) );
                   }
                 }
-
-                // what is the worst that can happen, a thread does an unnecessary
-                // notify?
-                notify_thread.store(false,boost::memory_order_relaxed);
               }
            }
 
@@ -631,18 +622,12 @@ namespace mace { namespace cmt {
         do { t->next = stale_head;
         }while( !my->task_in_queue.compare_exchange_weak( stale_head, t, boost::memory_order_release ) );
 
-        // we can avoid waking and an atomic test on notify_thread if stale_head is not 0 because
-        // we know that either this thread is not blocking or another thread will be responsible
-        // for waking this thread.
-       
+        // Because only one thread can post the 'first task', only that thread will attempt
+        // to aquire the lock and therefore there should be no contention on this lock except
+        // when *this thread is about to block on a wait condition.  
         if( this != &current() &&  !stale_head ) { 
-          // we must make sure that any 'read' of notify_thread happens *AFTER* the write.
-          // we could use memory_order_acquire, but this provides a stronger guarantee than is required
-          // since the only operations depending on the value of the state need to be ordered.
-          if( my->notify_thread.load(boost::memory_order_consume)  ) {
             boost::unique_lock<boost::mutex> lock(my->task_ready_mutex);
             my->task_ready.notify_one();
-          }
         }
     }
     void yield() { thread::current().yield(); }
