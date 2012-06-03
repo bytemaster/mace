@@ -34,7 +34,7 @@ namespace mace { namespace cmt {
         static int64_t global_task_count=0;
         posted_num = ++global_task_count;
       }
-      ~task() { }
+      virtual ~task() { }
 
       virtual void run() = 0;
       /// implemented in thread.cpp
