@@ -116,6 +116,7 @@ namespace mace { namespace cmt {
         public:
            thread_private(cmt::thread& s)
             :self(s), boost_thread(0),
+             notify_thread(0),
              task_in_queue(0),
              done(false),
              current(0),
@@ -130,8 +131,8 @@ namespace mace { namespace cmt {
            bc::stack_allocator              stack_alloc;
            boost::mutex                     task_ready_mutex;
            boost::condition_variable        task_ready;
+           boost::atomic<bool>              notify_thread;
 
-           std::vector<task*>   test_stack;
            boost::atomic<task*>             task_in_queue;
            std::vector<task*>               task_pqueue;
            std::vector<task*>               task_sch_queue;
@@ -320,15 +321,24 @@ namespace mace { namespace cmt {
 
                 clear_free_list();
 
-                boost::unique_lock<boost::mutex> lock(task_ready_mutex);
-                if( has_next_task() ) continue;
-                system_clock::time_point timeout_time = check_for_timeouts();
+                // any dereference of notify_thread must happen *AFTER* this store
+                notify_thread.store(true,boost::memory_order_release);
 
-                if( timeout_time == system_clock::time_point::max() ) {
-                  task_ready.wait( lock );
-                } else if( timeout_time != system_clock::time_point::min() ) {
-                  task_ready.timed_wait( lock, to_system_time(timeout_time) );
+                { // lock scope
+                  boost::unique_lock<boost::mutex> lock(task_ready_mutex);
+                  if( has_next_task() ) continue;
+                  system_clock::time_point timeout_time = check_for_timeouts();
+                  
+                  if( timeout_time == system_clock::time_point::max() ) {
+                    task_ready.wait( lock );
+                  } else if( timeout_time != system_clock::time_point::min() ) {
+                    task_ready.timed_wait( lock, to_system_time(timeout_time) );
+                  }
                 }
+
+                // what is the worst that can happen, a thread does an unnecessary
+                // notify?
+                notify_thread.store(false,boost::memory_order_relaxed);
               }
            }
 
@@ -621,7 +631,10 @@ namespace mace { namespace cmt {
         do { t->next = stale_head;
         }while( !my->task_in_queue.compare_exchange_weak( stale_head, t, boost::memory_order_release ) );
 
-        if( this != &current() ) {
+        // we must make sure thany any 'read' of notify_thread happens *AFTER* the write
+        // we could use memory_order_acquire, but this provides a stronger guarantee than is required
+        // since the only operations depending on the value of the state need to be ordered.
+        if( this != &current() && notify_thread.load(boost::memory_order_consume)  ) {
           boost::unique_lock<boost::mutex> lock(my->task_ready_mutex);
           my->task_ready.notify_one();
         }

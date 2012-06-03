@@ -169,7 +169,7 @@ namespace cmt {
     priority current_priority()const;
     ~thread();
 
-    protected:
+    private:
       void set_boost_thread( boost::thread* t );
       friend class thread_private;
       friend void mace::cmt::yield();

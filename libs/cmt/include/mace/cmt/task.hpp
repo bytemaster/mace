@@ -1,3 +1,8 @@
+/**
+ *  @file mace/cmt/task.hpp
+ *
+ *  @todo move into detail folder, this is not part of the public api.
+ */
 #ifndef MACE_CMT_TASK_HPP
 #define MACE_CMT_TASK_HPP
 #include <boost/enable_shared_from_this.hpp>
