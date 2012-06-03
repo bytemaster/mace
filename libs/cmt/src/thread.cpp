@@ -295,7 +295,7 @@ namespace mace { namespace cmt {
                     next->set_active_context( current );
                     next->run();
                     next->set_active_context(0);
-                    next->release();
+                    delete next;
                     return true;
                 }
                 return false;
@@ -615,10 +615,6 @@ namespace mace { namespace cmt {
         my->clear_free_list();
     }
 
-
-    void thread::post( const boost::function<void()>& t, priority prio ) {
-       async_task(task::ptr( new vtask(t,prio) ) );
-    }
 
     void thread::async_task( const task::ptr& t ) {
         task::ptr stale_head = my->task_in_queue.load(boost::memory_order_relaxed);

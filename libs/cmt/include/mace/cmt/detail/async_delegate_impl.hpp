@@ -58,7 +58,7 @@ class async_delegate_impl<n, Signature > {
   public:
     typedef boost::function_traits<Signature>  traits;
     future<typename traits::result_type> operator()(PARAM_ARGS) { 
-      return m_thr.async<typename traits::result_type>( boost::bind(m_del,PARAM_NAMES) );
+      return m_thr.async( boost::bind(m_del,PARAM_NAMES) );
     }
 
     template<typename Functor>

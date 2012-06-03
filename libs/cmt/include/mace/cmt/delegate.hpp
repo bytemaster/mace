@@ -21,8 +21,8 @@ namespace mace { namespace cmt {
             typedef Signature signature;
 
             template<typename Functor>
-            async_delegate( const Functor& slot, thread& s = thread::current() )
-            :detail::async_delegate_impl<boost::function_traits<Signature>::arity, Signature >(slot,s){}
+            async_delegate( Functor&& slot, thread& s = thread::current() )
+            :detail::async_delegate_impl<boost::function_traits<Signature>::arity, Signature >(std::forward<Functor>(slot),s){}
     };
 
 } // namespace mace::cmt
