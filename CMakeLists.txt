@@ -15,6 +15,7 @@ SET( BUILD_SHARED_LIBS NO )
 SET(Boost_USE_STATIC_LIBS ON)
 FIND_PACKAGE(Boost COMPONENTS thread date_time system filesystem program_options signals serialization chrono) 
 
+
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
@@ -44,6 +45,7 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 if( UNIX ) 
+  SET( TCMALLOC_LIBRARY libtcmalloc.a )
   if( NOT APPLE )  
     set(rt_library rt )
 	set(pthread_library pthread) 

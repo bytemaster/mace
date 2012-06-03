@@ -3,9 +3,9 @@ include_directories( ../libs/reflect/include )
 include_directories( ../libs/atomic/include )
 
 SET( libraries 
-    #/usr/local/lib/tcmalloc/libtcmalloc.a
     mace_cmt
     boost_context 
+    ${TCMALLOC_LIBRARY}
     ${pthread_library}
     ${rt_library}
     ${Boost_THREAD_LIBRARY} 

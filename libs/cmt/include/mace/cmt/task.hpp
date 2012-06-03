@@ -62,7 +62,7 @@ namespace mace { namespace cmt {
       void cancel();
 
     protected:
-      void          set_active_context( cmt_context* c ) {
+      void set_active_context( cmt_context* c ) {
         boost::unique_lock<cmt::spin_lock> lock( active_context_lock );
         active_context = c;
       }
