@@ -315,7 +315,7 @@ namespace mace { namespace cmt {
            void process_tasks() {
               while( !done || blocked ) {
                 if( run_next_task() ) continue;
-                if( ready_head ) { start_next_fiber(true); continue; }
+                if( ready_head ) { start_next_fiber(true); }
 
                 clear_free_list();
 
