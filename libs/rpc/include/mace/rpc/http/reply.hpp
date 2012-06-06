@@ -40,6 +40,10 @@ namespace mace { namespace rpc { namespace http {
         service_unavailable = 503
       } status;
 
+      reply():keep_alive(false){}
+
+      bool keep_alive;
+
       /// The headers to be included in the reply.
       std::vector<header> headers;
 

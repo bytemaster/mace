@@ -22,30 +22,49 @@ namespace mace { namespace cmt { namespace asio {
                               const boost::system::error_code& ec ) {
             p->set_value(ec);
         }
+
+        template<typename EndpointType, typename IteratorType>
+        void resolve_handler( 
+                             const typename promise<std::vector<EndpointType> >::ptr& p,
+                             const boost::system::error_code& ec, 
+                             IteratorType itr) {
+            if( !ec ) {
+                std::vector<EndpointType> eps;
+                while( itr != IteratorType() ) {
+                    eps.push_back(*itr);
+                    ++itr;
+                }
+                p->set_value( eps );
+            } else {
+                p->set_exception( boost::copy_exception( boost::system::system_error(ec) ) );
+            }
+        }
     }
     boost::asio::io_service& default_io_service() {
         static boost::asio::io_service*      io = new boost::asio::io_service();
         static boost::asio::io_service::work the_work(*io);
         static boost::thread                 io_t(boost::bind(&boost::asio::io_service::run, io));
+        static boost::thread                 io_t2(boost::bind(&boost::asio::io_service::run, io));
+        static boost::thread                 io_t3(boost::bind(&boost::asio::io_service::run, io));
         return *io;
     }
 
     namespace tcp {
-        std::vector<endpoint> resolve( const std::string& hostname, const std::string& port, const microseconds& timeout_us ) {
+        cmt::future<std::vector<endpoint> > resolve( const std::string& hostname, const std::string& port) {
             resolver res( mace::cmt::asio::default_io_service() );
             promise<std::vector<endpoint> >::ptr p( new promise<std::vector<endpoint> >() );
             res.async_resolve( resolver::query(hostname,port), 
                              boost::bind( detail::resolve_handler<endpoint,resolver_iterator>, p, _1, _2 ) );
-            return p->wait(timeout_us);
+            return p;
         }
     }
     namespace udp {
-        std::vector<endpoint> resolve( resolver& r, const std::string& hostname, const std::string& port, const microseconds& timeout_us  ) {
+        cmt::future<std::vector<endpoint> > resolve( resolver& r, const std::string& hostname, const std::string& port) {
                 resolver res( mace::cmt::asio::default_io_service() );
                 promise<std::vector<endpoint> >::ptr p( new promise<std::vector<endpoint> >() );
                 res.async_resolve( resolver::query(hostname,port), 
                                     boost::bind( detail::resolve_handler<endpoint,resolver_iterator>, p, _1, _2 ) );
-                return p->wait(timeout_us);
+                return p;
         }
     }
 

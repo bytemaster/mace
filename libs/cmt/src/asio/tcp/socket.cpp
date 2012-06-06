@@ -49,7 +49,7 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
     }
 
 
-    boost::system::error_code socket::connect( const boost::asio::ip::tcp::endpoint& ep ) {
+    mace::cmt::future<boost::system::error_code> socket::connect( const boost::asio::ip::tcp::endpoint& ep ) {
         return mace::cmt::asio::tcp::connect( *this, ep );
     }
 

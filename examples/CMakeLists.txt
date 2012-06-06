@@ -5,7 +5,6 @@ include_directories( ../libs/atomic/include )
 SET( libraries 
     mace_cmt
     boost_context 
-    ${TCMALLOC_LIBRARY}
     ${pthread_library}
     ${rt_library}
     ${Boost_THREAD_LIBRARY} 

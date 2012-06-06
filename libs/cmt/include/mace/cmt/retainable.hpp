@@ -51,6 +51,8 @@ class retainable {
             }
         }
 
+        int32_t retain_count()const { return m_ref_count; }
+
     protected:
         virtual ~retainable() {}
 

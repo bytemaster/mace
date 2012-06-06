@@ -64,43 +64,45 @@ void server::operator()(boost::system::error_code ec, std::size_t length)
         // The child exits the loop and processes the connection.
       } while (is_parent());
 
-      // Create the objects needed to receive a request on the connection.
-      buffer_.reset(new boost::array<char, 8192>);
-      request_.reset(new request);
-
-      // Loop until a complete request (or an invalid one) has been received.
-      do
-      {
-        // Receive some more data. When control resumes at the following line,
-        // the ec and length parameters reflect the result of the asynchronous
-        // operation.
-        yield socket_->async_read_some(boost::asio::buffer(*buffer_), strand_->wrap(*this));
-
-        // Parse the data we just received.
-        boost::tie(valid_request_, boost::tuples::ignore)
-          = request_parser_.parse(*request_,
-              buffer_->data(), buffer_->data() + length);
-
-        // An indeterminate result means we need more data, so keep looping.
-      } while (boost::indeterminate(valid_request_));
-
-      // Create the reply object that will be sent back to the client.
-      reply_.reset(new reply);
-
-      if (valid_request_)
-      {
-        // A valid request was received. Call the user-supplied function object
-        // to process the request and compose a reply.
-        request_handler_(*request_, *reply_);
-      }
-      else
-      {
-        // The request was invalid.
-        *reply_ = reply::stock_reply(reply::bad_request);
-      }
-
-      // Send the reply back to the client.
-      yield boost::asio::async_write(*socket_, reply_->to_buffers(), strand_->wrap(*this));
+      do {
+         // Create the objects needed to receive a request on the connection.
+         buffer_.reset(new boost::array<char, 8192>);
+         request_.reset(new request);
+         
+         // Loop until a complete request (or an invalid one) has been received.
+         do
+         {
+           // Receive some more data. When control resumes at the following line,
+           // the ec and length parameters reflect the result of the asynchronous
+           // operation.
+           yield socket_->async_read_some(boost::asio::buffer(*buffer_), strand_->wrap(*this));
+         
+           // Parse the data we just received.
+           boost::tie(valid_request_, boost::tuples::ignore)
+             = request_parser_.parse(*request_,
+                 buffer_->data(), buffer_->data() + length);
+         
+           // An indeterminate result means we need more data, so keep looping.
+         } while (boost::indeterminate(valid_request_));
+         
+         // Create the reply object that will be sent back to the client.
+         reply_.reset(new reply);
+         
+         if (valid_request_)
+         {
+           // A valid request was received. Call the user-supplied function object
+           // to process the request and compose a reply.
+           request_handler_(*request_, *reply_);
+         }
+         else
+         {
+           // The request was invalid.
+           *reply_ = reply::stock_reply(reply::bad_request);
+         }
+         
+         // Send the reply back to the client.
+         yield boost::asio::async_write(*socket_, reply_->to_buffers(), strand_->wrap(*this));
+      } while ( reply_->keep_alive ) ;
 
       // Initiate graceful connection closure.
       socket_->shutdown(tcp::socket::shutdown_both, ec);

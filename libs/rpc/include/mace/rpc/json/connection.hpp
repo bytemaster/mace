@@ -129,7 +129,6 @@ typedef boost::error_info<struct json_err_code_,int64_t> err_code;
         json::value msg;
         msg["method"] = method_name;
         msg["id"]     = next_method_id();
-        // TODO: transform functor params...
 
         if( boost::fusion::size(param ) )
           pack_params( msg["params"], param, typename has_named_params<ParamSeq>::type() );
@@ -147,8 +146,6 @@ typedef boost::error_info<struct json_err_code_,int64_t> err_code;
         // TODO: JSON RCP 1.0 sets this to 'null' instead of being empty
         //msg["id"]     = next_method_id();
 
-        // TODO: transform functor params...
-         
         // TODO: JSON RPC 1.0 does not allow empty param
         if( boost::fusion::size(param ) )
           pack_params( msg["params"], param, typename has_named_params<ParamSeq>::type() );

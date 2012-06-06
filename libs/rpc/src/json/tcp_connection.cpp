@@ -103,7 +103,7 @@ tcp_connection::tcp_connection( const std::string& host, uint16_t port,
   std::vector<boost::asio::ip::tcp::endpoint> eps = mace::cmt::asio::tcp::resolve(host, boost::lexical_cast<std::string>(port) );
   for( uint32_t i = 0; i < eps.size(); ++i ) {
     mace::cmt::asio::tcp::socket::ptr sock = boost::make_shared<mace::cmt::asio::tcp::socket>();
-    if( !sock->connect(eps[i]) ) {
+    if( !sock->connect(eps[i]).wait() ) {
       my = new tcp_connection_private(*this, sock );
       return;
     } 
