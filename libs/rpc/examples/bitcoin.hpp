@@ -34,11 +34,12 @@ struct server_info {
 
 class client {
     public:
-        std::string               backupwallet( const std::string& destination );
-        std::string               getaccount( const std::string& address );
-        std::string               getaccountaddress( const std::string& account );
-        std::vector<std::string>  getaddressesbyaccount( const std::string& account );
-        uint64_t                  getbalance( const std::string& account = "", uint32_t minconf = 1 );
+        std::string                  backupwallet( const std::string& destination );
+        std::string                  getaccount( const std::string& address );
+        std::string                  getaccountaddress( const std::string& account );
+        std::vector<std::string>     getaddressesbyaccount( const std::string& account );
+        double                       getbalance( const std::string& account = "", uint32_t minconf = 1 );
+        std::map<std::string,double> listaccounts( int minconf = 1 );
 
         uint32_t                  getblockcount();
         uint32_t                  getblocknumber();
@@ -47,8 +48,8 @@ class client {
         bool                      getgenerate();
         server_info               getinfo();
                                   
-        uint64_t                  getreceivedbyaddress( const std::string& address, uint32_t minconf = 1 );
-        uint64_t                  getreceivedbyaccount( const std::string& account, uint32_t minconf = 1 );
+        double                  getreceivedbyaddress( const std::string& address, uint32_t minconf = 1 );
+        double                  getreceivedbyaccount( const std::string& account, uint32_t minconf = 1 );
 
         std::string  getnewaddress( const std::string& account = "" );
         void         setaccount( const std::string& address, const std::string& account );
@@ -82,6 +83,7 @@ MACE_REFLECT( bitcoin::server_info,
 
 MACE_STUB( bitcoin::client,
   (backupwallet)
+  (listaccounts)
   (getaccount)
   (getaccountaddress)
   (getaddressesbyaccount)

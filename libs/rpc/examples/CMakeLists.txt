@@ -17,6 +17,11 @@ ENDIF(UNIX)
 #add_executable( jsonv  jsonv.cpp  )
 #target_link_libraries( jsonv ${libraries} )
 
+add_executable( tcpc  tcpc.cpp  )
+target_link_libraries( tcpc ${libraries} )
+add_executable( tcps  tcps.cpp  )
+target_link_libraries( tcps ${libraries} )
+
 add_executable( rpcs  rpc_server.cpp  )
 target_link_libraries( rpcs ${libraries} )
 

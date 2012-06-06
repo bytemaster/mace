@@ -54,6 +54,7 @@ namespace mace { namespace cmt {
     class promise : public promise_base {
         public:
             typedef retainable_ptr<promise> ptr;
+            static ptr make() { return ptr(new promise()); }
 
             promise(){}
             promise( const T& v ):m_value(v){}

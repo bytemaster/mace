@@ -1,6 +1,7 @@
 #ifndef _MACE_CMT_ASIO_TCP_SOCKET_HPP
 #define _MACE_CMT_ASIO_TCP_SOCKET_HPP
 #include <boost/asio.hpp>
+#include <mace/cmt/future.hpp>
 
 namespace mace { namespace cmt { namespace asio { namespace tcp {
     namespace detail { struct socket; }
@@ -18,7 +19,7 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
             socket();
             ~socket();
 
-            boost::system::error_code connect( const boost::asio::ip::tcp::endpoint& ep );
+            mace::cmt::future<boost::system::error_code> connect( const boost::asio::ip::tcp::endpoint& ep );
 
             /**
              * Reads one element at a time.

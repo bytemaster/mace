@@ -1,306 +1,189 @@
-#ifndef _MACE_RPC_JSON_CONNECTION_HPP_
-#define _MACE_RPC_JSON_CONNECTION_HPP_
-#include <boost/rpc/json/value_io.hpp>
-#include <boost/rpc/error.hpp>
-#include <boost/function.hpp>
-#include <vector>
-#include <boost/cmt/thread.hpp>
-#include <boost/signals.hpp>
-#include <boost/fusion/include/size.hpp>
-#include <boost/fusion/include/front.hpp>
-#include <boost/fusion/support/deduce.hpp>
-#include <boost/fusion/include/make_fused_function_object.hpp>
-#include <boost/fusion/support/deduce_sequence.hpp>
-#include <boost/fusion/include/make_unfused.hpp>
-#include <boost/rpc/json/named_parameters.hpp>
-#include <boost/function_types/result_type.hpp>
-#include <mace/reflect/value.hpp>
-
+#ifndef _MACE_RPC_CONNECTION_HPP_
+#define _MACE_RPC_CONNECTION_HPP_
+#include <mace/rpc/connection_base.hpp>
+#include <boost/fusion/support/is_sequence.hpp>
+#include <boost/make_shared.hpp>
+#include <mace/rpc/detail/pending_result.hpp>
+#include <mace/rpc/filter.hpp>
 #include <mace/stub/ptr.hpp>
+#include <boost/fusion/support/deduce.hpp>
+#include <boost/fusion/support/deduce_sequence.hpp>
 
+#include <boost/signals.hpp>
 
 namespace mace { namespace rpc { 
 
-//typedef boost::error_info<struct rpc_error_,json::value> error;
-typedef boost::error_info<struct err_data_,std::string> err_data;
-typedef boost::error_info<struct err_code_,int64_t> err_code;
-
-  struct error_object : public virtual mace::rpc::exception {
-      const char* what()const throw()     { return message().c_str();     }
-      virtual void       rethrow()const   { BOOST_THROW_EXCEPTION(*this); } 
-
-      const std::string& data()const
-      { return *boost::get_error_info<mace::rpc::json::err_data>(*this); }
-      int64_t code()const
-      { return *boost::get_error_info<mace::rpc::json::err_code>(*this); }
-  };
-
-  class connection;
-  typedef boost::function<boost::reflect::value( connection&, const boost::reflect::value_cref& param )> rpc_method;
-
   /**
-   *  Manages RPC call state including:
-   *    - sending invokes, setting return codes, and handling promises
-   *    - receiving invokes, calling methods, and sending return codes.
+   *  @tparam IODelegate must implement the following expressions
    *
-   *  Does not implement communication details which are provided by derived classes
-   *  which reimplement send() and call the  protected handler methods.
+   *    datavec IODelegate::pack<T>    ( Filter&, const T& )
+   *    size_t  IODelegate::packsize<T>( Filter&, const T& )
+   *    R       IODelegate::unpack<R>  ( Filter&, const datavec& )
+   *
+   *  @tparam Filter must implement the following expressions
+   *    template<typename T,typename R>
+   *    R operator()( const T& v ) -> returns the data to pack in place of v
+   *
+   *    template<typename T, typename R>
+   *    void operator()( R& r, T& v )  -> given r, assign to v. 
+   *    
+   *    template<typename T>
+   *    const bool is_filtered(const T*)const { return false; }
+   *
+   *    template<typename Signature>
+   *    const bool is_filtered(const boost::function<Signature>*)const { return true; }
+   *
+   *    unpack( Filter& f, Stream& s, T& v ) {
+   *      if( f.is_filtered(&v) ) { // optimizing compiler should reduce this to 1 use case.
+   *        boost::remove_reference<decltype(f(T()))>::type r;
+   *        unpack(f,s,r)
+   *        f( r, v );
+   *      }
+   *      else {
+   *        // do your thing...
+   *      }
+   *    }
    */
-  class connection : public boost::enable_shared_from_this<connection> {
+  template<typename IODelegate >
+  class connection : public connection_base {
     public:
-      /**
-       *  When packing parameters, intercept any boost function and
-       *  create a callback for it.
-       */
-      struct function_filter {
-         function_filter( connection& c ):m_con(c){}
-
-         template<typename T>
-         const T& operator()( const T& v ) { return v; }
-
-         template<typename T>
-         inline void operator()( const json::value& j, T& v ) { 
-           json::io::unpack( *this, j, v ); 
-         }
-         template<typename Signature>
-         inline void operator()( const json::value& j, boost::function<Signature> & v ) { 
-             typedef typename boost::function_types::parameter_types<Signature>::type  mpl_param_types;
-             typedef typename boost::fusion::result_of::as_vector<mpl_param_types>::type param_types;
-             typedef typename boost::function_types::result_type<Signature>::type  R;
-
-             cmt::future<R> (connection::*cf)(const std::string&, const param_types&) = &connection::call_fused;
-             v = boost::fusion::make_unfused(boost::bind( cf, &m_con, (const std::string&)j, _1 ) );
-           //return unpack( *this, j, v ); 
-         }
-
-         template<typename Signature>
-         std::string operator()( const boost::function<Signature>& f ); 
-
-         private:
-             connection& m_con;
-      };
-      
       typedef boost::shared_ptr<connection> ptr;
-      typedef boost::weak_ptr<connection>   wptr;
+      typedef IODelegate io_delegate_type;
 
-      /**
-       *  @param t - the thread in which messages will be sent and callbacks invoked
-       */
-      connection( cmt::thread* t = &cmt::thread::current()  );
-      ~connection();
+      boost::signal<void()> closed;
 
-      cmt::thread* get_thread()const;
-
-      void add_method( const std::string& mid, const rpc_method& m );
-
-      /** The connection will generate and return a method name **/
-      std::string add_method( const rpc_method& m );
-
-
-      #include <boost/rpc/json/detail/call_methods.hpp>
-
-
-      template<typename ParamSeq>
-      boost::cmt::future<json::value> call_fused( const std::string& method_name, const ParamSeq& param ) {
-        json::value msg;
-        create_call( method_name, param, msg );
-        msg["id"]     = next_method_id();
-        typename pending_result_impl<json::value>::ptr pr = boost::make_shared<pending_result_impl<json::value> >(); 
-        send( msg, boost::static_pointer_cast<pending_result>(pr) );
-        return pr->prom;
+      template<typename R, typename ParamSeq>
+      cmt::future<R> call_fused( const std::string& id, ParamSeq&& params ) {
+        return call_fused( std::string(id), std::move(params) );
       }
-
       template<typename ParamSeq>
-      void create_call( const std::string& method_name, const ParamSeq& param, json::value& msg ) {
-        msg["method"] = method_name;
-      
-        if( boost::fusion::size(param ) )
-          pack_params( msg["params"], param, typename has_named_params<ParamSeq>::type() );
-      
-        msg["jsonrpc"] = "2.0";
+      void notice_fused( const std::string& id, ParamSeq&& params ) {
+        notice_fused( std::string(id), std::move(params) );
       }
 
       template<typename R, typename ParamSeq>
-      boost::cmt::future<R> call_fused( const std::string& method_name, const ParamSeq& param ) {
-        json::value msg;
-        msg["method"] = method_name;
-        msg["id"]     = next_method_id();
-        // TODO: transform functor params...
-
-        if( boost::fusion::size(param ) )
-          pack_params( msg["params"], param, typename has_named_params<ParamSeq>::type() );
-
-        typename pending_result_impl<R>::ptr pr = boost::make_shared<pending_result_impl<R> >(); 
-
-        msg["jsonrpc"] = "2.0";
-        send( msg, boost::static_pointer_cast<pending_result>(pr) );
+      cmt::future<R> call_fused( std::string&& id, ParamSeq&& params ) {
+        BOOST_STATIC_ASSERT( boost::fusion::traits::is_sequence<ParamSeq>::value );
+        // TODO: filter params for non-const references and add them as additional 'return values'
+        //       then pass the extra references to the pending_result impl.
+        //       References must remain valid until pr->prom->wait() returns.
+        auto pr = boost::make_shared<detail::pending_result_impl<R,connection,IODelegate> >( boost::ref(*this), mace::cmt::promise<R>::make() );
+        function_filter<connection> f(*this);
+        raw_call( std::move(id), IODelegate::pack(f, params), pr );
         return pr->prom;
       }
+
       template<typename ParamSeq>
-      void notice_fused( const std::string& method_name, const ParamSeq& param ) {
-        json::value msg;
-        msg["method"] = method_name;
-        // TODO: JSON RCP 1.0 sets this to 'null' instead of being empty
-        //msg["id"]     = next_method_id();
-
-        // TODO: transform functor params...
-         
-        // TODO: JSON RPC 1.0 does not allow empty param
-        if( boost::fusion::size(param ) )
-          pack_params( msg["params"], param, typename has_named_params<ParamSeq>::type() );
-
-        msg["jsonrpc"] = "2.0";
-        send( msg );
+      void notice_fused( std::string&& id, ParamSeq&& params ) {
+        BOOST_STATIC_ASSERT( boost::fusion::traits::is_sequence<ParamSeq>::value );
+        function_filter<connection> f(*this);
+        raw_call( std::move(id), IODelegate::pack(f, params), detail::pending_result::ptr() );
       }
 
-      boost::signal<void()> closed;
+      using connection_base::add_method;
+      /**
+       *  Adds a new 'anonymous' method and returns the name generated for it.
+       */
+      template<typename Signature>
+      std::string add_method( const boost::function<Signature>& m ) {
+        // TODO:  convert m into a rpc::method and add it.
+        return std::string();
+      }
+
+      /**
+       *  @return a functor that will call this->call(name, params) 
+       */
+      template<typename Signature>
+      boost::function<Signature> create_callback( const std::string& name ) {
+        return boost::function<Signature>();  
+      }
+
+      /**
+       *  Converts fused functor into rpc::method compatiable functor for
+       *  this connection type.
+       */
+      template<typename Seq, typename Functor>
+      struct rpc_recv_functor {
+        rpc_recv_functor( Functor f, connection& c )
+        :m_func(f),m_con(c){ }
       
-      void handle_call( const json::value& c, json::value& result );
-      void handle_notice( const json::value& m );
+        message operator()( const message& m ) {
+          message reply;
+          reply.id = m.id;
+          try {
+            Seq paramv;
+            if( boost::fusion::size(paramv) ) {
+               function_filter<connection> f(m_con);
+               if( m.id ) {
+                  slog( "%1%", m_func(IODelegate::template unpack<Seq, function_filter<connection> >( f, m.data )) );
+                  reply.data = 
+                      IODelegate::pack(f, m_func(IODelegate::template unpack<Seq, function_filter<connection> >( f, m.data )) );
+               } else {
+                 slog( "no id" );
+                 m_func(IODelegate::template unpack<Seq,function_filter<connection> >( f, m.data ));
+               }
+            }
+          } catch ( ... ) {
+            if( m.id ) {
+              function_filter<connection> f(m_con);
+              reply.err  = rpc::message::exception_thrown;
+              reply.data = IODelegate::pack( f, boost::current_exception_diagnostic_information() );
+            }
+          }
+          return reply;
+        }
+      
+        Functor     m_func;
+        connection& m_con;
+      };
 
 
-      class pending_result {
-        public:
-          typedef boost::shared_ptr<pending_result> ptr;
-          virtual ~pending_result(){}
-          virtual void handle_result( connection& c, const json::value& data )       = 0;
-          virtual void handle_error( const boost::exception_ptr& e  ) = 0;
+
+      /**
+       *  Visits each method on the any_ptr<InterfaceType> and adds it to the connection object.
+       */
+      template<typename InterfaceType>
+      struct add_interface_visitor {
+        add_interface_visitor( connection& c, mace::stub::ptr<InterfaceType>& s )
+        :m_con(c),m_aptr(s){}
+      
+        template<typename MemberPtr,  MemberPtr m>
+        void operator()(const char* name )const  {
+            typedef typename boost::function_types::result_type<MemberPtr>::type MemberRef;
+            typedef typename boost::remove_reference<MemberRef>::type Member;
+            typedef typename boost::fusion::traits::deduce_sequence<typename Member::fused_params>::type param_type;
+            m_con.add_method( std::string(name), method(rpc_recv_functor<param_type, Member&>( (*m_aptr).*m, m_con )) );
+        }
+        connection&                       m_con;
+        mace::stub::ptr<InterfaceType>&   m_aptr;
       };
 
     protected:
-       // change how params are packed based upon whether or not they are named params
-       template<typename Seq>
-       void pack_params( json::value& v, const Seq& s, const boost::true_type& is_named ) {
-          function_filter f(*this);
-          json::io::pack(f, v, boost::fusion::at_c<0>(s));
-       }
-       template<typename Seq>
-       void pack_params( json::value& v, const Seq& s, const boost::false_type& is_named ) {
-          function_filter f(*this);
-          json::io::pack(f, v,s);
-       }
-
-
-      void break_promises();
-      void handle_call(   const rpc::value& m );
-      void handle_result( const rpc::value& m );
-      void handle_error(  const rpc::value& m );
-
-
-      virtual void send( const reflect::value_cref& msg );
-      virtual void send( const reflect::value_cref& msg, const connection::pending_result::ptr& pr );
-      virtual uint64_t next_method_id();
-
-    private:
-      friend class connection_private;
-
-
-      template<typename R> 
-      class pending_result_impl : public pending_result {
-        public:
-          pending_result_impl():prom(new boost::cmt::promise<R>()){}
-          ~pending_result_impl() {
-            if( !prom->ready() ) {
-              prom->set_exception( boost::copy_exception( boost::cmt::error::broken_promise() ));
-            }
-          }
-          typedef boost::shared_ptr<pending_result_impl> ptr;
-          virtual void handle_result( connection& c, const rpc::value& data ) {
-            R value;
-            function_filter f(c);
-            json::io::unpack( f, data, value );
-            prom->set_value( value );
-          }
-          virtual void handle_error( const boost::exception_ptr& e  ) {
-            prom->set_exception(e);
-          }
-          typename boost::cmt::promise<R>::ptr prom;
-      };
-      class connection_private* my;
+      connection( detail::connection_base* b ):connection_base(b){ slog( "cb: %1%", b ); }
+      connection();
   };
 
-  namespace detail {
+  namespace udp {
+    template<typename IODelegate> 
+    class connection : public mace::rpc::connection<IODelegate> {
+      public:
+          virtual ~connection();
+          virtual void send( message&& m );
 
-     template<typename Seq, typename Functor,bool NamedParams>
-     struct rpc_recv_functor {
-       rpc_recv_functor( Functor f )
-       :m_func(f){ }
-
-       reflect::value operator()( rpc::connection& c, const rpc::value& param ) {
-         Seq paramv;
-         if( boost::fusion::size(paramv) ) {
-            if( !param.is_array() ) {
-              MACE_RPC_THROW( "param value is not an array" );
-            }
-            connection::function_filter f(c);
-            json::io::unpack( f, param, paramv );
-         }
-         return m_func(paramv);
-       }
-
-       Functor m_func;
-     };
-
-     /**
-      * 
-      */
-     template<typename Seq, typename Functor>
-     struct rpc_recv_functor<Seq,Functor,true> {
-       rpc_recv_functor( Functor f )
-       :m_func(f){  }
-
-       json::value operator()( json::connection& c, const json::value& param ) {
-         Seq paramv;
-         if( param.is_array() ) {
-            json::io::unpack( param, paramv );
-         }
-         else if( param.is_object() ) {
-            connection::function_filter f(c);
-            json::io::unpack( f, param, boost::fusion::at_c<0>(paramv) );
-         } else {
-            MACE_RPC_THROW( "param value is not an object or array" );
-         }
-         json::value rtn;
-         connection::function_filter f(c);
-         json::io::pack( f, rtn, m_func(paramv) );
-         return rtn;
-       }
-
-       Functor m_func;
-     };
+      private:
+          class connection_private* my;
+    };
   }
 
-
-  template<typename Signature>
-  std::string connection::function_filter::operator()( const boost::function<Signature>& f ) {
-     typedef typename boost::function_types::parameter_types<Signature>::type  mpl_param_types;
-     typedef typename boost::fusion::result_of::as_vector<mpl_param_types>::type param_types;
-     typedef typename boost::function_types::result_type<Signature>::type  R;
-     return m_con.add_method( detail::rpc_recv_functor<param_types,boost::function<R(param_types)>,false>( boost::fusion::make_fused_function_object(f) ) );
+  namespace http {
+    template<typename IODelegate> 
+    class connection : public mace::rpc::connection<IODelegate> {
+      public:
+          virtual ~connection();
+          virtual void send( message&& m );
+    };
   }
 
+} }
 
-  /**
-   *  Visits each method on the any_ptr<InterfaceType> and adds it to the connection object.
-   */
-  template<typename InterfaceType>
-  struct add_interface_visitor {
-    add_interface_visitor( rpc::json::connection& c, boost::reflect::any_ptr<InterfaceType>& s )
-    :m_con(c),m_aptr(s){}
-  
-    template<typename MemberPtr,  MemberPtr m>
-    void operator()(const char* name )const  {
-        typedef typename boost::function_types::result_type<MemberPtr>::type MemberRef;
-        typedef typename boost::remove_reference<MemberRef>::type Member;
-        typedef typename boost::fusion::traits::deduce_sequence<typename Member::fused_params>::type param_type;
-        m_con.add_method( name, detail::rpc_recv_functor<param_type, Member&, 
-                          has_named_params<typename Member::fused_params>::value >( (*m_aptr).*m ) );
-    }
-    rpc::json::connection&                   m_con;
-    boost::reflect::any_ptr<InterfaceType>& m_aptr;
-  };
-
-
- } } // mace::rpc
-
-#endif
+#endif 

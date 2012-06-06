@@ -27,6 +27,9 @@ namespace mace { namespace stub {
       ptr()
       :m_vtable(boost::make_shared<vtable_type>()) {}
 
+      ptr( ptr&& m ) 
+      :m_vtable( std::move(m.m_vtable) ),m_ptr( std::move(m.m_ptr) ){}
+
       operator bool()const  { return m_vtable; }
       bool operator!()const { return !m_vtable; }
 

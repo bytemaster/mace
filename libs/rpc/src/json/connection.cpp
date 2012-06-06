@@ -19,7 +19,7 @@ namespace mace { namespace rpc { namespace json {
       rpc::json::connection&     self;
       method_map                 methods;
       pending_result_map         pending_results;
-      mace::cmt::thread*        m_thread;
+      mace::cmt::thread*         m_thread;
       uint64_t                   next_method_id;
       uint64_t                   next_callback_id;
 

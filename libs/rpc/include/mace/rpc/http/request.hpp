@@ -19,8 +19,13 @@ namespace mace { namespace rpc { namespace http {
 
 /// A request received from a client.
 struct request {
+  request()
+  :keep_alive(true),http_version_major(1),http_version_minor(1){}
+
   /// The request method, e.g. "GET", "POST".
   std::string method;
+
+  bool keep_alive;
 
   /// The requested URI, such as a path to a file.
   std::string uri;

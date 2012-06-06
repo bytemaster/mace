@@ -3,24 +3,31 @@
 #include <mace/rpc/json/http_client.hpp>
 #include <mace/cmt/asio.hpp>
 #include <mace/rpc/json/http_connection.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace mace { namespace rpc { namespace json {
+
+typedef boost::network::http::client http10_client;
 
 // called from io_service 
 void async_post_http_request( 
   const mace::rpc::json::connection::ptr& con,
-  const boost::shared_ptr<boost::network::http::client>& c,
-  const boost::shared_ptr<boost::network::http::client::request>& rq,
+  const boost::shared_ptr<http10_client>& c,
+  const boost::shared_ptr<http10_client::request>& rq,
   const std::string& json_str,
   const std::string& req_id,
   const connection::pending_result::ptr& rs  = connection::pending_result::ptr() )
 {
   try {
-    boost::network::http::client::response resp = c->post(*rq,json_str);//"application/json",json_str);
-    std::cout << boost::network::http::body(resp) << std::endl;
+    http10_client::response resp = c->post(*rq,json_str);//"application/json",json_str);
+      std::string rsp = boost::network::http::body(resp);
+      boost::trim(rsp);
+    std::cout <<"'";
+    std::cout<< rsp;
+    std::cout<<"'\n";
     if( rs ) {
       json::value v;
-      json::from_string( boost::network::http::body(resp), v );
+      json::from_string( rsp, v );
       if( req_id.size() && ( v.contains( "id" ) && std::string(v["id"]) != req_id) ) {
          rs->handle_error( 
             boost::copy_exception( mace::rpc::exception() 
@@ -55,7 +62,7 @@ using namespace boost::network::http;
 class http_connection_private {
   public:
       http_connection_private( const std::string& url )
-      :m_url(url),m_client(new boost::network::http::client( boost::network::http::_cache_resolved = true))
+      :m_url(url),m_client(new http10_client( boost::network::http::_cache_resolved = true))
       {
         // network::http::_openssl_certificate 
         // network::http::_openssl_verify_path 
@@ -63,7 +70,7 @@ class http_connection_private {
 
       std::map<std::string,std::string>                m_headers;
       std::string                                      m_url;
-      boost::shared_ptr<boost::network::http::client>  m_client;
+      boost::shared_ptr<http10_client>  m_client;
 };
 
 
@@ -79,8 +86,8 @@ http_connection::~http_connection() {
 
 void http_connection::send( const json::value& msg, 
                  const connection::pending_result::ptr& pr ) {
-    boost::shared_ptr<boost::network::http::client::request> req 
-        = boost::make_shared<boost::network::http::client::request>(my->m_url);
+    boost::shared_ptr<http10_client::request> req 
+        = boost::make_shared<http10_client::request>(my->m_url);
 
     for( std::map<std::string,std::string>::const_iterator i = my->m_headers.begin(); 
          i != my->m_headers.end(); ++i ) {
@@ -88,14 +95,15 @@ void http_connection::send( const json::value& msg,
     }
     std::string json_str;
     json::to_string( msg, json_str );
+
     mace::cmt::asio::default_io_service().post( 
       boost::bind( async_post_http_request, shared_from_this(),
                   my->m_client, req, json_str, std::string(msg["id"]), pr ) );
 }
 
 void http_connection::send( const json::value& msg ) {
-    boost::shared_ptr<boost::network::http::client::request> req 
-        = boost::make_shared<boost::network::http::client::request>(my->m_url);
+    boost::shared_ptr<http10_client::request> req 
+        = boost::make_shared<http10_client::request>(my->m_url);
     std::string json_str;
     json::to_string( msg, json_str );
     mace::cmt::asio::default_io_service().post( 

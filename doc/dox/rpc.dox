@@ -7,6 +7,19 @@
   The MACE.RPC Library leverages the features of @ref mace_reflect, @ref mace_stub, and @ref mace_cmt 
   to provide the most effecient, and native-feeling C++ RPC library known to man. 
 
+  This library has three primary goals:
+    - seamless interoperability with established RPC protocols like JSON-RPC or XML-RPC
+    - seamless remote-object interface that fully abstracts the location of your C++ objects.
+      - send a <code>boost::function<></code> as an RPC parameter / return value and have them work transparently.
+      - send @ref cmt::stub::ptr<> as RPC parameters or return values.
+      - propagate exceptions back across RPC boundary.
+      - pass reference parameters.
+      - use <code>boost::signals<></code> over the network
+    - abstract transport (udp,tcp,http,https,ssl) and protocol (json,binary,xml,etc) from the RPC interface.
+
+  Clearly if you plan on interacting with a well-defined JSON-RPC or JSON-XML interface then you will
+  not be able to use the advanced features.  
+
   This library currently implements the JSON RPC-2.0 spec, but will expand to include XML-RPC,
   and various other protocols.  
 

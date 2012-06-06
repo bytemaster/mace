@@ -12,47 +12,25 @@
   #include <mace/stub/void.hpp>
   #include <mace/stub/vtable.hpp>
 
-  #include <mace/rpc/json/client_base.hpp>
-
-  namespace mace { namespace rpc { namespace json {
+  namespace mace { namespace rpc { 
     /**
      *  @brief Specialized to mirror the member 
      *         variable/method pointed to by MemberPtr
      */
-    template<typename MemberPtr>
+    template<typename MemberPtr, typename ConnectionType>
     struct client_member;
 
-    class client_base;
-
-    namespace detail {
-      namespace client_interface {
-        template<typename VTableType>
-        class set_visitor {
-          public:
-            set_visitor( VTableType& vt, mace::rpc::json::client_base* ci )
-            :m_ci(ci),vtbl(vt){}
-
-            template<typename M, M m>
-            void operator()( const char* name )const {
-              (vtbl.*m).set( name, m_ci );
-            }
-          private:
-            mace::rpc::json::client_base* m_ci;
-            VTableType&                    vtbl;
-        };
-
-        struct client_member_base {
-          client_member_base():m_ci(0){}
-          void set( const std::string& mid, mace::rpc::json::client_base* ci ) {
-            m_method_id    = mid;
-            m_ci           = ci;
-          }
-          protected:
-            std::string                    m_method_id;
-            mace::rpc::json::client_base* m_ci;
-        };
+    template<typename ConnectionType>
+    struct client_member_base {
+      client_member_base(){}
+      void set( const std::string& mid, const typename ConnectionType::ptr& con ) {
+        m_method_id    = mid;
+        m_con          = con;
       }
-    }
+      protected:
+        std::string                      m_method_id;
+        typename ConnectionType::ptr     m_con;
+    };
     
     /**
      *  @brief Interface Delegate that adapts an interface for asynchronous
@@ -66,6 +44,7 @@
      *  client_member<Type(Class::*)> 
      *  @endcode
      */
+    template<typename ConnectionType>
     struct client_interface {
       /**
        * @brief Implements the InterfaceDelegate meta-function to 
@@ -74,13 +53,28 @@
        */
       template<typename MemberPointer>
       struct calculate_type {
-        typedef client_member<MemberPointer>  type; 
+        typedef client_member<MemberPointer,ConnectionType>  type; 
       };
 
       template<typename ClientType>
-      static void set( ClientType& cl ) {
-        mace::stub::visit( cl, detail::client_interface::set_visitor<typename ClientType::vtable_type>( *cl, &cl ) );
+      static void set_vtable( ClientType& cl, typename ConnectionType::ptr& t ) {
+        mace::stub::visit( cl, set_visitor<typename ClientType::vtable_type>( *cl, t ) );
       }
+
+      template<typename VTableType>
+      class set_visitor {
+        public:
+          set_visitor( VTableType& vt, typename ConnectionType::ptr& con )
+          :m_con(con),vtbl(vt){}
+
+          template<typename M, M m>
+          void operator()( const char* name )const {
+            (vtbl.*m).set( name, m_con );
+          }
+        private:
+          typename ConnectionType::ptr&  m_con;
+          VTableType&                    vtbl;
+      };
     };
 
 
@@ -95,14 +89,14 @@
 
 #       include <boost/preprocessor/iteration/iterate.hpp>
 #       define BOOST_PP_ITERATION_LIMITS (0, BOOST_CLIENT_IMPL_SIZE -1 )
-#       define BOOST_PP_FILENAME_1 <mace/rpc/json/client_interface.hpp>
+#       define BOOST_PP_FILENAME_1 <mace/rpc/client_interface.hpp>
 #       include BOOST_PP_ITERATE()
 
   #undef PARAM_NAME
   #undef PARAM_TYPE
   #undef PARAM_ARG
 
-  } } } // namespace mace::rpc::json
+   } } // namespace mace::rpc
   #endif // BOOST_CLIENT_INTERFACE_HPP
 
 #else // BOOST_PP_IS_ITERATING
@@ -113,9 +107,8 @@
 #define PARAM_TYPE_NAMES     BOOST_PP_ENUM(n,PARAM_TYPE_NAME,A) // typename TYPE_N
 #define PARAM_TYPES          BOOST_PP_ENUM(n,PARAM_TYPE,A) // TYPE_N
 
-template<typename R, typename Class BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
-struct client_member<R(Class::*)(PARAM_TYPES)const> : public detail::client_interface::client_member_base
-{
+template<typename ConnectionType, typename R, typename Class BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
+struct client_member<R(Class::*)(PARAM_TYPES)const,ConnectionType> : public client_member_base<ConnectionType> {
   typedef typename mace::stub::adapt_void<R>::result_type    result_type;
   typedef mace::cmt::future<result_type>                        future_type;
   typedef client_member                                          self_type;
@@ -129,18 +122,24 @@ struct client_member<R(Class::*)(PARAM_TYPES)const> : public detail::client_inte
     return (*this)( boost::fusion::make_vector(PARAM_NAMES) );
   }
   inline future_type operator() ( const fused_params& fp )const {
-    BOOST_ASSERT(m_ci);
-    return m_ci->call_fused<result_type,fused_params>( m_method_id, fp );
+    BOOST_ASSERT(this->m_con);
+    return this->m_con->template call_fused<result_type,fused_params>( std::string(this->m_method_id), fp );
+  }
+  inline future_type operator() ( fused_params&& fp )const {
+    BOOST_ASSERT(this->m_con);
+    return this->m_con->template call_fused<result_type,fused_params>( std::string(this->m_method_id), std::move(fp) );
+  }
+  inline void notice( PARAM_ARGS )const {
+    notice( boost::fusion::make_vector(PARAM_NAMES) );
   }
   inline void notice( const fused_params& fp )const {
-    BOOST_ASSERT(m_ci);
-    return m_ci->notice_fused( m_method_id, fp );
+    BOOST_ASSERT(this->m_con);
+    this->m_con->notice_fused( this->m_method_id, fp );
   }
 };
 
-template<typename R, typename Class  BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
-struct client_member<R(Class::*)(PARAM_TYPES)>  : public detail::client_interface::client_member_base
-{
+template<typename ConnectionType, typename R, typename Class  BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
+struct client_member<R(Class::*)(PARAM_TYPES),ConnectionType>  : public client_member_base<ConnectionType> {
   typedef typename mace::stub::adapt_void<R>::result_type   result_type;
   typedef mace::cmt::future<result_type>                       future_type;
   typedef client_member                                         self_type;
@@ -156,14 +155,22 @@ struct client_member<R(Class::*)(PARAM_TYPES)>  : public detail::client_interfac
     return (*this)( boost::fusion::make_vector(PARAM_NAMES) );
   }
   inline future_type operator() ( const fused_params& fp ) {
-    BOOST_ASSERT(m_ci);
-    return m_ci->call_fused<result_type,fused_params>( m_method_id, fp );
-  }
-  inline void notice( const fused_params& fp )const {
-    BOOST_ASSERT(m_ci);
-    return m_ci->notice_fused( m_method_id, fp );
+    BOOST_ASSERT(this->m_con);
+    return this->m_con->template call_fused<result_type,fused_params>( this->m_method_id, fp );
   }
 
+  inline future_type operator() ( fused_params&& fp ) {
+    BOOST_ASSERT(this->m_con);
+    return this->m_con->template call_fused<result_type,fused_params>( std::string(this->m_method_id), std::move(fp) );
+  }
+
+  inline void notice( PARAM_ARGS )const {
+    return notice( boost::fusion::make_vector(PARAM_NAMES) );
+  }
+  inline void notice( const fused_params& fp )const {
+    BOOST_ASSERT(this->m_con);
+    this->m_con->notice_fused( this->m_method_id, fp );
+  }
 };
 
 
