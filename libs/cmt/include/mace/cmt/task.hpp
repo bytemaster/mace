@@ -13,23 +13,12 @@
 #include <boost/function.hpp>
 #include <boost/exception/diagnostic_information.hpp>
 #include <mace/cmt/log/log.hpp>
+#include <mace/cmt/priority.hpp>
 
 namespace mace { namespace cmt {
   using namespace boost::chrono;
 
-   struct cmt_context;
-  /**
-   *  An integer value used to sort asynchronous tasks.  The higher the
-   *  prioirty the sooner it will be run.
-   */
-   struct priority {
-     explicit priority( int v = 0):value(v){}
-     priority( const priority& p ):value(p.value){}
-     bool operator < ( const priority& p )const {
-    return value < p.value;
-     }
-     int value;
-   };
+   struct context;
 
   /**
    *  @todo 
@@ -62,7 +51,7 @@ namespace mace { namespace cmt {
       void cancel();
 
     protected:
-      void set_active_context( cmt_context* c ) {
+      void set_active_context( cmt::context* c ) {
         boost::unique_lock<cmt::spin_lock> lock( active_context_lock );
         active_context = c;
       }
@@ -75,7 +64,7 @@ namespace mace { namespace cmt {
       uint64_t                 posted_num;
       priority                 prio;
       task*                    next;
-      cmt_context*             active_context;
+      cmt::context*            active_context;
       mace::cmt::spin_lock     active_context_lock;
   };
 

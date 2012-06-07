@@ -3,10 +3,9 @@
  */
 #ifndef MACE_CMT_THREAD_HPP
 #define MACE_CMT_THREAD_HPP
-#include <vector>
 #include <mace/cmt/task.hpp>
-#include <mace/cmt/retainable.hpp>
 #include <boost/chrono.hpp>
+#include <mace/cmt/abstract_thread.hpp>
 
 namespace mace { 
 /**
@@ -16,20 +15,14 @@ namespace cmt {
    using boost::chrono::microseconds;
    using boost::chrono::system_clock;
 
-   class abstract_thread : public retainable {
-    public:
-      typedef retainable_ptr<abstract_thread> ptr;
+   struct context;
 
-      virtual ~abstract_thread(){};
-    protected:
-      friend class promise_base;
-      virtual void wait( const promise_base::ptr& p, const boost::chrono::microseconds& timeout_us ) = 0;
-      virtual void wait( const promise_base::ptr& p, const system_clock::time_point& timeout ) = 0;
-      virtual void notify( const promise_base::ptr& p ) = 0;
-   };
-   priority current_priority();
+   priority    current_priority();
    inline void usleep( uint64_t us );
    inline void sleep_until( const system_clock::time_point& tp );
+
+   boost::posix_time::ptime to_system_time( const system_clock::time_point& t );
+   system_clock::time_point to_time_point( const boost::posix_time::ptime& from );
 
   /**
   * @brief manages cooperative scheduling of tasks within a single operating system thread.
@@ -172,19 +165,26 @@ namespace cmt {
     private:
       void set_boost_thread( boost::thread* t );
       friend class thread_private;
+      friend class mutex;
+
+
       friend void mace::cmt::yield();
       friend void mace::cmt::usleep( uint64_t );
       friend void mace::cmt::sleep_until( const system_clock::time_point& );
 
       // these methods may only be called from the current thread
-      void yield();
+      void yield( bool reschedule = true );
+      void yield_until( const system_clock::time_point& tp, bool reschedule = true );
       void usleep( uint64_t us );
       void sleep_until( const system_clock::time_point& tp );
-
 
       void wait( const promise_base::ptr& p, const microseconds& timeout_us );
       void wait( const promise_base::ptr& p, const system_clock::time_point& timeout );
       void notify( const promise_base::ptr& p );
+
+      cmt::context* current_context()const;
+
+      void          unblock( cmt::context* c );
 
     private:
       thread();
@@ -211,16 +211,19 @@ namespace cmt {
    inline void usleep( uint64_t us ) {
     mace::cmt::thread::current().usleep(us);
    }
-   /** 
+  /** 
   *  @brief Same as <code>cmt::current().sleep_until()</code>
   */
    inline void sleep_until( const system_clock::time_point& tp ) {
     mace::cmt::thread::current().sleep_until(tp);
    }
-   /** 
-  *  @brief Same as <code>cmt::current().yield()</code>
+  /** 
+  *  @brief Same as <code>cmt::thread::current().yield()</code>
   */
    void yield();
+
+   /// short for cmt::thread::current().quit()
+   inline void quit() { cmt::thread::current().quit(); }
 } } // mace::cmt
 
 #endif // MACE_CMT_THREAD_HPP

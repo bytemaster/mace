@@ -167,8 +167,8 @@
             c.unblock(); 
       }
       private:
-        bool                        unblock;
         boost::signals::connection& c; 
+        bool                        unblock;
     };
     #endif
 

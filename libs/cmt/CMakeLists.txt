@@ -8,6 +8,7 @@ include_directories( ../stub/include )
 SET( sources 
             src/future.cpp
             src/thread.cpp
+            src/mutex.cpp
             src/asio.cpp
             src/asio/acceptor.cpp
             src/asio/udp/socket.cpp
