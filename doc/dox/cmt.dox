@@ -2,19 +2,74 @@
   @defgroup mace_cmt CMT (Cooperative Multi-Tasking) Library
   @ingroup mace
 
+  The MACE CMT library allows you to effeciently manage large numbers of
+  parallel and asynchronous tasks and inter-thread communication using a
+  <i>lock-free</i> scheduler.
+
   In a cooperative implementation of multitasking, each task must explicitly 
-  yield control to the central scheduler to allow the next task to run. This means that 
-  a misbehaving task that never yields control, can starve all other tasks.
+  yield control to the central scheduler to allow the next task to run.  Assuming tasks
+  play fairly this can result in much more effecient code when dealing with a high
+  number of parallel tasks that are normally 'idle' waiting for data or a large
+  number of small tasks.
 
-  Multithreading on the other hand, at least on most implementations, implies preemptive multitasking; 
-  each task is allowed to run for a certain amount of time, called time-slice. When the time-slice is 
-  over the task is forcibly interrupted and the scheduler selects the next task. If the interrupted task
-  was manipulating some shared resource, this can be left in an undefined state. A task cannot control 
-  when is preempted, so it must be pessimistic and lock all shared resources that it uses. As any 
-  programmer that has had to work with heavily threaded applications knows, dealing with complex locking is
-  not a trivial task. In addition both locking and thread switching imposes some considerable overhead.
+  Like traditional multi-threading each task has its own 'thread' of control which
+  I will call a fiber.  Unlike traditional multi-threading, you can be 100% sure that
+  there can be no race conditions between two fibers running in the same thread; therefore,
+  you can consider all operations that do not result in a yield to the scheduler 'atomic'.
 
-  Cooperative multitasking does not have these problems as long as a task never yields (waits) while manipulating shared state.
+  The ability to treat most of your code as 'atomic' while still performing asynchronous
+  operations that appear 'blocking' and 'synchronous' can greatly improve the readability
+  of your code.
+
+  Because you only block a fiber when you are waiting on the result of an asynchronous operation,
+  say posting a task to another thread,  you greatly increase the amount of parallelism without
+  increasing the number of 'real threads' and incurring additional synchronization and 
+  unnecessary context switching associated with large numbers of pre-emptive threads.
+
+  @section cmt_lockfree Lock-Free Scheduler
+
+  Multi-threading is hard, lock-free multi-threading is even harder and a source of a large
+  number of hard-to-debug race conditions if not done right.  With MACE CMT you can develop
+  heavily multi-threaded applications without ever having to block on a <code>boost::mutex</code>
+  (unless a thread is idle waiting for something to do).
+
+  Because traditional mutexes such as <code>boost::mutex</code> stall an entire thread and
+  result in a switch between user-space and kernel space they can become a significant bottleneck
+  in cases with high contention.  They are also 'deadly' to a cooperative environment where one
+  task grabing a <code>boost::mutex</code> will stop all other tasks from running in that thread.
+
+  The preferred method of interthread communication and synchronization is to ensure that
+  only one thread is responsible for manipulating the 'shared' data.  If another thread needs
+  to query or set that data it does so by delegating the operation to the appropirate
+  thread.  
+
+  @code
+    future<R> r = other_thread->async( operation ); // async
+    int r = other_thread->async( operation );       // sync
+  @endcode
+
+  The act of posting <code>operation</code> is a single atomic <code>compare_and_exchange</code> and
+  the act of 'waiting' on the result is almost free assuming your thread has other tasks to run
+  while it waits.  If it has nothing else to do, then it becomes an effective <code>boost::wait_condition</code>.
+
+  Consider the following example;
+  @code  
+    async(implicit_other_task); // implicit
+    future<R> r = other_thread->async( operation );
+    explicit_other_task();      // explicit other tasks, no need for context switching
+    r.wait();                   // perform implicit_other_task if r is not ready
+  @endcode
+
+  The other tasks could be 'explicit' such as <code>other_task()</code>, or they could be implicit:
+  
+  Most of the time a program with many things going on has plenty of asynchronous implicit tasks
+  to keep it busy while waiting and therefore you incure minimal 'locking overhead'.  It is even better 
+  if you can run call <code>async(operation)</code> and not even care about the return value.
+
+  @note While no locks are used directly, there is no pratical way to avoid memory allocation
+    as a result of posting an asynchronous operation.  The default memory allocator on most
+    systems requires a memory lock.  If this becomes a performance issue, you may want to consider using
+    a thread-friendly allocator such as <a href="http://www.canonware.com/jemalloc/index.html">jemalloc</a>.
 
 
   @section cmt_single_thread Single Threaded Benchmark
@@ -29,9 +84,9 @@
 
   In this example all tasks will occur in parallel in three different threads (t1,t2, and main).
 
-  While <code>main</code> waits for results from threads <code>t1</code> and \p t2 it will switch
-  contexts and execute other operations that are scheduled in the \p main thread such as calculating
-  the result of \p f3.
+  While <code>main</code> waits for results from threads <code>t1</code> and <code>t2</code> it will switch
+  contexts and execute other operations that are scheduled in the <code>main</code> thread such as calculating
+  the result of <code>f3</code>.
 
   @include cmt_mt.cpp
 
@@ -68,6 +123,109 @@
   Everything in this example runs in the main thread.
 
   @include cmt_signal.cpp
+
+
+  @section cmt_mutex Cooperative Mutexes 
+
+  Cooperatively multi-tasked code must still worry about 
+  reentrancy.  Suppose you have a thread sending a message across a socket,
+  the socket members are thread safe, but the <code>write_message()</code> operation is
+  not rentrant because the context could yield while waiting for a partial
+  write to complete.
+  
+  If while it has yielded another task in the same thread attempts to write
+  a second message then you will get garbage out as both fibers take
+  turns writing parts of their messages out of the socket.
+  
+  Example problem:
+  @code
+    async(write_message);
+    async(write_message);
+    void write_message() {
+      sock->write(part1); // may yield
+      sock->write(part2); // may yield
+      sock->write(part3); // may yield
+    }
+  @endcode
+  
+  The output could look something like:
+  @code
+    part1
+    part2
+    part1
+    part3
+    part2
+    part3
+  @endcode
+  
+  What you want to happen is this:
+  @code
+    void write_message() {
+      boost::unique_lock<cmt::mutex> lock(sock->write_lock);
+      sock->write(part1); // may yield
+      sock->write(part2); // may yield
+      sock->write(part3); // may yield
+    }
+  @endcode
+  
+  Now if while writing the first message, someone attempts to
+  write a second message second write will 'queue' behind the
+  first by 'blocking' on the mutex.  
+
+  The difference between <code>boost::mutex</code> and @ref mace::cmt::mutex is that @ref mace::cmt::mutex will
+  not 'block' the calling thread while waiting for a lock, it will simply <i>yield</i> to other tasks until the lock
+  has been aquired.  There are no system calls and in a single threaded multi-tasked environment like the example
+  above, no spin-lock contention at all.  Multi-threaded environments use a spin-lock while updating the lock state.
+
+  @section cmt_bind Move-Aware Bind (passing non-copyable parameters)
+
+   One of the major drawbacks of passing parameters through to asynchronous operations
+   via <code>boost::bind()</code> is that <code>boost::bind</code> must make an internal
+   copy of the parameters.  The only way to avoid the internal copy is to use boost::ref(),
+   but now you must make sure that the reference does not go out of scope before the
+   bound functor.
+  
+   A side effect of this lack of move support is that it becomes impossible to pass
+   non-copyable, but movable, objects between threads without doing heap allocation and
+   using smart pointers. 
+  
+   Often even the simple case of calling an asynchronous method and passing a string as
+   a parameter results in two unnecessary copies. 
+  
+     - First the string is copied into the <code>boost::bind</code> functor.
+     - Second the boost::bind functor is copied into the <code>mace::cmt::task</code> object.
+         - this copies all of the parameters.
+  
+   With that background, <code>mace::cmt::bind(...)</code> is designed to serve the needs of
+   the CMT library and returns a functor that takes no arguments, the exact 
+   type of functor required for passing to mace::cmt::async(...).  
+   
+  @code
+  int test( std::string&& s );
+  
+  int main() {
+    return async( mace::cmt::bind( &test, std::string("Hello World") ) ).wait();
+  }
+  @endcode
+
+   This functor takes its arguments by rvalue-reference and therefore, you cannot call it
+   using <code>boost::bind</code> or <code>std::bind</code>.  
+
+   A side effect of mace::cmt::bind's default assumption of 'move semantics', is that you
+   cannot 'bind' non-rvalues. Therefore, you can use one of the following techniques:
+
+   @code
+   int cr_test( const std::string& s );
+   int main() {
+      std::string lvalue;
+      int r  = cmt::async( cmt::bind( &cr_test, boost::ref(lvalue) ) );
+      int r2 = cmt::async( cmt::bind( &cr_test, cmt::copy(lvalue) ) );
+   }
+   @endcode
+ 
+   The benefit of always using mace::cmt::bind is that in addition for potential performance gains,
+   and support for move-only objects, your code is also much more explicit about where copies are
+   being made.
 
   @section cmt_promise Using Promises 
   
