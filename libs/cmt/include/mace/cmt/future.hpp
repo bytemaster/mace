@@ -108,6 +108,15 @@ namespace mace { namespace cmt {
         }
         notify();
       }
+      virtual void set_value( T&& v ) {
+        {
+          boost::unique_lock<spin_yield_lock> lock( m_spin_yield );
+          if( m_error ) 
+            return;
+          m_value = std::move(v);
+        }
+        notify();
+      }
       virtual void set_value( const T& v ) {
         {
           boost::unique_lock<spin_yield_lock> lock( m_spin_yield );
