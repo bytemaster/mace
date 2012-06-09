@@ -32,6 +32,9 @@ namespace mace { namespace cmt {
    *    is that extra memory would be kept around until no-one needed the 
    *    task any more.
    *
+   *  @todo track the parent/child relationship with all async operations so that
+   *    when the parent is canceled, all child tasks get canceled as well.
+   *
    *  @todo Eliminate vtask as redundant once all tasks are promises and
    *    there is no 'extra' overhead associated with returning a promise.
    *

@@ -83,6 +83,7 @@ namespace cmt {
          typedef decltype(f()) Result;
          typename promise<Result>::ptr p(new promise<Result>());
          task::ptr tsk( new rtask<Functor,Result>( std::forward<Functor>(f),p,when,std::max(current_priority(),prio)) );
+         p->set_task(tsk);
          async_task(tsk);
          return p;
     }
@@ -101,6 +102,7 @@ namespace cmt {
        typedef decltype(f()) Result;
        typename promise<Result>::ptr p(new promise<Result>());
        task::ptr tsk( new rtask<Functor,Result>( std::forward<Functor>(f),p,std::max(current_priority(),prio)) );
+       p->set_task(tsk);
        async_task(tsk);
        return p;
     }
