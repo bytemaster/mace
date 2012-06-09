@@ -23,18 +23,20 @@ namespace mace { namespace cmt {
             const char*  what()const throw() { return "timeout waiting for future"; }
             virtual void rethrow()const      { BOOST_THROW_EXCEPTION(*this); }
         };
-
         struct broken_promise : public virtual future_exception {
             const char*  what()const throw() { return "broken promise - operation timeout"; }
             virtual void rethrow()const      { BOOST_THROW_EXCEPTION(*this); }
         };
-
         struct task_canceled : public virtual future_exception {
-            const char*  what()const throw() { return "task canceled"; }
+            const char*  what()const throw() { return "task canceled";       }
             virtual void rethrow()const      { BOOST_THROW_EXCEPTION(*this); }
         };
         struct thread_quit : public virtual future_exception {
             const char*  what()const throw() { return "thread quit"; }
+            virtual void rethrow()const      { BOOST_THROW_EXCEPTION(*this); }
+        };
+        struct null_rvalue : public virtual future_exception {
+            const char*  what()const throw() { return "null rvalue"; }
             virtual void rethrow()const      { BOOST_THROW_EXCEPTION(*this); }
         };
     } // namespace error
