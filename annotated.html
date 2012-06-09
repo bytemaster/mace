@@ -99,7 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -117,7 +117,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <tr><td class="indexkey"><a class="el" href="classmace_1_1cmt_1_1asio_1_1tcp_1_1socket.html">mace::cmt::asio::tcp::socket</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey"><a class="el" href="structmace_1_1cmt_1_1asio_1_1tcp_1_1socket_1_1iterator.html">mace::cmt::asio::tcp::socket::iterator</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey"><a class="el" href="classmace_1_1cmt_1_1future.html">mace::cmt::future&lt; T &gt;</a></td><td class="indexvalue">Placeholder for the result of an asynchronous operation </td></tr>
-  <tr><td class="indexkey"><a class="el" href="classmace_1_1cmt_1_1mutex.html">mace::cmt::mutex</a></td><td class="indexvalue">A non-blocking mutex, modified spin-lock that yields on failure </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classmace_1_1cmt_1_1mutex.html">mace::cmt::mutex</a></td><td class="indexvalue">Mutex </td></tr>
   <tr><td class="indexkey"><a class="el" href="classmace_1_1cmt_1_1promise.html">mace::cmt::promise&lt; T &gt;</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey"><a class="el" href="classmace_1_1cmt_1_1thread.html">mace::cmt::thread</a></td><td class="indexvalue">Manages cooperative scheduling of tasks within a single operating system thread </td></tr>
   <tr><td class="indexkey"><a class="el" href="classmace_1_1reflect_1_1bad__value__cast.html">mace::reflect::bad_value_cast</a></td><td class="indexvalue">Thrown when a conversion using mace::value, mace::value_ref, or mace::value_cref fails </td></tr>
@@ -127,6 +127,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <tr><td class="indexkey"><a class="el" href="classmace_1_1reflect_1_1value__base.html">mace::reflect::value_base</a></td><td class="indexvalue">Provides runtime access to class members </td></tr>
   <tr><td class="indexkey"><a class="el" href="classmace_1_1reflect_1_1value__cref.html">mace::reflect::value_cref</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey"><a class="el" href="classmace_1_1reflect_1_1value__ref.html">mace::reflect::value_ref</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1client.html">mace::rpc::client&lt; InterfaceType, ConnectionType &gt;</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1client__interface.html">mace::rpc::client_interface&lt; ConnectionType &gt;</a></td><td class="indexvalue">Interface Delegate that adapts an interface for asynchronous calls over the network </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1client__interface_1_1calculate__type.html">mace::rpc::client_interface&lt; ConnectionType &gt;::calculate_type&lt; MemberPointer &gt;</a></td><td class="indexvalue">Implements the InterfaceDelegate meta-function to determine what type to create to mirror MemberPointer in mace::reflect::vtable used by <a class="el" href="classmace_1_1stub_1_1ptr.html" title="Behaves like a smart pointer that can handle any type with the same interface.">mace::stub::ptr</a> </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1connection.html">mace::rpc::connection&lt; IODelegate &gt;</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1connection_1_1add__interface__visitor.html">mace::rpc::connection&lt; IODelegate &gt;::add_interface_visitor&lt; InterfaceType &gt;</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1connection_1_1rpc__recv__functor.html">mace::rpc::connection&lt; IODelegate &gt;::rpc_recv_functor&lt; Seq, Functor &gt;</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1connection__base.html">mace::rpc::connection_base</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1datastream.html">mace::rpc::datastream&lt; T &gt;</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1default__filter.html">mace::rpc::default_filter</a></td><td class="indexvalue">Performs no transformations </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1function__filter.html">mace::rpc::function_filter&lt; Connection &gt;</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1http_1_1connection.html">mace::rpc::http::connection&lt; IODelegate &gt;</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1http_1_1file__handler.html">mace::rpc::http::file_handler</a></td><td class="indexvalue">The common handler for all incoming requests </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1http_1_1reply.html">mace::rpc::http::reply</a></td><td class="indexvalue">A reply to be sent to a client </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1http_1_1request.html">mace::rpc::http::request</a></td><td class="indexvalue">A request received from a client </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1http_1_1request__parser.html">mace::rpc::http::request_parser</a></td><td class="indexvalue">Parser for incoming requests </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1http_1_1server.html">mace::rpc::http::server</a></td><td class="indexvalue">The top-level coroutine of the HTTP server </td></tr>
   <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1json_1_1add__interface__visitor.html">mace::rpc::json::add_interface_visitor&lt; InterfaceType &gt;</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1json_1_1client.html">mace::rpc::json::client&lt; InterfaceType &gt;</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1json_1_1client__interface.html">mace::rpc::json::client_interface</a></td><td class="indexvalue">Interface Delegate that adapts an interface for asynchronous calls over the network </td></tr>
@@ -139,6 +155,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1json_1_1http__server.html">mace::rpc::json::http_server</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1json_1_1tcp__server.html">mace::rpc::json::tcp_server&lt; InterfaceType &gt;</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1json_1_1value.html">mace::rpc::json::value</a></td><td class="indexvalue">Variant type that may hold a string, int, double, array, bool, nil, or object </td></tr>
+  <tr><td class="indexkey"><a class="el" href="structmace_1_1rpc_1_1message.html">mace::rpc::message</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1server.html">mace::rpc::server&lt; InterfaceType, ConnectionType &gt;</a></td><td class="indexvalue">Listens for incoming connections and create a new session for servicing those connections </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classmace_1_1rpc_1_1tcp_1_1connection.html">mace::rpc::tcp::connection&lt; IODelegate &gt;</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey"><a class="el" href="structmace_1_1stub_1_1adapt__void.html">mace::stub::adapt_void&lt; R, Functor &gt;</a></td><td class="indexvalue">Converts functors returning void to functors returning <a class="el" href="structmace_1_1stub_1_1void__t.html">mace::stub::void_t</a> </td></tr>
   <tr><td class="indexkey"><a class="el" href="structmace_1_1stub_1_1mirror__interface.html">mace::stub::mirror_interface</a></td><td class="indexvalue">Interface Delegate that mirrors the reflected interface without any transformation </td></tr>
   <tr><td class="indexkey"><a class="el" href="structmace_1_1stub_1_1mirror__interface_1_1calculate__type.html">mace::stub::mirror_interface::calculate_type&lt; MemberPointer &gt;</a></td><td class="indexvalue">Implements the InterfaceDelegate meta-function to determine what type to create to mirror MemberPointer in <a class="el" href="classmace_1_1stub_1_1vtable.html" title="Contains functors defined by InterfaceDelegate for each reflected member of InterfaceType.">mace::stub::vtable</a> used by mace::stub::any_ptr </td></tr>
@@ -152,7 +171,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:42 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:55 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

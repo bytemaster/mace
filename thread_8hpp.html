@@ -96,7 +96,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -115,10 +115,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">libs/cmt/include/mace/cmt/thread.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;vector&gt;</code><br/>
-<code>#include &lt;mace/cmt/task.hpp&gt;</code><br/>
-<code>#include &lt;mace/cmt/retainable.hpp&gt;</code><br/>
+<div class="textblock"><code>#include &lt;mace/cmt/task.hpp&gt;</code><br/>
 <code>#include &lt;boost/chrono.hpp&gt;</code><br/>
+<code>#include &lt;mace/cmt/abstract_thread.hpp&gt;</code><br/>
 </div>
 <p><a href="thread_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -140,19 +139,24 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="memitem:ad3ac7122b84ba8e8ce08148739c5d065"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3ac7122b84ba8e8ce08148739c5d065"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#ad3ac7122b84ba8e8ce08148739c5d065">mace::cmt::sleep_until</a> (const system_clock::time_point &amp;tp)</td></tr>
 <tr class="memdesc:ad3ac7122b84ba8e8ce08148739c5d065"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as <code>cmt::current().<a class="el" href="namespacemace_1_1cmt.html#ad3ac7122b84ba8e8ce08148739c5d065" title="Same as cmt::current().sleep_until()">sleep_until()</a></code> <br/></td></tr>
-<tr class="memitem:ac428192d0807b17852ccc812cb4678be"><td class="memTemplParams" colspan="2"><a class="anchor" id="ac428192d0807b17852ccc812cb4678be"></a>
+<tr class="memitem:a981be3ed1d440797cbd17f985995d85c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a981be3ed1d440797cbd17f985995d85c"></a>
+boost::posix_time::ptime&#160;</td><td class="memItemRight" valign="bottom"><b>mace::cmt::to_system_time</b> (const system_clock::time_point &amp;t)</td></tr>
+<tr class="memitem:a8f4768a8d48841a031eaaf7267baae20"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f4768a8d48841a031eaaf7267baae20"></a>
+system_clock::time_point&#160;</td><td class="memItemRight" valign="bottom"><b>mace::cmt::to_time_point</b> (const boost::posix_time::ptime &amp;from)</td></tr>
+<tr class="memitem:a2d0b6d83a8a1ff1e2dcd48758fdd7271"><td class="memTemplParams" colspan="2"><a class="anchor" id="a2d0b6d83a8a1ff1e2dcd48758fdd7271"></a>
 template&lt;typename Functor &gt; </td></tr>
-<tr class="memitem:ac428192d0807b17852ccc812cb4678be"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>mace::cmt::async</b> (Functor &amp;&amp;f, const char *n, priority prio=priority())-&gt; cmt</td></tr>
-<tr class="memitem:a7987c0abcbbcd5644e93535195b7a804"><td class="memTemplParams" colspan="2"><a class="anchor" id="a7987c0abcbbcd5644e93535195b7a804"></a>
-template&lt;typename Functor &gt; </td></tr>
-<tr class="memitem:a7987c0abcbbcd5644e93535195b7a804"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>mace::cmt::async</b> (Functor &amp;&amp;f, priority prio=priority(), const char *n=&quot;&quot;)-&gt; cmt</td></tr>
+<tr class="memitem:a2d0b6d83a8a1ff1e2dcd48758fdd7271"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>mace::cmt::async</b> (Functor &amp;&amp;f, priority prio=priority())-&gt; cmt</td></tr>
 <tr class="memitem:a1235a11cd88f39acf0d35d5a10c1789a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1235a11cd88f39acf0d35d5a10c1789a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>mace::cmt::async</b> (const boost::function&lt; void()&gt; &amp;t, priority prio=priority())</td></tr>
 <tr class="memitem:affb5be33f34a8bd5c279e923349902b3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="affb5be33f34a8bd5c279e923349902b3"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#affb5be33f34a8bd5c279e923349902b3">mace::cmt::exec</a> ()</td></tr>
 <tr class="memdesc:affb5be33f34a8bd5c279e923349902b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as <code>cmt::current().<a class="el" href="namespacemace_1_1cmt.html#affb5be33f34a8bd5c279e923349902b3" title="Same as cmt::current().exec()">exec()</a></code> <br/></td></tr>
-<tr class="memitem:af8f5129408ef43d58f02d75b101275a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8">mace::cmt::yield</a> ()</td></tr>
-<tr class="memdesc:af8f5129408ef43d58f02d75b101275a8"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classmace_1_1cmt_1_1thread.html#a40ad356d1c0bbc9bf0b0cbbdfafded15">cmt::thread::current()</a>.<a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="cmt::thread::current().yield()">yield()</a>  <a href="#af8f5129408ef43d58f02d75b101275a8"></a><br/></td></tr>
+<tr class="memitem:af8f5129408ef43d58f02d75b101275a8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af8f5129408ef43d58f02d75b101275a8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8">mace::cmt::yield</a> ()</td></tr>
+<tr class="memdesc:af8f5129408ef43d58f02d75b101275a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as <code><a class="el" href="classmace_1_1cmt_1_1thread.html#a40ad356d1c0bbc9bf0b0cbbdfafded15">cmt::thread::current()</a>.<a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="Same as cmt::thread::current().yield()">yield()</a></code> <br/></td></tr>
+<tr class="memitem:a9005ebcb9d3921fea68d930b261a0ae2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9005ebcb9d3921fea68d930b261a0ae2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt.html#a9005ebcb9d3921fea68d930b261a0ae2">mace::cmt::quit</a> ()</td></tr>
+<tr class="memdesc:a9005ebcb9d3921fea68d930b261a0ae2"><td class="mdescLeft">&#160;</td><td class="mdescRight">short for <a class="el" href="classmace_1_1cmt_1_1thread.html#a40ad356d1c0bbc9bf0b0cbbdfafded15">cmt::thread::current()</a>.<a class="el" href="namespacemace_1_1cmt.html#a9005ebcb9d3921fea68d930b261a0ae2" title="short for cmt::thread::current().quit()">quit()</a> <br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock">
@@ -161,7 +165,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="names
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:40 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:54 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

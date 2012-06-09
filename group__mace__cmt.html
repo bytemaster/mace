@@ -91,7 +91,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -105,24 +105,46 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">CMT (Cooperative Multi-Tasking) Library</div>  </div>
 <div class="ingroups"><a class="el" href="group__mace.html">MACE - Massively Asynchronous Coding Environment</a></div></div><!--header-->
 <div class="contents">
-<p>In a cooperative implementation of multitasking, each task must explicitly yield control to the central scheduler to allow the next task to run. This means that a misbehaving task that never yields control, can starve all other tasks.</p>
-<p>Multithreading on the other hand, at least on most implementations, implies preemptive multitasking; each task is allowed to run for a certain amount of time, called time-slice. When the time-slice is over the task is forcibly interrupted and the scheduler selects the next task. If the interrupted task was manipulating some shared resource, this can be left in an undefined state. A task cannot control when is preempted, so it must be pessimistic and lock all shared resources that it uses. As any programmer that has had to work with heavily threaded applications knows, dealing with complex locking is not a trivial task. In addition both locking and thread switching imposes some considerable overhead.</p>
-<p>Cooperative multitasking does not have these problems as long as a task never yields (waits) while manipulating shared state.</p>
+<p>The MACE CMT library allows you to effeciently manage large numbers of parallel and asynchronous tasks and inter-thread communication using a <em>lock-free</em> scheduler.</p>
+<p>In a cooperative implementation of multitasking, each task must explicitly yield control to the central scheduler to allow the next task to run. Assuming tasks play fairly this can result in much more effecient code when dealing with a high number of parallel tasks that are normally 'idle' waiting for data or a large number of small tasks.</p>
+<p>Like traditional multi-threading each task has its own 'thread' of control which I will call a fiber. Unlike traditional multi-threading, you can be 100% sure that there can be no race conditions between two fibers running in the same thread; therefore, you can consider all operations that do not result in a yield to the scheduler 'atomic'.</p>
+<p>The ability to treat most of your code as 'atomic' while still performing asynchronous operations that appear 'blocking' and 'synchronous' can greatly improve the readability of your code.</p>
+<p>Because you only block a fiber when you are waiting on the result of an asynchronous operation, say posting a task to another thread, you greatly increase the amount of parallelism without increasing the number of 'real threads' and incurring additional synchronization and unnecessary context switching associated with large numbers of pre-emptive threads.</p>
+<h2><a class="anchor" id="cmt_lockfree"></a>
+Lock-Free Scheduler</h2>
+<p>Multi-threading is hard, lock-free multi-threading is even harder and a source of a large number of hard-to-debug race conditions if not done right. With MACE CMT you can develop heavily multi-threaded applications without ever having to block on a <code>boost::mutex</code> (unless a thread is idle waiting for something to do).</p>
+<p>Because traditional mutexes such as <code>boost::mutex</code> stall an entire thread and result in a switch between user-space and kernel space they can become a significant bottleneck in cases with high contention. They are also 'deadly' to a cooperative environment where one task grabing a <code>boost::mutex</code> will stop all other tasks from running in that thread.</p>
+<p>The preferred method of interthread communication and synchronization is to ensure that only one thread is responsible for manipulating the 'shared' data. If another thread needs to query or set that data it does so by delegating the operation to the appropirate thread.</p>
+<div class="fragment"><pre class="fragment">    future&lt;R&gt; r = other_thread-&gt;async( operation ); <span class="comment">// async</span>
+    <span class="keywordtype">int</span> r = other_thread-&gt;async( operation );       <span class="comment">// sync</span>
+</pre></div><p>The act of posting <code>operation</code> is a single atomic <code>compare_and_exchange</code> and the act of 'waiting' on the result is almost free assuming your thread has other tasks to run while it waits. If it has nothing else to do, then it becomes an effective <code>boost::wait_condition</code>.</p>
+<p>Consider the following example; </p>
+<div class="fragment"><pre class="fragment">    async(implicit_other_task); <span class="comment">// implicit</span>
+    future&lt;R&gt; r = other_thread-&gt;async( operation );
+    explicit_other_task();      <span class="comment">// explicit other tasks, no need for context switching</span>
+    r.wait();                   <span class="comment">// perform implicit_other_task if r is not ready</span>
+</pre></div><p>The other tasks could be 'explicit' such as <code>other_task()</code>, or they could be implicit:</p>
+<p>Most of the time a program with many things going on has plenty of asynchronous implicit tasks to keep it busy while waiting and therefore you incure minimal 'locking overhead'. It is even better if you can run call <code>async(operation)</code> and not even care about the return value.</p>
+<dl class="section note"><dt>Note:</dt><dd>While no locks are used directly, there is no pratical way to avoid memory allocation as a result of posting an asynchronous operation. The default memory allocator on most systems requires a memory lock. If this becomes a performance issue, you may want to consider using a thread-friendly allocator such as <a href="http://www.canonware.com/jemalloc/index.html">jemalloc</a>.</dd></dl>
 <h2><a class="anchor" id="cmt_single_thread"></a>
 Single Threaded Benchmark</h2>
 <p>Here is a simple benchmark program that performs an asynchornous operation and waits on the result. This example is effecitvely synchronous because only one async operation is in flight at a time and there is only one real thread.</p>
 <div class="fragment"><pre class="fragment"><span class="preprocessor">#include &lt;<a class="code" href="thread_8hpp.html">mace/cmt/thread.hpp</a>&gt;</span>
+<span class="keyword">using</span> boost::chrono::system_clock;
+<span class="keyword">namespace </span>cmt = mace::cmt;
 
 <span class="keywordtype">int</span> hello( <span class="keywordtype">int</span> in ){ <span class="keywordflow">return</span> in; }
 
 <span class="keywordtype">int</span> main( <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv ) {
-    boost::chrono::system_clock::time_point start = boost::chrono::system_clock::now();
+    system_clock::time_point start = system_clock::now();
     <span class="keywordtype">int</span> sum = 0;
-    <span class="keywordflow">for</span>( uint32_t i = 0; i &lt; 1000000; ++i ) 
-        sum += mace::cmt::async( std::bind(hello, i) ).wait();
-    boost::chrono::system_clock::time_point end = boost::chrono::system_clock::now();
-    slog( <span class="stringliteral">&quot;%1% calls/sec&quot;</span>, 
-      (1000000.0/((end - start).count()/1000000000.0)) );
+    <span class="keywordflow">for</span>( uint32_t i = 0; i &lt; 100000000; ++i ) {
+        sum += cmt::async( std::bind(hello, i) ).wait();
+        <span class="keywordflow">if</span>( i % 1000000 == 0 ) {
+            system_clock::time_point end = system_clock::now();
+            slog( <span class="stringliteral">&quot;%1% calls/sec&quot;</span>, (i/((end - start).count()/1000000000.0)) );
+        }
+    }
 }
 </pre></div><h2><a class="anchor" id="cmt_multi_threading"></a>
 Multi-Threading with MACE.CMT</h2>
@@ -164,12 +186,12 @@ Exception Handling</h2>
 Yielding and Sleeping</h2>
 <p>The current task can either yield and allow other tasks to run before returning or it can sleep for an specific amount of time while allowing other tasks to run.</p>
 <div class="fragment"><pre class="fragment">      <a class="code" href="namespacemace_1_1cmt.html#af4a6cb3372677000d4c35d1c377b9bee" title="Same as cmt::current().usleep()">cmt::usleep</a>(100000<span class="comment">/*us*/</span>);
-      cmt::yield();
+      <a class="code" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="Same as cmt::thread::current().yield()">cmt::yield</a>();
 
       <span class="comment">// or the more verbose...</span>
       cmt::thread::current().usleep(10000);
       cmt::thread::current().yield();
-</pre></div><p>You can only yield or sleep for the current thread. If there are no other tasks ready to run then yield() returns immediately.</p>
+</pre></div><p>You can only yield or sleep for the current thread. If there are no other tasks ready to run then <a class="el" href="namespacemace_1_1cmt.html#af8f5129408ef43d58f02d75b101275a8" title="Same as cmt::thread::current().yield()">yield()</a> returns immediately.</p>
 <dl class="section note"><dt>Note:</dt><dd>Sleep and yield times are dependent upon other tasks yielding in a timely manner.</dd></dl>
 <h2><a class="anchor" id="cmt_async_signal_wait"></a>
 Boost.Signals Integration</h2>
@@ -193,11 +215,68 @@ boost::signal&lt;void(std::string)&gt; test_signal;
      std::cerr&lt;&lt; cmt::wait(test_signal) &lt;&lt; std::endl;
      <span class="keywordflow">return</span> 0;
 }
-</pre></div><h2><a class="anchor" id="cmt_promise"></a>
+</pre></div><h2><a class="anchor" id="cmt_mutex"></a>
+Cooperative Mutexes</h2>
+<p>Cooperatively multi-tasked code must still worry about reentrancy. Suppose you have a thread sending a message across a socket, the socket members are thread safe, but the <code>write_message()</code> operation is not rentrant because the context could yield while waiting for a partial write to complete.</p>
+<p>If while it has yielded another task in the same thread attempts to write a second message then you will get garbage out as both fibers take turns writing parts of their messages out of the socket.</p>
+<p>Example problem: </p>
+<div class="fragment"><pre class="fragment">    async(write_message);
+    async(write_message);
+    <span class="keywordtype">void</span> write_message() {
+      sock-&gt;write(part1); <span class="comment">// may yield</span>
+      sock-&gt;write(part2); <span class="comment">// may yield</span>
+      sock-&gt;write(part3); <span class="comment">// may yield</span>
+    }
+</pre></div><p>The output could look something like: </p>
+<div class="fragment"><pre class="fragment">    part1
+    part2
+    part1
+    part3
+    part2
+    part3
+</pre></div><p>What you want to happen is this: </p>
+<div class="fragment"><pre class="fragment">    <span class="keywordtype">void</span> write_message() {
+      boost::unique_lock&lt;cmt::mutex&gt; lock(sock-&gt;write_lock);
+      sock-&gt;write(part1); <span class="comment">// may yield</span>
+      sock-&gt;write(part2); <span class="comment">// may yield</span>
+      sock-&gt;write(part3); <span class="comment">// may yield</span>
+    }
+</pre></div><p>Now if while writing the first message, someone attempts to write a second message second write will 'queue' behind the first by 'blocking' on the mutex.</p>
+<p>The difference between <code>boost::mutex</code> and <a class="el" href="classmace_1_1cmt_1_1mutex.html">mace::cmt::mutex</a> is that <a class="el" href="classmace_1_1cmt_1_1mutex.html">mace::cmt::mutex</a> will not 'block' the calling thread while waiting for a lock, it will simply <em>yield</em> to other tasks until the lock has been aquired. There are no system calls and in a single threaded multi-tasked environment like the example above, no spin-lock contention at all. Multi-threaded environments use a spin-lock while updating the lock state.</p>
+<h2><a class="anchor" id="cmt_bind"></a>
+Move-Aware Bind (passing non-copyable parameters)</h2>
+<p>One of the major drawbacks of passing parameters through to asynchronous operations via <code>boost::bind()</code> is that <code>boost::bind</code> must make an internal copy of the parameters. The only way to avoid the internal copy is to use boost::ref(), but now you must make sure that the reference does not go out of scope before the bound functor.</p>
+<p>A side effect of this lack of move support is that it becomes impossible to pass non-copyable, but movable, objects between threads without doing heap allocation and using smart pointers.</p>
+<p>Often even the simple case of calling an asynchronous method and passing a string as a parameter results in two unnecessary copies.</p>
+<ul>
+<li>First the string is copied into the <code>boost::bind</code> functor.<ul>
+<li>Second the boost::bind functor is copied into the <code>mace::cmt::task</code> object.<ul>
+<li>this copies all of the parameters.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>With that background, <code>mace::cmt::bind(...)</code> is designed to serve the needs of the CMT library and returns a functor that takes no arguments, the exact type of functor required for passing to mace::cmt::async(...).</p>
+<div class="fragment"><pre class="fragment">  <span class="keywordtype">int</span> test( std::string&amp;&amp; s );
+  
+  <span class="keywordtype">int</span> main() {
+    <span class="keywordflow">return</span> async( mace::cmt::bind( &amp;test, std::string(<span class="stringliteral">&quot;Hello World&quot;</span>) ) ).wait();
+  }
+</pre></div><p>This functor takes its arguments by rvalue-reference and therefore, you cannot call it using <code>boost::bind</code> or <code>std::bind</code>.</p>
+<p>A side effect of mace::cmt::bind's default assumption of 'move semantics', is that you cannot 'bind' non-rvalues. Therefore, you can use one of the following techniques:</p>
+<div class="fragment"><pre class="fragment">   <span class="keywordtype">int</span> cr_test( <span class="keyword">const</span> std::string&amp; s );
+   <span class="keywordtype">int</span> main() {
+      std::string lvalue;
+      <span class="keywordtype">int</span> r  = cmt::async( cmt::bind( &amp;cr_test, boost::ref(lvalue) ) );
+      <span class="keywordtype">int</span> r2 = cmt::async( cmt::bind( &amp;cr_test, cmt::copy(lvalue) ) );
+   }
+</pre></div><p>The benefit of always using mace::cmt::bind is that in addition for potential performance gains, and support for move-only objects, your code is also much more explicit about where copies are being made.</p>
+<h2><a class="anchor" id="cmt_promise"></a>
 Using Promises</h2>
-<p>Sometimes you need to perform an asynchronous operation of your own, such as a network call or waiting on user input. Here is an example from MACE.CMT's ASIO wrapper. Using <code>cmt::asio::read</code> you can perform a 'synchronous' read in the current thread without blocking the current thread. Instead the current thread will switch to running other tasks while waiting for the read to complete and then switch back once the read is ready. If an error occurs then <code><a class="el" href="namespacemace_1_1cmt_1_1asio.html#a9ba4c2a592e2cd9250b781662d583fc4" title="wraps boost::asio::async_read">read()</a></code> will throw the exception passed to ASIO's completion handler.</p>
+<p>Sometimes you need to perform an asynchronous operation of your own, such as a network call or waiting on user input. Here is an example from MACE.CMT's ASIO wrapper. Using <code>cmt::asio::read</code> you can perform a 'synchronous' read in the current thread without blocking the current thread. Instead the current thread will switch to running other tasks while waiting for the read to complete and then switch back once the read is ready. If an error occurs then <code><a class="el" href="namespacemace_1_1cmt_1_1asio.html#af5da54b3599ba2c926b071fd2e27d9a7" title="wraps boost::asio::async_read">read()</a></code> will throw the exception passed to ASIO's completion handler.</p>
 <div class="fragment"><pre class="fragment">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> AsyncReadStream, <span class="keyword">typename</span> MutableBufferSequence&gt;
-    <span class="keywordtype">size_t</span> <a class="code" href="namespacemace_1_1cmt_1_1asio.html#a9ba4c2a592e2cd9250b781662d583fc4" title="wraps boost::asio::async_read">read</a>( AsyncReadStream&amp; s, <span class="keyword">const</span> MutableBufferSequence&amp; buf, <span class="keyword">const</span> microseconds&amp; timeout_us = microseconds::max() ) {
+    <span class="keywordtype">size_t</span> <a class="code" href="namespacemace_1_1cmt_1_1asio.html#af5da54b3599ba2c926b071fd2e27d9a7" title="wraps boost::asio::async_read">read</a>( AsyncReadStream&amp; s, <span class="keyword">const</span> MutableBufferSequence&amp; buf, <span class="keyword">const</span> microseconds&amp; timeout_us = microseconds::max() ) {
         promise&lt;size_t&gt;::ptr p(<span class="keyword">new</span> promise&lt;size_t&gt;());
         boost::asio::async_read( s, buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
         <span class="keywordflow">return</span> p-&gt;wait(timeout_us);
@@ -268,9 +347,9 @@ MACE.CMT vs Boost.ASIO</h2>
   cmt::thread* t2;
 
   <span class="keywordtype">void</span> test() {
-    cmt::future&lt;int&gt; f1 = t1-&gt;async&lt;<span class="keywordtype">int</span>&gt;( async_opp );
-    cmt::future&lt;int&gt; f2 = t2-&gt;async&lt;<span class="keywordtype">int</span>&gt;( another_async_opp );
-    async&lt;void&gt;( other_work ); <span class="comment">// in current thread</span>
+    cmt::future&lt;int&gt; f1 = t1-&gt;async( async_opp );
+    cmt::future&lt;int&gt; f2 = t2-&gt;async( another_async_opp );
+    async( other_work ); <span class="comment">// in current thread</span>
 
     <span class="keywordflow">try</span> {
       <span class="comment">// while waiting other_work can run in this thread.</span>
@@ -314,7 +393,7 @@ Cooperative Threading vs Qt-like Event Loops</h2>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:41 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:54 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

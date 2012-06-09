@@ -97,7 +97,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -126,12 +126,42 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <tr><td class="indexkey">libs/reflect/include/mace/reflect/<b>value_base.hpp</b> <a href="value__base_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/reflect/include/mace/reflect/<b>value_cref.hpp</b> <a href="value__cref_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/reflect/include/mace/reflect/<b>value_ref.hpp</b> <a href="value__ref_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>client.hpp</b> <a href="client_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>base64.hpp</b> <a href="base64_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>client.hpp</b> <a href="client_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>client_interface.hpp</b> <a href="client__interface_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>connection.hpp</b> <a href="connection_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>connection_base.hpp</b> <a href="connection__base_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>datastream.hpp</b> <a href="datastream_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>describe.hpp</b> <a href="describe_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>error.hpp</b> <a href="rpc_2include_2mace_2rpc_2error_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>filter.hpp</b> <a href="filter_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>message.hpp</b> <a href="message_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>server.hpp</b> <a href="server_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/<b>varint.hpp</b> <a href="varint_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/detail/<b>connection_base.hpp</b> <a href="detail_2connection__base_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/detail/<b>pending_result.hpp</b> <a href="detail_2pending__result_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/detail/<b>server_base.hpp</b> <a href="server__base_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>connection.hpp</b> <a href="http_2connection_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>coroutine.hpp</b> <a href="coroutine_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>file_handler.hpp</b> <a href="file__handler_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>header.hpp</b> <a href="header_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>mime_types.hpp</b> <a href="mime__types_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>path_handler.hpp</b> <a href="path__handler_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>pending_result.hpp</b> <a href="http_2pending__result_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>reply.hpp</b> <a href="reply_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>request.hpp</b> <a href="request_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>request_parser.hpp</b> <a href="request__parser_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>server.hpp</b> <a href="http_2server_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>unyield.hpp</b> <a href="unyield_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/<b>yield.hpp</b> <a href="yield_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/http/detail/<b>connection.hpp</b> <a href="http_2detail_2connection_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>client.hpp</b> <a href="json_2client_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>client_base.hpp</b> <a href="client__base_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>client_interface.hpp</b> <a href="client__interface_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>connection.hpp</b> <a href="connection_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>client_interface.hpp</b> <a href="json_2client__interface_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>connection.hpp</b> <a href="json_2connection_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>error.hpp</b> <a href="rpc_2include_2mace_2rpc_2json_2error_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>http_client.hpp</b> <a href="http__client_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>http_client_base.hpp</b> <a href="http__client__base_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>http_connection.hpp</b> <a href="http__connection_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>http_server.hpp</b> <a href="http__server_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>named_parameters.hpp</b> <a href="named__parameters_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
@@ -139,6 +169,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>tcp_server.hpp</b> <a href="tcp__server_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>value.hpp</b> <a href="rpc_2include_2mace_2rpc_2json_2value_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/<b>value_io.hpp</b> <a href="value__io_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/detail/<b>call_methods.hpp</b> <a href="call__methods_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/json/detail/<b>tcp_server_base.hpp</b> <a href="tcp__server__base_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/raw/<b>message.hpp</b> <a href="raw_2message_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/raw/<b>raw.hpp</b> <a href="raw_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/raw/<b>raw_io.hpp</b> <a href="raw__io_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/raw/tcp/<b>connection.hpp</b> <a href="raw_2tcp_2connection_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/raw/tcp/<b>server.hpp</b> <a href="raw_2tcp_2server_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/raw/tcp/detail/<b>connection.hpp</b> <a href="raw_2tcp_2detail_2connection_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/tcp/<b>connection.hpp</b> <a href="tcp_2connection_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/tcp/<b>server.hpp</b> <a href="tcp_2server_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey">libs/rpc/include/mace/rpc/tcp/detail/<b>connection.hpp</b> <a href="tcp_2detail_2connection_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/stub/include/mace/stub/<b>mirror_interface.hpp</b> <a href="mirror__interface_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/stub/include/mace/stub/<b>ptr.hpp</b> <a href="ptr_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
   <tr><td class="indexkey">libs/stub/include/mace/stub/<b>void.hpp</b> <a href="void_8hpp_source.html">[code]</a></td><td class="indexvalue"></td></tr>
@@ -148,7 +189,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:42 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:55 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

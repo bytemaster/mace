@@ -98,7 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -140,8 +140,9 @@ Public Types</h2></td></tr>
 typedef boost::shared_ptr&lt; <a class="el" href="classmace_1_1cmt_1_1asio_1_1tcp_1_1socket.html">socket</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ptr</b></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:abbaa63b5906c6e46fe914fd1c1d10f74"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abbaa63b5906c6e46fe914fd1c1d10f74"></a>
-boost::system::error_code&#160;</td><td class="memItemRight" valign="bottom"><b>connect</b> (const boost::asio::ip::tcp::endpoint &amp;ep)</td></tr>
+<tr class="memitem:a2ba9ce9d1727c846fd95266cfab76da2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2ba9ce9d1727c846fd95266cfab76da2"></a>
+<a class="el" href="classmace_1_1cmt_1_1future.html">mace::cmt::future</a><br class="typebreak"/>
+&lt; boost::system::error_code &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>connect</b> (const boost::asio::ip::tcp::endpoint &amp;ep)</td></tr>
 <tr class="memitem:a9841d23e2455018afa921cea2b4c7a1f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9841d23e2455018afa921cea2b4c7a1f"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>read_some</b> (char *buffer, size_t size)</td></tr>
 <tr class="memitem:a28b53920fd488d936f9ad88053059b5a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a28b53920fd488d936f9ad88053059b5a"></a>
@@ -155,7 +156,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flush</b> ()</td></tr
 <div class="textblock"><p>Provides a buffered socket based on boost::asio.</p>
 <p>Read buffer grabs what ever is available from ASIO when it is empty. This makes small synchronous reads much more effecient. </p>
 
-<p>Definition at line <a class="el" href="tcp_2socket_8hpp_source.html#l00014">14</a> of file <a class="el" href="tcp_2socket_8hpp_source.html">socket.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tcp_2socket_8hpp_source.html#l00015">15</a> of file <a class="el" href="tcp_2socket_8hpp_source.html">socket.hpp</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>libs/cmt/include/mace/cmt/asio/tcp/<a class="el" href="tcp_2socket_8hpp_source.html">socket.hpp</a></li>
 </ul>
@@ -163,7 +164,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flush</b> ()</td></tr
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:41 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:54 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

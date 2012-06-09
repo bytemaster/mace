@@ -96,7 +96,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -127,18 +127,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a8cf6e34ed0c045b1618e0cf73bdf721a"><td class="memItemLeft" align="right" valign="top">boost::asio::io_service &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt_1_1asio.html#a8cf6e34ed0c045b1618e0cf73bdf721a">default_io_service</a> ()</td></tr>
-<tr class="memitem:a9ba4c2a592e2cd9250b781662d583fc4"><td class="memTemplParams" colspan="2">template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </td></tr>
-<tr class="memitem:a9ba4c2a592e2cd9250b781662d583fc4"><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt_1_1asio.html#a9ba4c2a592e2cd9250b781662d583fc4">read</a> (AsyncReadStream &amp;s, const MutableBufferSequence &amp;buf, const microseconds &amp;timeout_us=microseconds::max())</td></tr>
-<tr class="memdesc:a9ba4c2a592e2cd9250b781662d583fc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">wraps boost::asio::async_read  <a href="#a9ba4c2a592e2cd9250b781662d583fc4"></a><br/></td></tr>
-<tr class="memitem:a827e5f561244d0ac1e72544ba578aa03"><td class="memTemplParams" colspan="2">template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </td></tr>
-<tr class="memitem:a827e5f561244d0ac1e72544ba578aa03"><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt_1_1asio.html#a827e5f561244d0ac1e72544ba578aa03">read_some</a> (AsyncReadStream &amp;s, const MutableBufferSequence &amp;buf, const microseconds &amp;timeout_us=microseconds::max())</td></tr>
-<tr class="memdesc:a827e5f561244d0ac1e72544ba578aa03"><td class="mdescLeft">&#160;</td><td class="mdescRight">wraps boost::asio::async_read_some  <a href="#a827e5f561244d0ac1e72544ba578aa03"></a><br/></td></tr>
-<tr class="memitem:a7f4c9fbcb9f2271d54046ae2ee941bbb"><td class="memTemplParams" colspan="2">template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </td></tr>
-<tr class="memitem:a7f4c9fbcb9f2271d54046ae2ee941bbb"><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt_1_1asio.html#a7f4c9fbcb9f2271d54046ae2ee941bbb">write</a> (AsyncReadStream &amp;s, const MutableBufferSequence &amp;buf, const microseconds &amp;timeout_us=microseconds::max())</td></tr>
-<tr class="memdesc:a7f4c9fbcb9f2271d54046ae2ee941bbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">wraps boost::asio::async_write  <a href="#a7f4c9fbcb9f2271d54046ae2ee941bbb"></a><br/></td></tr>
-<tr class="memitem:a37ac230168b9471cd7e0732cdf1e7cf0"><td class="memTemplParams" colspan="2">template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </td></tr>
-<tr class="memitem:a37ac230168b9471cd7e0732cdf1e7cf0"><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt_1_1asio.html#a37ac230168b9471cd7e0732cdf1e7cf0">write_some</a> (AsyncReadStream &amp;s, const MutableBufferSequence &amp;buf, const microseconds &amp;timeout_us=microseconds::max())</td></tr>
-<tr class="memdesc:a37ac230168b9471cd7e0732cdf1e7cf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">wraps boost::asio::async_write_some  <a href="#a37ac230168b9471cd7e0732cdf1e7cf0"></a><br/></td></tr>
+<tr class="memitem:af5da54b3599ba2c926b071fd2e27d9a7"><td class="memTemplParams" colspan="2">template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </td></tr>
+<tr class="memitem:af5da54b3599ba2c926b071fd2e27d9a7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classmace_1_1cmt_1_1future.html">cmt::future</a>&lt; size_t &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt_1_1asio.html#af5da54b3599ba2c926b071fd2e27d9a7">read</a> (AsyncReadStream &amp;s, const MutableBufferSequence &amp;buf)</td></tr>
+<tr class="memdesc:af5da54b3599ba2c926b071fd2e27d9a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">wraps boost::asio::async_read  <a href="#af5da54b3599ba2c926b071fd2e27d9a7"></a><br/></td></tr>
+<tr class="memitem:a525a523496ee19834ae963ce45999409"><td class="memTemplParams" colspan="2">template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </td></tr>
+<tr class="memitem:a525a523496ee19834ae963ce45999409"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classmace_1_1cmt_1_1future.html">cmt::future</a>&lt; size_t &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt_1_1asio.html#a525a523496ee19834ae963ce45999409">read_some</a> (AsyncReadStream &amp;s, const MutableBufferSequence &amp;buf)</td></tr>
+<tr class="memdesc:a525a523496ee19834ae963ce45999409"><td class="mdescLeft">&#160;</td><td class="mdescRight">wraps boost::asio::async_read_some  <a href="#a525a523496ee19834ae963ce45999409"></a><br/></td></tr>
+<tr class="memitem:a411571dcd80c9b86a3624e4ede5d3878"><td class="memTemplParams" colspan="2">template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </td></tr>
+<tr class="memitem:a411571dcd80c9b86a3624e4ede5d3878"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classmace_1_1cmt_1_1future.html">cmt::future</a>&lt; size_t &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt_1_1asio.html#a411571dcd80c9b86a3624e4ede5d3878">write</a> (AsyncReadStream &amp;s, const MutableBufferSequence &amp;buf)</td></tr>
+<tr class="memdesc:a411571dcd80c9b86a3624e4ede5d3878"><td class="mdescLeft">&#160;</td><td class="mdescRight">wraps boost::asio::async_write  <a href="#a411571dcd80c9b86a3624e4ede5d3878"></a><br/></td></tr>
+<tr class="memitem:a026f08d3fd93a15b7a0441b888169554"><td class="memTemplParams" colspan="2">template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </td></tr>
+<tr class="memitem:a026f08d3fd93a15b7a0441b888169554"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classmace_1_1cmt_1_1future.html">cmt::future</a>&lt; size_t &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacemace_1_1cmt_1_1asio.html#a026f08d3fd93a15b7a0441b888169554">write_some</a> (AsyncReadStream &amp;s, const MutableBufferSequence &amp;buf)</td></tr>
+<tr class="memdesc:a026f08d3fd93a15b7a0441b888169554"><td class="mdescLeft">&#160;</td><td class="mdescRight">wraps boost::asio::async_write_some  <a href="#a026f08d3fd93a15b7a0441b888169554"></a><br/></td></tr>
 </table>
 <hr/><h2>Function Documentation</h2>
 <a class="anchor" id="a8cf6e34ed0c045b1618e0cf73bdf721a"></a>
@@ -159,14 +159,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a9ba4c2a592e2cd9250b781662d583fc4"></a>
+<a class="anchor" id="af5da54b3599ba2c926b071fd2e27d9a7"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">size_t <a class="el" href="namespacemace_1_1cmt_1_1asio.html#a9ba4c2a592e2cd9250b781662d583fc4">mace::cmt::asio::read</a> </td>
+          <td class="memname"><a class="el" href="classmace_1_1cmt_1_1future.html">cmt::future</a>&lt;size_t&gt; <a class="el" href="namespacemace_1_1cmt_1_1asio.html#af5da54b3599ba2c926b071fd2e27d9a7">mace::cmt::asio::read</a> </td>
           <td>(</td>
           <td class="paramtype">AsyncReadStream &amp;&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -175,13 +175,7 @@ template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const MutableBufferSequence &amp;&#160;</td>
-          <td class="paramname"><em>buf</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const microseconds &amp;&#160;</td>
-          <td class="paramname"><em>timeout_us</em> = <code>microseconds::max()</code>&#160;</td>
+          <td class="paramname"><em>buf</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -193,18 +187,18 @@ template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div
 <div class="memdoc">
 <dl class="section return"><dt>Returns:</dt><dd>the number of bytes read. </dd></dl>
 
-<p>Definition at line <a class="el" href="asio_8hpp_source.html#l00064">64</a> of file <a class="el" href="asio_8hpp_source.html">asio.hpp</a>.</p>
+<p>Definition at line <a class="el" href="asio_8hpp_source.html#l00046">46</a> of file <a class="el" href="asio_8hpp_source.html">asio.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a827e5f561244d0ac1e72544ba578aa03"></a>
+<a class="anchor" id="a525a523496ee19834ae963ce45999409"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">size_t <a class="el" href="namespacemace_1_1cmt_1_1asio.html#a827e5f561244d0ac1e72544ba578aa03">mace::cmt::asio::read_some</a> </td>
+          <td class="memname"><a class="el" href="classmace_1_1cmt_1_1future.html">cmt::future</a>&lt;size_t&gt; <a class="el" href="namespacemace_1_1cmt_1_1asio.html#a525a523496ee19834ae963ce45999409">mace::cmt::asio::read_some</a> </td>
           <td>(</td>
           <td class="paramtype">AsyncReadStream &amp;&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -213,13 +207,7 @@ template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const MutableBufferSequence &amp;&#160;</td>
-          <td class="paramname"><em>buf</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const microseconds &amp;&#160;</td>
-          <td class="paramname"><em>timeout_us</em> = <code>microseconds::max()</code>&#160;</td>
+          <td class="paramname"><em>buf</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -231,18 +219,18 @@ template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div
 <div class="memdoc">
 <dl class="section return"><dt>Returns:</dt><dd>the number of bytes read. </dd></dl>
 
-<p>Definition at line <a class="el" href="asio_8hpp_source.html#l00073">73</a> of file <a class="el" href="asio_8hpp_source.html">asio.hpp</a>.</p>
+<p>Definition at line <a class="el" href="asio_8hpp_source.html#l00055">55</a> of file <a class="el" href="asio_8hpp_source.html">asio.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a7f4c9fbcb9f2271d54046ae2ee941bbb"></a>
+<a class="anchor" id="a411571dcd80c9b86a3624e4ede5d3878"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">size_t <a class="el" href="namespacemace_1_1cmt_1_1asio.html#a7f4c9fbcb9f2271d54046ae2ee941bbb">mace::cmt::asio::write</a> </td>
+          <td class="memname"><a class="el" href="classmace_1_1cmt_1_1future.html">cmt::future</a>&lt;size_t&gt; <a class="el" href="namespacemace_1_1cmt_1_1asio.html#a411571dcd80c9b86a3624e4ede5d3878">mace::cmt::asio::write</a> </td>
           <td>(</td>
           <td class="paramtype">AsyncReadStream &amp;&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -251,13 +239,7 @@ template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const MutableBufferSequence &amp;&#160;</td>
-          <td class="paramname"><em>buf</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const microseconds &amp;&#160;</td>
-          <td class="paramname"><em>timeout_us</em> = <code>microseconds::max()</code>&#160;</td>
+          <td class="paramname"><em>buf</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -269,18 +251,18 @@ template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div
 <div class="memdoc">
 <dl class="section return"><dt>Returns:</dt><dd>the number of bytes written </dd></dl>
 
-<p>Definition at line <a class="el" href="asio_8hpp_source.html#l00083">83</a> of file <a class="el" href="asio_8hpp_source.html">asio.hpp</a>.</p>
+<p>Definition at line <a class="el" href="asio_8hpp_source.html#l00065">65</a> of file <a class="el" href="asio_8hpp_source.html">asio.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a37ac230168b9471cd7e0732cdf1e7cf0"></a>
+<a class="anchor" id="a026f08d3fd93a15b7a0441b888169554"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">size_t <a class="el" href="namespacemace_1_1cmt_1_1asio.html#a37ac230168b9471cd7e0732cdf1e7cf0">mace::cmt::asio::write_some</a> </td>
+          <td class="memname"><a class="el" href="classmace_1_1cmt_1_1future.html">cmt::future</a>&lt;size_t&gt; <a class="el" href="namespacemace_1_1cmt_1_1asio.html#a026f08d3fd93a15b7a0441b888169554">mace::cmt::asio::write_some</a> </td>
           <td>(</td>
           <td class="paramtype">AsyncReadStream &amp;&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -289,13 +271,7 @@ template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const MutableBufferSequence &amp;&#160;</td>
-          <td class="paramname"><em>buf</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const microseconds &amp;&#160;</td>
-          <td class="paramname"><em>timeout_us</em> = <code>microseconds::max()</code>&#160;</td>
+          <td class="paramname"><em>buf</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -307,7 +283,7 @@ template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div
 <div class="memdoc">
 <dl class="section return"><dt>Returns:</dt><dd>the number of bytes written </dd></dl>
 
-<p>Definition at line <a class="el" href="asio_8hpp_source.html#l00093">93</a> of file <a class="el" href="asio_8hpp_source.html">asio.hpp</a>.</p>
+<p>Definition at line <a class="el" href="asio_8hpp_source.html#l00075">75</a> of file <a class="el" href="asio_8hpp_source.html">asio.hpp</a>.</p>
 
 </div>
 </div>
@@ -315,7 +291,7 @@ template&lt;typename AsyncReadStream , typename MutableBufferSequence &gt; </div
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:41 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:54 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

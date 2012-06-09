@@ -91,7 +91,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -110,11 +110,14 @@ Introduction to MACE</h2>
 <p>MACE (Massively Asynchronous Coding Environment), is a collection of software libraries that aim to simplify developing modular, asynchronous applications in C++. The three main libraries provide tools for:</p>
 <ul>
 <li><a class="el" href="group__mace__cmt.html">CMT (Cooperative Multi-Tasking) Library</a><ul>
+<li><a class="el" href="group__mace__cmt.html#cmt_lockfree">Lock-Free Scheduler</a></li>
 <li><a class="el" href="group__mace__cmt.html#cmt_single_thread">Single Threaded Benchmark</a></li>
 <li><a class="el" href="group__mace__cmt.html#cmt_multi_threading">Multi-Threading with MACE.CMT</a></li>
 <li><a class="el" href="group__mace__cmt.html#cmt_async_signal_wait">Boost.Signals Integration</a></li>
+<li><a class="el" href="group__mace__cmt.html#cmt_mutex">Cooperative Mutexes</a></li>
 <li><a class="el" href="group__mace__cmt.html#cmt_usleep">Yielding and Sleeping</a></li>
 <li><a class="el" href="group__mace__cmt.html#cmt_asio_integration">Boost.ASIO Integration</a></li>
+<li><a class="el" href="group__mace__cmt.html#cmt_bind">Move-Aware Bind (passing non-copyable parameters)</a></li>
 <li><a class="el" href="group__mace__cmt.html#cmt_promise">Using Promises</a></li>
 <li><a class="el" href="group__mace__cmt.html#cmt_vs_asio">MACE.CMT vs Boost.ASIO</a></li>
 </ul>
@@ -151,13 +154,21 @@ Introduction to MACE</h2>
 </ul>
 </li>
 </ul>
-<ul>
-<li>Actor Paradigm</li>
-</ul>
-<p>All of these libraries are being developed as a proposal for inclusion with Boost and therefore use the boost namespace.</p>
+<p>All of these libraries are being developed with an eye toward submitting the code to Boost, therefore, the coding style and practices attempt to follow Boost best practices.</p>
 <h2><a class="anchor" id="mace_install"></a>
 Installing MACE</h2>
 <p>MACE has been tested on Linux, Mac OS X, and Windows 7.</p>
+<h3><a class="anchor" id="mace_requirements"></a>
+C++11 Requirements</h3>
+<p>Now that C++11 has been ratified, MACE attempts to use the new language features that are supported on Visual Studio 2010 and g++4.4 or newer.</p>
+<ul>
+<li>decltype<ul>
+<li>rvalue references</li>
+<li>postfix return types</li>
+<li>auto keyword</li>
+</ul>
+</li>
+</ul>
 <h3><a class="anchor" id="mace_windows7"></a>
 Windows 7 Install</h3>
 <p>In order to build Boost.Context, which uses ASM files, you must run the following commands from the Visual Studio Command Prompt. This has been tested and known to work with Visual Studio 2010 Express.</p>
@@ -200,7 +211,7 @@ Download</h3>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:42 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:55 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

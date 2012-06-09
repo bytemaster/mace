@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>MACE: libs/rpc/include/mace/rpc/json/client.hpp Source File</title>
+<title>MACE: libs/rpc/include/mace/rpc/client.hpp Source File</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="style.css" rel="stylesheet" type="text/css" />
@@ -97,7 +97,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -108,56 +108,80 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">libs/rpc/include/mace/rpc/json/client.hpp</div>  </div>
+<div class="title">libs/rpc/include/mace/rpc/client.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#ifndef _MACE_RPC_JSON_CLIENT_HPP_</span>
-<a name="l00002"></a>00002 <span class="preprocessor"></span><span class="preprocessor">#define _MACE_RPC_JSON_CLIENT_HPP_</span>
+<div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#ifndef _MACE_RPC_CLIENT_HPP_</span>
+<a name="l00002"></a>00002 <span class="preprocessor"></span><span class="preprocessor">#define _MACE_RPC_CLIENT_HPP_</span>
 <a name="l00003"></a>00003 <span class="preprocessor"></span><span class="preprocessor">#include &lt;mace/stub/ptr.hpp&gt;</span>
-<a name="l00004"></a>00004 <span class="preprocessor">#include &lt;mace/rpc/json/client_interface.hpp&gt;</span>
-<a name="l00005"></a>00005 <span class="preprocessor">#include &lt;mace/rpc/json/client_base.hpp&gt;</span>
+<a name="l00004"></a>00004 <span class="preprocessor">#include &lt;mace/rpc/client_interface.hpp&gt;</span>
+<a name="l00005"></a>00005 <span class="preprocessor">#include &lt;mace/rpc/raw/tcp/connection.hpp&gt;</span>
 <a name="l00006"></a>00006 
-<a name="l00007"></a><a class="code" href="namespacemace_1_1rpc_1_1json.html">00007</a> <span class="keyword">namespace </span>mace { <span class="keyword">namespace </span>rpc {  <span class="keyword">namespace </span>json {
+<a name="l00007"></a>00007 <span class="keyword">namespace </span>mace { <span class="keyword">namespace </span>rpc {  
 <a name="l00008"></a>00008 
-<a name="l00017"></a>00017   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InterfaceType&gt;
-<a name="l00018"></a><a class="code" href="classmace_1_1rpc_1_1json_1_1client.html">00018</a>   <span class="keyword">class </span><a class="code" href="classmace_1_1rpc_1_1json_1_1client.html">client</a> : <span class="keyword">public</span> <a class="code" href="classmace_1_1stub_1_1ptr.html" title="Behaves like a smart pointer that can handle any type with the same interface.">mace::stub::ptr</a>&lt;InterfaceType, mace::rpc::json::client_interface&gt;, 
-<a name="l00019"></a>00019                  <span class="keyword">public</span> client_base {
-<a name="l00020"></a>00020     <span class="keyword">public</span>:
-<a name="l00021"></a>00021       <span class="keyword">typedef</span> boost::shared_ptr&lt;client&gt;   ptr;
+<a name="l00017"></a>00017   <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InterfaceType, <span class="keyword">typename</span> ConnectionType = mace::rpc::raw::tcp::connection&lt;raw_io&gt; &gt;
+<a name="l00018"></a><a class="code" href="classmace_1_1rpc_1_1client.html">00018</a>   <span class="keyword">class </span><a class="code" href="classmace_1_1rpc_1_1client.html">client</a> : <span class="keyword">public</span> <a class="code" href="classmace_1_1stub_1_1ptr.html" title="Behaves like a smart pointer that can handle any type with the same interface.">mace::stub::ptr</a>&lt;InterfaceType, mace::rpc::client_interface&lt; ConnectionType &gt; &gt; {
+<a name="l00019"></a>00019     <span class="keyword">public</span>:
+<a name="l00020"></a>00020       <span class="keyword">typedef</span> boost::shared_ptr&lt;client&gt;                     ptr;
+<a name="l00021"></a>00021       <span class="keyword">typedef</span> <a class="code" href="structmace_1_1rpc_1_1client__interface.html" title="Interface Delegate that adapts an interface for asynchronous calls over the network.">mace::rpc::client_interface&lt; ConnectionType &gt;</a> <a class="code" href="structmace_1_1rpc_1_1client__interface.html" title="Interface Delegate that adapts an interface for asynchronous calls over the network.">delegate_type</a>;
 <a name="l00022"></a>00022 
-<a name="l00023"></a>00023       <a class="code" href="classmace_1_1rpc_1_1json_1_1client.html">client</a>(){}
-<a name="l00024"></a>00024       <a class="code" href="classmace_1_1rpc_1_1json_1_1client.html">client</a>( <span class="keyword">const</span> <a class="code" href="classmace_1_1rpc_1_1json_1_1client.html">client</a>&amp; c ):client_base(c) {
-<a name="l00025"></a>00025         mace::rpc::json::client_interface::set( *<span class="keyword">this</span> );
-<a name="l00026"></a>00026       }
-<a name="l00027"></a>00027       <span class="keywordtype">bool</span> operator!()<span class="keyword">const </span>{ <span class="keywordflow">return</span> !m_con; }
+<a name="l00023"></a>00023       <a class="code" href="classmace_1_1rpc_1_1client.html">client</a>(){}
+<a name="l00024"></a>00024 
+<a name="l00025"></a>00025       <a class="code" href="classmace_1_1rpc_1_1client.html">client</a>( <span class="keyword">const</span> <a class="code" href="classmace_1_1rpc_1_1client.html">client</a>&amp; c ):m_con(c.m_con) {
+<a name="l00026"></a>00026          delegate_type::set_vtable( *<span class="keyword">this</span>, m_con );
+<a name="l00027"></a>00027       }
 <a name="l00028"></a>00028 
-<a name="l00029"></a>00029       <a class="code" href="classmace_1_1rpc_1_1json_1_1client.html">client</a>&amp; operator=( <span class="keyword">const</span> <a class="code" href="classmace_1_1rpc_1_1json_1_1client.html">client</a>&amp; c ) {
-<a name="l00030"></a>00030         <span class="keywordflow">if</span>( &amp;c != <span class="keyword">this</span> )  {
-<a name="l00031"></a>00031             m_con = c.m_con;
-<a name="l00032"></a>00032             mace::rpc::json::client_interface::set( *<span class="keyword">this</span> );
-<a name="l00033"></a>00033         }
-<a name="l00034"></a>00034         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00035"></a>00035       }
-<a name="l00036"></a>00036       <a class="code" href="classmace_1_1rpc_1_1json_1_1client.html">client</a>( <span class="keyword">const</span> mace::rpc::json::connection::ptr&amp; c) 
-<a name="l00037"></a>00037       :client_base(c) {
-<a name="l00038"></a>00038          mace::rpc::json::client_interface::set( *<span class="keyword">this</span> );
-<a name="l00039"></a>00039       }      
-<a name="l00040"></a>00040 
-<a name="l00041"></a>00041       <span class="comment">// TODO: client( endpoint )</span>
-<a name="l00042"></a>00042       <a class="code" href="classmace_1_1rpc_1_1json_1_1client.html">client</a>( <span class="keyword">const</span> std::string&amp; host, uint16_t port ) 
-<a name="l00043"></a>00043       :client_base(host,port){
-<a name="l00044"></a>00044          mace::rpc::json::client_interface::set( *<span class="keyword">this</span> );
-<a name="l00045"></a>00045       }
-<a name="l00046"></a>00046   };
+<a name="l00029"></a>00029       <a class="code" href="classmace_1_1rpc_1_1client.html">client</a>( <a class="code" href="classmace_1_1rpc_1_1client.html">client</a>&amp;&amp; c ) {
+<a name="l00030"></a>00030         m_con = std::move(c.m_con);
+<a name="l00031"></a>00031       }
+<a name="l00032"></a>00032 
+<a name="l00033"></a>00033       <span class="keywordtype">bool</span> operator!()<span class="keyword">const </span>{ <span class="keywordflow">return</span> !m_con; }
+<a name="l00034"></a>00034 
+<a name="l00035"></a>00035       <a class="code" href="classmace_1_1rpc_1_1client.html">client</a>&amp; operator=( <span class="keyword">const</span> <a class="code" href="classmace_1_1rpc_1_1client.html">client</a>&amp; c ) {
+<a name="l00036"></a>00036         <span class="keywordflow">if</span>( &amp;c != <span class="keyword">this</span> )  {
+<a name="l00037"></a>00037             m_con = c.m_con;
+<a name="l00038"></a>00038             delegate_type::set_vtable( *<span class="keyword">this</span>, m_con );
+<a name="l00039"></a>00039         }
+<a name="l00040"></a>00040         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00041"></a>00041       }
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043       <a class="code" href="classmace_1_1rpc_1_1client.html">client</a>( <span class="keyword">const</span> <span class="keyword">typename</span> ConnectionType::ptr&amp; c) 
+<a name="l00044"></a>00044       :m_con(c) {
+<a name="l00045"></a>00045         delegate_type::set_vtable( *<span class="keyword">this</span>, m_con );
+<a name="l00046"></a>00046       }      
 <a name="l00047"></a>00047 
-<a name="l00048"></a>00048 } } } <span class="comment">// mace::rpc::json</span>
-<a name="l00049"></a>00049 
-<a name="l00050"></a>00050 <span class="preprocessor">#endif</span>
+<a name="l00048"></a>00048       <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;
+<a name="l00049"></a>00049       <span class="keywordtype">void</span> connect( T&amp;&amp; v ) {
+<a name="l00050"></a>00050         <span class="keyword">typename</span> ConnectionType::ptr c( <span class="keyword">new</span> ConnectionType( std::forward&lt;T&gt;(v) ) );
+<a name="l00051"></a>00051         m_con = c;
+<a name="l00052"></a>00052         delegate_type::set_vtable( *<span class="keyword">this</span>, m_con );
+<a name="l00053"></a>00053       }
+<a name="l00054"></a>00054 
+<a name="l00055"></a>00055       <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> T2&gt;
+<a name="l00056"></a>00056       <span class="keywordtype">void</span> connect( T&amp;&amp; v, T2&amp;&amp; v2 ) {
+<a name="l00057"></a>00057         <span class="keyword">typename</span> ConnectionType::ptr c( <span class="keyword">new</span> ConnectionType( std::forward&lt;T&gt;(v), std::forward&lt;T&gt;(v2)  ) );
+<a name="l00058"></a>00058         m_con = c;
+<a name="l00059"></a>00059         delegate_type::set_vtable( *<span class="keyword">this</span>, m_con );
+<a name="l00060"></a>00060       }
+<a name="l00061"></a>00061 
+<a name="l00062"></a>00062       <span class="keyword">typename</span> ConnectionType::ptr <a class="code" href="classmace_1_1rpc_1_1connection.html">connection</a>()<span class="keyword">const </span>{ <span class="keywordflow">return</span> m_con; }
+<a name="l00063"></a>00063 
+<a name="l00064"></a>00064       <span class="keywordtype">void</span> set_connection( <span class="keyword">const</span> <span class="keyword">typename</span> ConnectionType::ptr&amp; c ) {
+<a name="l00065"></a>00065         m_con = c;
+<a name="l00066"></a>00066         delegate_type::set_vtable( *<span class="keyword">this</span>, m_con );
+<a name="l00067"></a>00067       }
+<a name="l00068"></a>00068     <span class="keyword">private</span>:
+<a name="l00069"></a>00069       <span class="keyword">typename</span> ConnectionType::ptr m_con;
+<a name="l00070"></a>00070   };
+<a name="l00071"></a>00071 
+<a name="l00072"></a>00072 } } <span class="comment">// mace::rpc::json</span>
+<a name="l00073"></a>00073 
+<a name="l00074"></a>00074 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:40 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:54 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

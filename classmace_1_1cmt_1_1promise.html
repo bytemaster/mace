@@ -98,7 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -119,6 +119,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a>  </div>
   <div class="headertitle">
@@ -150,16 +151,22 @@ virtual const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>wait
 virtual const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>wait_until</b> (const system_clock::time_point &amp;timeout)</td></tr>
 <tr class="memitem:ac167e9f1e8488baa84d8abfee2d1682c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac167e9f1e8488baa84d8abfee2d1682c"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>set_exception</b> (const boost::exception_ptr &amp;e)</td></tr>
+<tr class="memitem:a4e1c68b6d252b62e07ecffea8823f19e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e1c68b6d252b62e07ecffea8823f19e"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>set_value</b> (T &amp;&amp;v)</td></tr>
 <tr class="memitem:a8f3611f8836b1db70dc4d1bab901dfd7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f3611f8836b1db70dc4d1bab901dfd7"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>set_value</b> (const T &amp;v)</td></tr>
+<tr><td colspan="2"><h2><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a05466255165bb135e9067063070c65c0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05466255165bb135e9067063070c65c0"></a>
+static ptr&#160;</td><td class="memItemRight" valign="bottom"><b>make</b> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a0a61f2703309f4501da57b39a2ab59b9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a61f2703309f4501da57b39a2ab59b9"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>set_timeout</b> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:adaaa43d80d78384e56a5453bb506e682"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adaaa43d80d78384e56a5453bb506e682"></a>
-<a class="el" href="classmace_1_1cmt_1_1mutex.html">cmt::mutex</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_mutex</b></td></tr>
+<tr class="memitem:a32657bfcd31afd4fedc917d66749a298"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a32657bfcd31afd4fedc917d66749a298"></a>
+cmt::spin_yield_lock&#160;</td><td class="memItemRight" valign="bottom"><b>m_spin_yield</b></td></tr>
 <tr class="memitem:a306437024c44c0b128de173511d10aa4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a306437024c44c0b128de173511d10aa4"></a>
 boost::exception_ptr&#160;</td><td class="memItemRight" valign="bottom"><b>m_error</b></td></tr>
 <tr class="memitem:a47a5ce5afc7101ffcfe2ae41ff385838"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a47a5ce5afc7101ffcfe2ae41ff385838"></a>
@@ -179,7 +186,7 @@ class mace::cmt::promise&lt; T &gt;</h3>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:41 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:54 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

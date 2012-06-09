@@ -1,11 +1,20 @@
 var searchData=
 [
+  ['calculate_5ftype',['calculate_type',['../structmace_1_1rpc_1_1client__interface_1_1calculate__type.html',1,'mace::rpc::client_interface']]],
   ['calculate_5ftype',['calculate_type',['../structmace_1_1rpc_1_1json_1_1client__interface_1_1calculate__type.html',1,'mace::rpc::json::client_interface']]],
   ['calculate_5ftype',['calculate_type',['../structmace_1_1stub_1_1mirror__interface_1_1calculate__type.html',1,'mace::stub::mirror_interface']]],
+  ['client',['client',['../classmace_1_1rpc_1_1client.html',1,'mace::rpc']]],
   ['client',['client',['../classmace_1_1rpc_1_1json_1_1client.html',1,'mace::rpc::json']]],
+  ['client_5finterface',['client_interface',['../structmace_1_1rpc_1_1client__interface.html',1,'mace::rpc']]],
   ['client_5finterface',['client_interface',['../structmace_1_1rpc_1_1json_1_1client__interface.html',1,'mace::rpc::json']]],
+  ['connection',['connection',['../classmace_1_1rpc_1_1tcp_1_1connection.html',1,'mace::rpc::tcp']]],
+  ['connection',['connection',['../classmace_1_1rpc_1_1connection.html',1,'mace::rpc']]],
   ['connection',['connection',['../classmace_1_1rpc_1_1json_1_1connection.html',1,'mace::rpc::json']]],
+  ['connection',['connection',['../classmace_1_1rpc_1_1http_1_1connection.html',1,'mace::rpc::http']]],
   ['connection',['connection',['../classmace_1_1rpc_1_1json_1_1connection.html#a06e31a18a003bdb2c6ff69599f4a5bf9',1,'mace::rpc::json::connection']]],
+  ['connection_5fbase',['connection_base',['../classmace_1_1rpc_1_1connection__base.html',1,'mace::rpc']]],
+  ['content',['content',['../structmace_1_1rpc_1_1http_1_1reply.html#a1199aff02a756e32d0db6ce7dfa28faf',1,'mace::rpc::http::reply::content()'],['../structmace_1_1rpc_1_1http_1_1request.html#a9acc9b36394d4900818d21671c7b1ded',1,'mace::rpc::http::request::content()']]],
   ['create',['create',['../classmace_1_1cmt_1_1thread.html#a4232900b8b55f4e039d8b4fda6fcd98d',1,'mace::cmt::thread']]],
+  ['create_5fcallback',['create_callback',['../classmace_1_1rpc_1_1connection.html#a14d4ce9fc60ea31872465854c811b7ac',1,'mace::rpc::connection']]],
   ['current',['current',['../classmace_1_1cmt_1_1thread.html#a40ad356d1c0bbc9bf0b0cbbdfafded15',1,'mace::cmt::thread']]]
 ];

@@ -99,7 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -130,6 +130,30 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><a class="el" href="classmace_1_1reflect_1_1value__ref.html">mace::reflect::value_ref</a></li>
 </ul>
 </li>
+<li><a class="el" href="structmace_1_1rpc_1_1client__interface.html">mace::rpc::client_interface&lt; ConnectionType &gt;</a></li>
+<li><a class="el" href="structmace_1_1rpc_1_1client__interface_1_1calculate__type.html">mace::rpc::client_interface&lt; ConnectionType &gt;::calculate_type&lt; MemberPointer &gt;</a></li>
+<li><a class="el" href="structmace_1_1rpc_1_1connection_1_1add__interface__visitor.html">mace::rpc::connection&lt; IODelegate &gt;::add_interface_visitor&lt; InterfaceType &gt;</a></li>
+<li><a class="el" href="structmace_1_1rpc_1_1connection_1_1rpc__recv__functor.html">mace::rpc::connection&lt; IODelegate &gt;::rpc_recv_functor&lt; Seq, Functor &gt;</a></li>
+<li><a class="el" href="classmace_1_1rpc_1_1connection__base.html">mace::rpc::connection_base</a><ul>
+<li><a class="el" href="classmace_1_1rpc_1_1connection.html">mace::rpc::connection&lt; IODelegate &gt;</a><ul>
+<li><a class="el" href="classmace_1_1rpc_1_1tcp_1_1connection.html">mace::rpc::tcp::connection&lt; IODelegate &gt;</a><ul>
+<li><a class="el" href="classmace_1_1rpc_1_1http_1_1connection.html">mace::rpc::http::connection&lt; IODelegate &gt;</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="el" href="structmace_1_1rpc_1_1datastream.html">mace::rpc::datastream&lt; T &gt;</a></li>
+<li><a class="el" href="structmace_1_1rpc_1_1default__filter.html">mace::rpc::default_filter</a><ul>
+<li><a class="el" href="structmace_1_1rpc_1_1function__filter.html">mace::rpc::function_filter&lt; Connection &gt;</a></li>
+</ul>
+</li>
+<li><a class="el" href="classmace_1_1rpc_1_1http_1_1file__handler.html">mace::rpc::http::file_handler</a></li>
+<li><a class="el" href="structmace_1_1rpc_1_1http_1_1reply.html">mace::rpc::http::reply</a></li>
+<li><a class="el" href="structmace_1_1rpc_1_1http_1_1request.html">mace::rpc::http::request</a></li>
+<li><a class="el" href="classmace_1_1rpc_1_1http_1_1request__parser.html">mace::rpc::http::request_parser</a></li>
+<li><a class="el" href="classmace_1_1rpc_1_1http_1_1server.html">mace::rpc::http::server</a></li>
 <li><a class="el" href="structmace_1_1rpc_1_1json_1_1add__interface__visitor.html">mace::rpc::json::add_interface_visitor&lt; InterfaceType &gt;</a></li>
 <li><a class="el" href="structmace_1_1rpc_1_1json_1_1client__interface.html">mace::rpc::json::client_interface</a></li>
 <li><a class="el" href="structmace_1_1rpc_1_1json_1_1client__interface_1_1calculate__type.html">mace::rpc::json::client_interface::calculate_type&lt; MemberPointer &gt;</a></li>
@@ -142,6 +166,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><a class="el" href="classmace_1_1rpc_1_1json_1_1http__server.html">mace::rpc::json::http_server</a></li>
 <li><a class="el" href="classmace_1_1rpc_1_1json_1_1tcp__server.html">mace::rpc::json::tcp_server&lt; InterfaceType &gt;</a></li>
 <li><a class="el" href="classmace_1_1rpc_1_1json_1_1value.html">mace::rpc::json::value</a></li>
+<li><a class="el" href="structmace_1_1rpc_1_1message.html">mace::rpc::message</a></li>
+<li><a class="el" href="classmace_1_1rpc_1_1server.html">mace::rpc::server&lt; InterfaceType, ConnectionType &gt;</a></li>
 <li><a class="el" href="structmace_1_1stub_1_1adapt__void.html">mace::stub::adapt_void&lt; R, Functor &gt;</a></li>
 <li><a class="el" href="structmace_1_1stub_1_1mirror__interface.html">mace::stub::mirror_interface</a></li>
 <li><a class="el" href="structmace_1_1stub_1_1mirror__interface_1_1calculate__type.html">mace::stub::mirror_interface::calculate_type&lt; MemberPointer &gt;</a></li>
@@ -151,6 +177,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><a class="el" href="classmace_1_1stub_1_1vtable__base.html">mace::stub::vtable_base&lt; t &gt;</a></li>
 <li><a class="el" href="structmace_1_1stub_1_1vtable__reflector.html">mace::stub::vtable_reflector&lt; InterfaceType, InterfaceDelegate &gt;</a></li>
 <li><a class="el" href="classmace_1_1cmt_1_1promise.html">mace::cmt::promise&lt; void_t &gt;</a></li>
+<li><a class="el" href="classmace_1_1stub_1_1ptr.html">mace::stub::ptr&lt; InterfaceType, mace::rpc::client_interface&lt; ConnectionType &gt; &gt;</a><ul>
+<li><a class="el" href="classmace_1_1rpc_1_1client.html">mace::rpc::client&lt; InterfaceType, ConnectionType &gt;</a></li>
+</ul>
+</li>
 <li><a class="el" href="classmace_1_1stub_1_1ptr.html">mace::stub::ptr&lt; InterfaceType, mace::rpc::json::client_interface &gt;</a><ul>
 <li><a class="el" href="classmace_1_1rpc_1_1json_1_1client.html">mace::rpc::json::client&lt; InterfaceType &gt;</a></li>
 <li><a class="el" href="classmace_1_1rpc_1_1json_1_1http__client.html">mace::rpc::json::http_client&lt; InterfaceType &gt;</a></li>
@@ -161,7 +191,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:42 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:55 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

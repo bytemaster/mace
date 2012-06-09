@@ -98,7 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -123,7 +123,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>A non-blocking mutex, modified spin-lock that yields on failure.  
+<p>mutex  
  <a href="classmace_1_1cmt_1_1mutex.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="mutex_8hpp_source.html">mutex.hpp</a>&gt;</code></p>
@@ -134,20 +134,59 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:afa222fe0b2ed055066c0a3016f035ee2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afa222fe0b2ed055066c0a3016f035ee2"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>try_lock</b> ()</td></tr>
-<tr class="memitem:acab1fb7df65d01a7d8ed1abb19e2a264"><td class="memTemplParams" colspan="2"><a class="anchor" id="acab1fb7df65d01a7d8ed1abb19e2a264"></a>
-template&lt;typename DurationType &gt; </td></tr>
-<tr class="memitem:acab1fb7df65d01a7d8ed1abb19e2a264"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>timed_lock</b> (const DurationType &amp;rel_time)</td></tr>
 <tr class="memitem:a24cb0b04cc2a1ec0cb11bbee57f9c4e8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a24cb0b04cc2a1ec0cb11bbee57f9c4e8"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>timed_lock</b> (const boost::system_time &amp;abs_time)</td></tr>
 <tr class="memitem:a95440fce6c0e2abf94b3b3248017c058"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a95440fce6c0e2abf94b3b3248017c058"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>lock</b> ()</td></tr>
 <tr class="memitem:a82a4205dcaeddb57ea80de771dcd8b07"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a82a4205dcaeddb57ea80de771dcd8b07"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>unlock</b> ()</td></tr>
+<tr class="memitem:acab1fb7df65d01a7d8ed1abb19e2a264"><td class="memTemplParams" colspan="2"><a class="anchor" id="acab1fb7df65d01a7d8ed1abb19e2a264"></a>
+template&lt;typename DurationType &gt; </td></tr>
+<tr class="memitem:acab1fb7df65d01a7d8ed1abb19e2a264"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>timed_lock</b> (const DurationType &amp;rel_time)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>This mutex does not block the current thread, but instead attempts to use an atomic operation to aquire the lock. If unsuccessful, then it yields to other tasks before trying again. If there is no current fiber, then yield is a no-op and mutex becomes a spin-lock. </p>
+<div class="textblock"><p>This mutex has an advantage over boost::mutex in that it does not involve any system calls, even in contention.</p>
+<p>Uncontensted access is a simple compare and swap, no delay.</p>
+<p>Contested access by different fibers in the same thread simply yields the thread until the lock is available. Actual delay is subject to the cooperative nature of other tasks in the fiber's thread.</p>
+<p>Contested access by different threads requires a spin lock while the task is enqueued. Because the enqueue action is well-defined and 'short-lived' time spent 'spinning' should be minimal.</p>
+<p>Cooperatively multi-tasked code must still worry about reentrancy. Suppose you have a thread sending a message across a socket, the socket members are thread safe, but the <code>write_message()</code> operation is not rentrant because the context could yield while waiting for a partial write to complete.</p>
+<p>If while it has yielded another task in the same thread attempts to write a second message then you will get garbage out as both fibers take turns writing parts of their messages out of the socket.</p>
+<p>Example problem: </p>
+<div class="fragment"><pre class="fragment">    async(write_message);
+    async(write_message);
+    <span class="keywordtype">void</span> write_message() {
+      sock-&gt;write(part1); <span class="comment">// may yield</span>
+      sock-&gt;write(part2); <span class="comment">// may yield</span>
+      sock-&gt;write(part3); <span class="comment">// may yield</span>
+    }
+</pre></div><p>The output could look something like:</p>
+<div class="fragment"><pre class="fragment">    part1
+    part2
+    part1
+    part3
+    part2
+    part3
+</pre></div><p>What you want to happen is this:</p>
+<div class="fragment"><pre class="fragment">    <span class="keywordtype">void</span> write_message() {
+      boost::unique_lock&lt;cmt::mutex&gt; lock(sock-&gt;write_lock);
+      sock-&gt;write(part1); <span class="comment">// may yield</span>
+      sock-&gt;write(part2); <span class="comment">// may yield</span>
+      sock-&gt;write(part3); <span class="comment">// may yield</span>
+    }
+</pre></div><p>Now if while writing the first message, someone attempts to write a second message second write will 'queue' behind the first by 'blocking' on the mutex.</p>
+<p>As a result we now have to extend the normal discussion on thread-safe vs reentrant.</p>
+<ul>
+<li>prempt-thread-safe : the code may be called by multiple os threads at the same time.<ul>
+<li>coop-thread-safe : the code may be called by multiple contexts within the same thread.</li>
+<li>thread-unsafe : the code may only be called by one context at a time for a set of data.</li>
+</ul>
+</li>
+</ul>
+<p>In the example above, before we added the mutex the code was thread-unsafe After we added the mutex the code became coop-thread-safe, and potentially prempt-thread-safe</p>
+<p>To be preempt-thread-safe any operations must be atomic or protected by a lock because the OS could switch you out between any two instructions.</p>
+<p>To be coop-thread-safe all operations are 'atomic' unless they span a 'yield'. If they span a yield (such as writing parts of a message), then a mutex is required. </p>
 
-<p>Definition at line <a class="el" href="mutex_8hpp_source.html#l00020">20</a> of file <a class="el" href="mutex_8hpp_source.html">mutex.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mutex_8hpp_source.html#l00090">90</a> of file <a class="el" href="mutex_8hpp_source.html">mutex.hpp</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>libs/cmt/include/mace/cmt/<a class="el" href="mutex_8hpp_source.html">mutex.hpp</a></li>
 </ul>
@@ -155,7 +194,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>unlock</b> ()</td></t
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:41 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:54 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

@@ -91,7 +91,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -117,6 +117,20 @@ Modules</h2></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>The MACE.RPC Library leverages the features of <a class="el" href="group__mace__reflect.html">Reflect Library</a>, <a class="el" href="group__mace__stub.html">Stub Library</a>, and <a class="el" href="group__mace__cmt.html">CMT (Cooperative Multi-Tasking) Library</a> to provide the most effecient, and native-feeling C++ RPC library known to man.</p>
+<p>This library has three primary goals:</p>
+<ul>
+<li>seamless interoperability with established RPC protocols like JSON-RPC or XML-RPC</li>
+<li>seamless remote-object interface that fully abstracts the location of your C++ objects.<ul>
+<li>send a <code>boost::function&lt;&gt;</code> as an RPC parameter / return value and have them work transparently.</li>
+<li>send cmt::stub::ptr&lt;&gt; as RPC parameters or return values.</li>
+<li>propagate exceptions back across RPC boundary.</li>
+<li>pass reference parameters.</li>
+<li>use <code>boost::signals&lt;&gt;</code> over the network</li>
+</ul>
+</li>
+<li>abstract transport (udp,tcp,http,https,ssl) and protocol (json,binary,xml,etc) from the RPC interface.</li>
+</ul>
+<p>Clearly if you plan on interacting with a well-defined JSON-RPC or JSON-XML interface then you will not be able to use the advanced features.</p>
 <p>This library currently implements the JSON RPC-2.0 spec, but will expand to include XML-RPC, and various other protocols.</p>
 <h2><a class="anchor" id="mace_rpc_dependencies"></a>
 Dependencies</h2>
@@ -130,7 +144,7 @@ Dependencies</h2>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 2 2012 00:52:41 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jun 9 2012 02:18:54 for MACE by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>
