@@ -50,7 +50,7 @@ typedef boost::error_info<struct json_err_code_,int64_t> err_code;
    *  Does not implement communication details which are provided by derived classes
    *  which reimplement send() and call the  protected handler methods.
    */
-  class connection : public boost::enable_shared_from_this<connection> {
+  class connection : public std::enable_shared_from_this<connection> {
     public:
       /**
        *  When packing parameters, intercept any boost function and
@@ -84,8 +84,8 @@ typedef boost::error_info<struct json_err_code_,int64_t> err_code;
              connection& m_con;
       };
       
-      typedef boost::shared_ptr<connection> ptr;
-      typedef boost::weak_ptr<connection>   wptr;
+      typedef std::shared_ptr<connection> ptr;
+      typedef std::weak_ptr<connection>   wptr;
 
       /**
        *  @param t - the thread in which messages will be sent and callbacks invoked
@@ -109,8 +109,8 @@ typedef boost::error_info<struct json_err_code_,int64_t> err_code;
         json::value msg;
         create_call( method_name, param, msg );
         msg["id"]     = next_method_id();
-        typename pending_result_impl<json::value>::ptr pr = boost::make_shared<pending_result_impl<json::value> >(); 
-        send( msg, boost::static_pointer_cast<pending_result>(pr) );
+        typename pending_result_impl<json::value>::ptr pr = std::make_shared<pending_result_impl<json::value> >(); 
+        send( msg, std::static_pointer_cast<pending_result>(pr) );
         return pr->prom;
       }
 
@@ -133,10 +133,10 @@ typedef boost::error_info<struct json_err_code_,int64_t> err_code;
         if( boost::fusion::size(param ) )
           pack_params( msg["params"], param, typename has_named_params<ParamSeq>::type() );
 
-        typename pending_result_impl<R>::ptr pr = boost::make_shared<pending_result_impl<R> >(); 
+        typename pending_result_impl<R>::ptr pr = std::make_shared<pending_result_impl<R> >(); 
 
         msg["jsonrpc"] = "2.0";
-        send( msg, boost::static_pointer_cast<pending_result>(pr) );
+        send( msg, std::static_pointer_cast<pending_result>(pr) );
         return pr->prom;
       }
       template<typename ParamSeq>
@@ -162,7 +162,7 @@ typedef boost::error_info<struct json_err_code_,int64_t> err_code;
 
       class pending_result {
         public:
-          typedef boost::shared_ptr<pending_result> ptr;
+          typedef std::shared_ptr<pending_result> ptr;
           virtual ~pending_result(){}
           virtual void handle_result( connection& c, const json::value& data )       = 0;
           virtual void handle_error( const boost::exception_ptr& e  ) = 0;
@@ -205,7 +205,7 @@ typedef boost::error_info<struct json_err_code_,int64_t> err_code;
               prom->set_exception( boost::copy_exception( mace::cmt::error::broken_promise() ));
             }
           }
-          typedef boost::shared_ptr<pending_result_impl> ptr;
+          typedef std::shared_ptr<pending_result_impl> ptr;
           virtual void handle_result( connection& c, const json::value& data ) {
             R value;
             function_filter f(c);

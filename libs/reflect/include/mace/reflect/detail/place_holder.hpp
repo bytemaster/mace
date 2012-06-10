@@ -168,11 +168,13 @@ namespace mace { namespace reflect { namespace detail {
       virtual bool       has_field( const std::string& f )const { return reflect::has_field<T>(f); }
       virtual value_ref  get_field( const std::string& f ) {
          BOOST_THROW_EXCEPTION(bad_value_cast());
+         int dummy;
+         return dummy;
       }
       virtual value_cref get_field( const std::string& f )const  {
          return reflect::get_field(f,val); 
       }
-      virtual iterator_impl_base*       begin()      { BOOST_THROW_EXCEPTION( bad_value_cast() ); return 0; }
+      virtual iterator_impl_base*       begin()      { BOOST_THROW_EXCEPTION( bad_value_cast() ); return NULL; }
       virtual const_iterator_impl_base* begin()const { return new const_iterator_impl<T>(val, get_field_map<T>().begin()); }
 
       const T& get_val()const { return val; }
@@ -227,7 +229,7 @@ namespace mace { namespace reflect { namespace detail {
       }
       virtual value_cref get_field( uint64_t idx )const { return this->get_val()[idx]; }
 
-      virtual iterator_impl_base*       begin()      { return 0; }
+      virtual iterator_impl_base*       begin()      { return NULL; }
       virtual const_iterator_impl_base* begin()const { return new const_vector_iterator_impl<typename T::value_type>( this->get_val(), this->get_val().begin() ); }
   };
 
@@ -253,6 +255,7 @@ namespace mace { namespace reflect { namespace detail {
          if( itr != this->get_val().end() )
            return itr->second;
          BOOST_THROW_EXCEPTION( bad_value_cast() );
+         return *((int*)0);
       }
       virtual iterator_impl_base*       begin()      { return new map_iterator_impl<K,V>( this->get_val(), this->get_val().begin() ); }
       virtual const_iterator_impl_base* begin()const { return new const_map_iterator_impl<K,V>( this->get_val(), this->get_val().begin() ); }
@@ -269,12 +272,14 @@ namespace mace { namespace reflect { namespace detail {
       }
       virtual value_ref  get_field( const std::string& f ) {
          BOOST_THROW_EXCEPTION( bad_value_cast() );
+         return value_ref( *((int*)0) ); // kill warning
       }
       virtual value_cref get_field( const std::string& f )const{
          typename std::map<K,V>::const_iterator itr = this->get_val().find(boost::lexical_cast<K>(f));
          if( itr != this->get_val().end() )
            return itr->second;
          BOOST_THROW_EXCEPTION( bad_value_cast() );
+         return value_ref( *((int*)0) ); // kill warning
       }
       virtual iterator_impl_base*       begin()      { return 0; }
       virtual const_iterator_impl_base* begin()const { return new const_map_iterator_impl<K,V>( this->get_val(), this->get_val().begin() ); }

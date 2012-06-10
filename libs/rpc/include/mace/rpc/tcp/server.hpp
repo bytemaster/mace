@@ -12,13 +12,13 @@ namespace mace { namespace rpc { namespace tcp {
       typedef ConnectionType            connection_type;
 
       template<typename SessionType>
-      server( const boost::function<boost::shared_ptr<SessionType>()>& sg, uint16_t port )
+      server( const boost::function<std::shared_ptr<SessionType>()>& sg, uint16_t port )
       :mace::rpc::server<InterfaceType,ConnectionType>( sg ) {
         listen_complete = cmt::async( boost::bind(&server::listen,this,port) ); 
       }
 
       template<typename SessionType>
-      server( const boost::shared_ptr<SessionType>& shared_session, uint16_t port )
+      server( const std::shared_ptr<SessionType>& shared_session, uint16_t port )
       :mace::rpc::server<InterfaceType,ConnectionType>( shared_session ) {
         listen_complete = cmt::async( boost::bind(&server::listen,this,port) ); 
       }
@@ -45,8 +45,8 @@ namespace mace { namespace rpc { namespace tcp {
 
       void listen( uint16_t p ) {
         try {
-          acc = boost::make_shared<boost::asio::ip::tcp::acceptor>( 
-                    boost::ref(cmt::asio::default_io_service()), 
+          acc = std::make_shared<boost::asio::ip::tcp::acceptor>( 
+                    std::ref(cmt::asio::default_io_service()), 
                     boost::asio::ip::tcp::endpoint( boost::asio::ip::tcp::v4(),p) );
 
           boost::system::error_code ec;
@@ -66,7 +66,7 @@ namespace mace { namespace rpc { namespace tcp {
         }
       }
 
-      boost::shared_ptr<boost::asio::ip::tcp::acceptor>  acc;
+      std::shared_ptr<boost::asio::ip::tcp::acceptor>  acc;
       mace::cmt::future<void>                            listen_complete;
       std::map<typename ConnectionType::ptr,boost::any>  connections;
   };

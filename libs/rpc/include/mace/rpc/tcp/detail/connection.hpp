@@ -24,7 +24,7 @@ namespace mace { namespace rpc { namespace tcp { namespace detail {
       connection( const mace::cmt::asio::tcp::socket::ptr& sock )
       :m_sock(sock){
         if( m_sock ) {
-          m_read_done = mace::cmt::async( boost::bind( &connection::read_loop, this ) );
+          m_read_done = mace::cmt::async( std::bind( &connection::read_loop, this ) );
         }
       }
       void close() {
@@ -63,9 +63,9 @@ namespace mace { namespace rpc { namespace tcp { namespace detail {
       void connect( const boost::asio::ip::tcp::endpoint& ep ) {
         close(); 
         try {
-            m_sock = boost::make_shared<mace::cmt::asio::tcp::socket>();
+            m_sock = std::make_shared<mace::cmt::asio::tcp::socket>();
             m_sock->connect(ep).wait();
-            m_read_done = mace::cmt::async( boost::bind( &connection::read_loop, this ) );
+            m_read_done = mace::cmt::async( std::bind( &connection::read_loop, this ) );
         } catch ( ... ) {
           m_sock.reset();
           throw;

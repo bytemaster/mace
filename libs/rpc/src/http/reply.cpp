@@ -242,7 +242,8 @@ reply reply::stock_reply(reply::status_type status)
 {
   reply rep;
   rep.status = status;
-  rep.content = stock_replies::to_string(status);
+  std::string c = stock_replies::to_string(status);
+  rep.content = std::vector<char>(c.begin(),c.end());
   rep.headers.resize(2);
   rep.headers[0].name = "Content-Length";
   rep.headers[0].value = boost::lexical_cast<std::string>(rep.content.size());

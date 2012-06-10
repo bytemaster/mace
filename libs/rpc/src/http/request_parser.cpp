@@ -13,6 +13,7 @@
 #include <cctype>
 #include <boost/lexical_cast.hpp>
 #include <mace/rpc/http/request.hpp>
+#include <iostream>
 
 namespace mace { namespace rpc { namespace http {
 
@@ -33,8 +34,7 @@ boost::tribool request_parser::consume(request& req, char c)
     content_length_ = 0;
 
     // Request method.
-    while (is_char(c) && !is_ctl(c) && !is_tspecial(c) && c != ' ')
-    {
+    while (is_char(c) && !is_ctl(c) && !is_tspecial(c) && c != ' ') {
       req.method.push_back(c);
       yield return boost::indeterminate;
     }
@@ -42,8 +42,13 @@ boost::tribool request_parser::consume(request& req, char c)
       return false;
 
     // Space.
-    if (c != ' ') return false;
+    if (c != ' ') {
+      return false;
+    }
     yield return boost::indeterminate;
+
+    while( c == ' ' )
+      yield return boost::indeterminate;
 
     // URI.
     while (!is_ctl(c) && c != ' ')
@@ -56,6 +61,9 @@ boost::tribool request_parser::consume(request& req, char c)
     // Space.
     if (c != ' ') return false;
     yield return boost::indeterminate;
+    // allow any number of spaces
+    while( c == ' ' )
+      yield return boost::indeterminate;
 
     // HTTP protocol identifier.
     if (c != 'H') return false;
@@ -91,6 +99,9 @@ boost::tribool request_parser::consume(request& req, char c)
       yield return boost::indeterminate;
     }
 
+    while( c == ' ' )
+      yield return boost::indeterminate;
+
     // CRLF.
     if (c != '\r') return false;
     yield return boost::indeterminate;
@@ -98,7 +109,7 @@ boost::tribool request_parser::consume(request& req, char c)
     yield return boost::indeterminate;
 
     // Headers.
-    while ((is_char(c) && !is_ctl(c) && !is_tspecial(c) && c != '\r')
+    while ((is_char(c) && !is_ctl(c) && !is_tspecial(c) && c != '\r' && c != '\n' )
         || (c == ' ' || c == '\t'))
     {
       if (c == ' ' || c == '\t')
@@ -123,16 +134,23 @@ boost::tribool request_parser::consume(request& req, char c)
         // Colon and space separates the header name from the header value.
         if (c != ':') return false;
         yield return boost::indeterminate;
-        if (c != ' ') return false;
-        yield return boost::indeterminate;
+
+        // we will accept no ' ' after ':' to be more forgiving
+        //if (c != ' ') return false;
+        //yield return boost::indeterminate;
+
+        while( c == ' ' )
+          yield return boost::indeterminate;
       }
 
       // Header value.
-      while (is_char(c) && !is_ctl(c) && c != '\r')
+      while (is_char(c) && !is_ctl(c) && c != '\r' && c != '\n' )
       {
         req.headers.back().value.push_back(c);
         yield return boost::indeterminate;
       }
+      std::cerr<<req.headers.back().name;
+      std::cerr<<req.headers.back().value;
 
       // CRLF.
       if (c != '\r') return false;

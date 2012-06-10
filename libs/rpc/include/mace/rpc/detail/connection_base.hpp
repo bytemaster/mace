@@ -15,7 +15,7 @@ namespace mace { namespace rpc { namespace detail {
    */
   class connection_base {
     public:
-      typedef boost::shared_ptr<connection_base> ptr;
+      typedef std::shared_ptr<connection_base> ptr;
       method_map  methods;
       pending_map results;
       int32_t     next_method_id;

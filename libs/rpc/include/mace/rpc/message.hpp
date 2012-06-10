@@ -46,6 +46,8 @@ namespace mace { namespace rpc {
 
     private:
       // we should not be copying these should we?
+      message& operator = ( const message& m );
+      // we should not be copying these should we?
       message( const message& ); 
   };
 

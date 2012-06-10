@@ -14,7 +14,7 @@ namespace mace { namespace rpc { namespace tcp {
     template<typename IODelegate> 
     class connection : public mace::rpc::connection<IODelegate> {
       public:
-        typedef boost::shared_ptr<connection> ptr;
+        typedef std::shared_ptr<connection> ptr;
 
         void close() { this->my->close(); }
 

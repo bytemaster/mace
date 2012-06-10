@@ -17,7 +17,7 @@ namespace mace { namespace rpc {
   template<typename InterfaceType, typename ConnectionType = mace::rpc::raw::tcp::connection<raw_io> >
   class client : public mace::stub::ptr<InterfaceType, mace::rpc::client_interface< ConnectionType > > {
     public:
-      typedef boost::shared_ptr<client>                     ptr;
+      typedef std::shared_ptr<client>                       ptr;
       typedef mace::rpc::client_interface< ConnectionType > delegate_type;
 
       client(){}

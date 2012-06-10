@@ -13,7 +13,7 @@ int main( int argc, char** argv ) {
      std::cerr << "Usage: "<<argv[0]<<" PORT\n"; return -1;
   }
   try {
-    auto s = boost::make_shared<calculator>();
+    auto s = std::make_shared<calculator>();
     mace::rpc::raw::tcp::server<calculator>  serv( s, boost::lexical_cast<int>(argv[1]) );
     mace::cmt::exec();
   } catch ( ... ) {

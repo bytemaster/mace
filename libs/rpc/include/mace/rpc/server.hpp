@@ -1,6 +1,7 @@
 #ifndef _MACE_RPC_SERVER_HPP_
 #define _MACE_RPC_SERVER_HPP_
 #include <mace/cmt/thread.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <mace/stub/ptr.hpp>
 
 namespace mace { namespace rpc { 
@@ -17,25 +18,26 @@ namespace mace { namespace rpc {
   template<typename InterfaceType, typename ConnectionType>
   class server {
     public:
-      typedef boost::shared_ptr<server> ptr;
+      typedef std::shared_ptr<server> ptr;
       typedef ConnectionType            connection_type;
       struct session_creator {
           virtual ~session_creator(){}
           virtual boost::any init_connection( const typename ConnectionType::ptr& ) = 0;
       };
 
+      boost::scoped_ptr<session_creator> sc;
       template<typename SessionType>
-      server( const boost::function<boost::shared_ptr<SessionType>()>& sg )
+      server( const boost::function<std::shared_ptr<SessionType>()>& sg )
       :sc( new session_creator_impl<SessionType>(sg) ){}
 
       template<typename SessionType>
-      server( const boost::shared_ptr<SessionType>& shared_session )
+      server( const std::shared_ptr<SessionType>& shared_session )
       :sc( new shared_session_creator<SessionType>(shared_session) ){}
 
     protected:
       template<typename SessionType>
       struct session_creator_impl : public session_creator {
-          session_creator_impl( const boost::function<boost::shared_ptr<SessionType>()>& sg )
+          session_creator_impl( const boost::function<std::shared_ptr<SessionType>()>& sg )
           :session_generator(sg){ }
 
           virtual boost::any init_connection( const typename ConnectionType::ptr& con ) {
@@ -43,12 +45,12 @@ namespace mace { namespace rpc {
             mace::stub::visit( session, typename ConnectionType::template add_interface_visitor<InterfaceType>( *con, session ) );
             return session;
           }
-          boost::function<boost::shared_ptr<SessionType>()> session_generator;
+          boost::function<std::shared_ptr<SessionType>()> session_generator;
       };
 
       template<typename SessionType>
       struct shared_session_creator : public session_creator {
-          shared_session_creator( const boost::shared_ptr<SessionType>& ss ):shared_session(ss){}
+          shared_session_creator( const std::shared_ptr<SessionType>& ss ):shared_session(ss){}
 
           virtual boost::any init_connection( const typename ConnectionType::ptr& con ) {
             mace::stub::ptr<InterfaceType> session;
@@ -56,9 +58,8 @@ namespace mace { namespace rpc {
             mace::stub::visit( session, typename ConnectionType::template add_interface_visitor<InterfaceType>( *con, session ) );
             return session;
           }
-          boost::shared_ptr<SessionType> shared_session;
+          std::shared_ptr<SessionType> shared_session;
       };
-      boost::scoped_ptr<session_creator> sc;
   };
 
 } }  // mace::rpc

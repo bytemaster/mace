@@ -40,6 +40,18 @@ struct request;
         boost::tribool result = boost::indeterminate;
         return boost::make_tuple(result, begin);
       }
+      template<typename Stream>
+      boost::tribool parse(request& req, Stream& s) {
+        while (!s.eof())
+        {
+          boost::tribool result = consume(req, s.get());
+          if (result || !result)
+            return result;
+        }
+        boost::tribool result = boost::indeterminate;
+        return result;
+      }
+
 
     private:
       /// The name of the content length header.

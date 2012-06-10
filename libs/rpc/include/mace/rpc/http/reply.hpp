@@ -48,7 +48,7 @@ namespace mace { namespace rpc { namespace http {
       std::vector<header> headers;
 
       /// The content to be sent in the reply.
-      std::string content;
+      std::vector<char> content;
 
       /// Convert the reply into a vector of buffers. The buffers do not own the
       /// underlying memory blocks, therefore the reply object must remain valid and
@@ -57,6 +57,13 @@ namespace mace { namespace rpc { namespace http {
 
       /// Get a stock reply.
       static reply stock_reply(status_type status);
+
+      template<typename Stream>
+      friend Stream& operator << (Stream& s, const reply& r ) {
+        if( r.content.size() )
+           s.write(  &r.content.front(), r.content.size() ); 
+        return s;
+      }
     };
 
 } } } // mace::rpc::http

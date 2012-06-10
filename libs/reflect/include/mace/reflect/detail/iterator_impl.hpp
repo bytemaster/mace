@@ -48,6 +48,7 @@ namespace mace { namespace reflect { namespace detail {
             if( type() == other->type() ) {
                 return itr == static_cast<const vector_iterator_impl<T>*>(other)->itr;
             }
+            return false;
         }
         virtual const char* type()const  { return get_typename<vector_iterator_impl>(); }
     };
@@ -71,6 +72,7 @@ namespace mace { namespace reflect { namespace detail {
             if( type() == other->type() ) {
                 return itr == static_cast<const vector_iterator_impl<T>*>(other)->itr;
             }
+            return false;
         }
         virtual const char* type()const  { return get_typename<const_vector_iterator_impl>(); }
     };
@@ -99,6 +101,7 @@ namespace mace { namespace reflect { namespace detail {
             if( type() == other->type() ) {
                 return itr == static_cast<const map_iterator_impl<K,V>*>(other)->itr;
             }
+            return false;
         }
         virtual const char* type()const  { return get_typename<map_iterator_impl>(); }
     };
@@ -122,6 +125,7 @@ namespace mace { namespace reflect { namespace detail {
             if( type() == other->type() ) {
                 return itr == static_cast<const map_iterator_impl<K,V>*>(other)->itr;
             }
+            return false;
         }
         virtual const char* type()const  { return get_typename<const_map_iterator_impl>(); }
     };

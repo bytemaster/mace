@@ -320,9 +320,9 @@
   cmt::thread* t2;
 
   void test() {
-    cmt::future<int> f1 = t1->async<int>( async_opp );
-    cmt::future<int> f2 = t2->async<int>( another_async_opp );
-    async<void>( other_work ); // in current thread
+    cmt::future<int> f1 = t1->async( async_opp );
+    cmt::future<int> f2 = t2->async( another_async_opp );
+    async( other_work ); // in current thread
 
     try {
       // while waiting other_work can run in this thread.

@@ -47,7 +47,7 @@ namespace mace { namespace rpc {
   template<typename IODelegate >
   class connection : public connection_base {
     public:
-      typedef boost::shared_ptr<connection> ptr;
+      typedef std::shared_ptr<connection> ptr;
       typedef IODelegate io_delegate_type;
 
       boost::signal<void()> closed;
@@ -67,7 +67,7 @@ namespace mace { namespace rpc {
         // TODO: filter params for non-const references and add them as additional 'return values'
         //       then pass the extra references to the pending_result impl.
         //       References must remain valid until pr->prom->wait() returns.
-        auto pr = boost::make_shared<detail::pending_result_impl<R,connection,IODelegate> >( boost::ref(*this), mace::cmt::promise<R>::make() );
+        auto pr = std::make_shared<detail::pending_result_impl<R,connection,IODelegate> >( std::ref(*this), mace::cmt::promise<R>::make() );
         function_filter<connection> f(*this);
         raw_call( std::move(id), IODelegate::pack(f, params), pr );
         return pr->prom;
@@ -115,11 +115,9 @@ namespace mace { namespace rpc {
             if( boost::fusion::size(paramv) ) {
                function_filter<connection> f(m_con);
                if( m.id ) {
-                  slog( "%1%", m_func(IODelegate::template unpack<Seq, function_filter<connection> >( f, m.data )) );
                   reply.data = 
                       IODelegate::pack(f, m_func(IODelegate::template unpack<Seq, function_filter<connection> >( f, m.data )) );
                } else {
-                 slog( "no id" );
                  m_func(IODelegate::template unpack<Seq,function_filter<connection> >( f, m.data ));
                }
             }
@@ -159,30 +157,9 @@ namespace mace { namespace rpc {
       };
 
     protected:
-      connection( detail::connection_base* b ):connection_base(b){ slog( "cb: %1%", b ); }
+      connection( detail::connection_base* b ):connection_base(b){ }
       connection();
   };
-
-  namespace udp {
-    template<typename IODelegate> 
-    class connection : public mace::rpc::connection<IODelegate> {
-      public:
-          virtual ~connection();
-          virtual void send( message&& m );
-
-      private:
-          class connection_private* my;
-    };
-  }
-
-  namespace http {
-    template<typename IODelegate> 
-    class connection : public mace::rpc::connection<IODelegate> {
-      public:
-          virtual ~connection();
-          virtual void send( message&& m );
-    };
-  }
 
 } }
 

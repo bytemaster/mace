@@ -107,6 +107,8 @@ value_cref get_field( const std::string& n, const T& v  ) {
   if( itr != get_field_map<T>().end() )
     return (*itr->second)(&v);
   BOOST_THROW_EXCEPTION( unknown_field() << err_msg(n+": '"+n+"'") );
+  int x;
+  return x;
 }
 
 template<typename T>
@@ -125,7 +127,7 @@ class const_iterator_impl : public detail::const_iterator_impl_base {
     :val(c.val),itr(c.itr){}
 
     virtual std::string               key()const         { return itr->first;                        }
-    virtual value_ref                 value()const       { BOOST_THROW_EXCEPTION( bad_value_cast() );}
+    virtual value_ref                 value()const       { BOOST_THROW_EXCEPTION( bad_value_cast() ); int dummy; return dummy; }
     virtual value_cref                const_value()const { return (*itr->second)(&val);              }
     virtual const_iterator_impl_base* const_clone()const { return new const_iterator_impl(val,itr);  }
     virtual const char*               type()const        { return get_typename<iterator_impl<T> >(); }
@@ -139,6 +141,7 @@ class const_iterator_impl : public detail::const_iterator_impl_base {
           return itr == static_cast<const const_iterator_impl<T>*>(other)->itr ||
                 &val == &static_cast<const const_iterator_impl<T>*>(other)->val;
       }
+      return false;
     }
 };
 template<typename T>
@@ -169,6 +172,7 @@ class iterator_impl : public detail::iterator_impl_base {
           return itr == static_cast<const iterator_impl<T>*>(other)->itr ||
                 &val == &static_cast<const iterator_impl<T>*>(other)->val;
       }
+      return false;
     }
 };
 

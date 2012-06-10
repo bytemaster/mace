@@ -8,9 +8,9 @@ namespace mace { namespace rpc {
   typedef std::vector<char> datavec;
 
   namespace detail {
-    class pending_result : public boost::enable_shared_from_this<pending_result> {
+    class pending_result : public std::enable_shared_from_this<pending_result> {
       public:
-        typedef boost::shared_ptr<pending_result> ptr;
+        typedef std::shared_ptr<pending_result> ptr;
         virtual ~pending_result(){}
         virtual void handle_value( datavec&& d ) = 0;
         virtual void handle_error( int32_t code, datavec&& d ) = 0;

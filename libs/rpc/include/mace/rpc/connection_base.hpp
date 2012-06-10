@@ -18,7 +18,7 @@ namespace mace { namespace rpc  {
    *  Derived classes will implement the message packing/unpacking
    *  and transport method.
    */
-  class connection_base {
+  class connection_base : public boost::noncopyable {
     public:
       ~connection_base();
 
@@ -35,10 +35,11 @@ namespace mace { namespace rpc  {
       /**
        *  Add a method and generate an ID
        */
-      std::string add_method( const method& m );
+      std::string   add_method( const method& m );
 
       /**
-       *  raw interface, returns the serialized data given the serialized parameters.
+       *  raw interface, returns the serialized data given the 
+       *              serialized parameters.
        *
        *  @param mid method name to call
        */
@@ -46,15 +47,22 @@ namespace mace { namespace rpc  {
 
       std::string create_method_id();
 
+      connection_base& operator=( connection_base&& m ) {
+        std::swap(m.my,my);
+        return *this;
+      }
+
     protected:
       /**
        *  Call method ID with param and use the given result handler if specified.  
        *
        *  @param pr - result handler, if not specified result will be ignored.
        */
-      void raw_call( std::string&& meth, datavec&& param, const detail::pending_result::ptr& pr );
+      void raw_call( std::string&& meth, datavec&& param, 
+                     const detail::pending_result::ptr& pr );
 
       connection_base( detail::connection_base* b );
+      connection_base( connection_base&& m ):my(m.my) { m.my=0; }
 
       detail::connection_base* my;
     private:
