@@ -1,6 +1,5 @@
 #ifndef _MACE_STUB_PTR_HPP
 #define _MACE_STUB_PTR_HPP
-#include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
 #include <boost/make_shared.hpp>
 #include <mace/stub/vtable.hpp>
@@ -25,7 +24,7 @@ namespace mace { namespace stub {
       typedef InterfaceDelegate                                       delegate_type;
 
       ptr()
-      :m_vtable(boost::make_shared<vtable_type>()) {}
+      :m_vtable(std::make_shared<vtable_type>()) {}
 
       ptr( ptr&& m ) 
       :m_vtable( std::move(m.m_vtable) ),m_ptr( std::move(m.m_ptr) ){}
@@ -35,12 +34,12 @@ namespace mace { namespace stub {
 
       template<typename T>
       ptr( T* v )
-      :m_ptr( boost::make_shared<boost::any>(v) ),m_vtable(boost::make_shared<vtable_type>()) {
+      :m_ptr( std::make_shared<boost::any>(v) ),m_vtable(std::make_shared<vtable_type>()) {
         InterfaceDelegate::set_vtable(*m_vtable,*v);
       }
       template<typename T>
-      ptr( const boost::shared_ptr<T>& v )
-      :m_ptr(boost::make_shared<boost::any>(v)),m_vtable(boost::make_shared<vtable_type>()) {
+      ptr( const std::shared_ptr<T>& v )
+      :m_ptr( new boost::any(v) ),m_vtable(std::make_shared<vtable_type>()) {
         InterfaceDelegate::set_vtable(*m_vtable,*v);
       }
 
@@ -49,8 +48,8 @@ namespace mace { namespace stub {
        */
       template<typename OtherInterface,typename OtherDelegate>
       ptr( const ptr<OtherInterface,OtherDelegate>& p )
-      :m_ptr(p),m_vtable(boost::make_shared<vtable_type>()) {
-        InterfaceDelegate::set_vtable( *m_vtable, *boost::any_cast<ptr<OtherInterface,OtherDelegate>&>(m_ptr) );
+      :m_ptr(p),m_vtable(std::make_shared<vtable_type>()) {
+        InterfaceDelegate::set_vtable( *m_vtable, *boost::any_cast<ptr<OtherInterface,OtherDelegate>&>(m_ptr.get()) );
       }
 
       const vtable_type& operator*()const  { return *m_vtable;  } 
@@ -60,8 +59,8 @@ namespace mace { namespace stub {
       vtable_type*       operator->()      { return m_vtable.get(); } 
        
     protected:
-      boost::shared_ptr<boost::any>       m_ptr;
-      boost::shared_ptr<vtable_type>      m_vtable;
+      std::shared_ptr<boost::any>     m_ptr;
+      std::shared_ptr<vtable_type>    m_vtable;
   };
   /**
    * @brief Helper function to enable automatic type deduction.

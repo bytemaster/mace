@@ -95,7 +95,7 @@
                 template<typename MemberPtr>
                 void operator=( MemberPtr p ) {
                     m.set_actor(a);
-                    m = boost::bind(boost::ref(v.*p), _1 );
+                    m = boost::bind(std::ref(v.*p), _1 );
                 }
                 private:
                  actor_base* a;
@@ -227,7 +227,7 @@ struct actor_member<R(Class::*)(PARAM_TYPES)const> : public detail::actor_member
   }
   future_type operator() ( const fused_params& fp )const {
     if( this->m_actor && &mace::cmt::thread::current() != m_actor->m_thread ) {
-      return this->m_actor->m_thread->async<R>( boost::bind(boost::ref(m_delegate),fp) );
+      return this->m_actor->m_thread->async<R>( boost::bind(std::ref(m_delegate),fp) );
     }
     return m_delegate( fp );
   }
@@ -314,11 +314,11 @@ struct actor_member< boost::signal<R(PARAM_TYPES)> (Class::*) >  : public detail
 
   future_type operator() ( const fused_params& fp ) {
     if( this->m_actor && &mace::cmt::thread::current() != this->m_actor->m_thread ) {
-      return this->m_actor->m_thread->async<R>( boost::bind(boost::ref(*this),fp) );
+      return this->m_actor->m_thread->async<R>( boost::bind(std::ref(*this),fp) );
     }
     scoped_block_signal block_reverse(m_reverse_con);
     if( int(m_signal.num_slots()) - 1 > 0 )  // do not count our reverse connection
-        boost::fusion::make_fused_function_object( boost::ref(m_signal) )(fp);
+        boost::fusion::make_fused_function_object( std::ref(m_signal) )(fp);
     return m_delegate( fp );
   }
 
@@ -326,7 +326,7 @@ struct actor_member< boost::signal<R(PARAM_TYPES)> (Class::*) >  : public detail
   future_type emit( const fused_params& fp ) {
     scoped_block_signal block_reverse(m_reverse_con);
     return mace::stub::adapt_void<R,boost::function<R(const fused_params&)> >(
-            boost::fusion::make_fused_function_object( boost::ref(m_signal) ) )(fp);
+            boost::fusion::make_fused_function_object( std::ref(m_signal) ) )(fp);
   }
 
   template<typename T>
@@ -380,7 +380,7 @@ struct actor_member< boost::signal<R(PARAM_TYPES)> (Class::*) >  : public detail
         result_type operator()( const fused_params& p ) {
           if( int(sig.num_slots()) -1 > 0 ) { // do not count our reverse connection
             return mace::stub::adapt_void<R, boost::function<R(const fused_params&)> >(
-                      boost::fusion::make_fused_function_object(boost::ref(sig)))(p);
+                      boost::fusion::make_fused_function_object(std::ref(sig)))(p);
           }
           BOOST_THROW_EXCEPTION( no_connected_slots() );
         }

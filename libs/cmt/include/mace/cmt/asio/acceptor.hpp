@@ -6,7 +6,7 @@
 
 namespace mace { namespace cmt {  namespace asio {
     typedef boost::asio::ip::tcp::socket  tcp_socket;
-    typedef boost::shared_ptr<tcp_socket> tcp_socket_ptr;
+    typedef std::shared_ptr<tcp_socket>   tcp_socket_ptr;
 
     /** 
      *  @class acceptor
@@ -23,9 +23,9 @@ namespace mace { namespace cmt {  namespace asio {
         acc.listen( 8000, on_new_connection );
      *  @endcode
      */
-    class acceptor : public boost::enable_shared_from_this<acceptor> {
+    class acceptor : public std::enable_shared_from_this<acceptor> {
         public:
-            typedef boost::shared_ptr<acceptor> ptr;
+            typedef std::shared_ptr<acceptor> ptr;
             typedef boost::function<void(const tcp_socket_ptr,boost::system::error_code)> handler;
 
             acceptor();

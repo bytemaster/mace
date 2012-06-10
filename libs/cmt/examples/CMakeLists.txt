@@ -14,10 +14,13 @@ SET( libraries
     
 
 add_executable( actor  actor.cpp  )
+add_executable( rvwrap  rvwrap.cpp o.cpp  )
 add_executable( cmt_test test.cpp  )
 add_executable( mutex mutex.cpp  )
 #add_executable( thread_test thread_test.cpp  )
 
+
+target_link_libraries( rvwrap ${libraries} )
 
 target_link_libraries( actor ${libraries} )
 target_link_libraries( cmt_test ${libraries} )

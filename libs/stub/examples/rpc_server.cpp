@@ -24,7 +24,7 @@ int main( int argc, char** argv ) {
   using namespace boost;
   try {
 //! [Assign Stub]
-    stub::ptr<calculator> calc( boost::make_shared<CalculatorServer>() );
+    stub::ptr<calculator> calc( std::make_shared<CalculatorServer>() );
 //! [Assign Stub]
     stub::rpc_server server( calc );
     server.listen( lexical_cast<uint16_t>(argv[1]) );

@@ -576,22 +576,12 @@ namespace mace { namespace cmt {
     }
 
     /**
-     *  @todo make this atomic instead of posting an event
+     *  @todo make 'thread::unblock' this atomic instead of posting an event
      */
     void thread::unblock( cmt::context* c ) {
       if(  &current() != this ) {
         async( boost::bind(  &thread::unblock, this, c ) );
         return;
-      }
-
-      // ensure thread is not in sleep queue
-      for( uint32_t i = 0; i < my->sleep_pqueue.size(); ++i ) {
-        if( my->sleep_pqueue[i] == c ) {
-          my->sleep_pqueue[i] = my->sleep_pqueue.back();
-          my->sleep_pqueue.pop_back();
-          std::make_heap( my->sleep_pqueue.begin(),my->sleep_pqueue.end(), sleep_priority_less() );
-          break;
-        }
       }
       my->ready_push_front(c); 
     }
@@ -687,12 +677,18 @@ namespace mace { namespace cmt {
      *  This is implemented in thread.cpp because it needs access to the cmt::context type
      *  in order to kill the current context.
      *
+     *  @todo this can be moved to task.cpp now that context.hpp is a separate file.
+     *        
      *  @todo determine if this is really called by different threads
      */
     void task::cancel() {
       boost::unique_lock<cmt::spin_lock> lock( active_context_lock );
       canceled = true;
       if( active_context ) {
+        if( active_context->prom ) {
+          // set exception and return
+          active_context->prom->cancel();
+        }
         active_context->canceled = true;
         active_context = 0;
       }

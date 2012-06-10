@@ -8,9 +8,14 @@
 #include <boost/asio.hpp>
 
 namespace mace { namespace cmt { namespace asio { namespace udp {
+    typedef boost::asio::ip::udp::endpoint endpoint;
+    typedef boost::asio::ip::udp::socket socket;
 
-    size_t receive_from( boost::asio::ip::udp::socket& s, char* data, size_t data_len, boost::asio::ip::udp::endpoint& ep );
-    size_t send_to( boost::asio::ip::udp::socket& s, const char* data, size_t data_len, const boost::asio::ip::udp::endpoint& ep );
+    size_t receive_from( boost::asio::ip::udp::socket& s, 
+                         char* data, size_t data_len, endpoint& ep );
+    size_t send_to( boost::asio::ip::udp::socket& s, 
+                         const char* data, size_t data_len, 
+                         const endpoint& ep );
 
 } } } } // namespace mace::cmt::asio::udp
 

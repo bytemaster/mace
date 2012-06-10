@@ -24,14 +24,14 @@ void test( mace::cmt::actor<calculator> act ) {
 int main( int argc, char** argv ) {
 
   mace::cmt::thread* at = mace::cmt::thread::create( "actor_thread" );
-  mace::stub::ptr<calculator> ap( boost::make_shared<calculator>() );
-  mace::cmt::actor<calculator> act( boost::make_shared<calculator>(), at );
+  mace::stub::ptr<calculator> ap( std::make_shared<calculator>() );
+  mace::cmt::actor<calculator> act( std::make_shared<calculator>(), at );
   mace::cmt::actor<calculator> act2(ap, at );
 
   mace::cmt::thread* tt = mace::cmt::thread::create( "test_thread" );
-  tt->async( boost::bind(test, act) ).wait();
-  tt->async( boost::bind(test, act2) ).wait();
-  at->async( boost::bind(test, act2) ).wait();
+  tt->async( std::bind(test, act) ).wait();
+  tt->async( std::bind(test, act2) ).wait();
+  at->async( std::bind(test, act2) ).wait();
 
   //test(act);
   test(act2);

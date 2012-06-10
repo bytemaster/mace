@@ -92,8 +92,8 @@ class rpc_client : public stub::ptr<InterfaceType,InterfaceDelegate> {
           ia >> ret_val;
           return ret_val;
        }
-       const char* m_name;
        rpc_client& m_client;
+       const char* m_name;
      };
      //! [RPC Client Functor]
        boost::asio::ip::udp::endpoint m_ep;

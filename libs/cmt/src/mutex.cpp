@@ -132,12 +132,9 @@ namespace mace { namespace cmt {
 
   void mutex::unlock() {
     cmt::context* next = 0;
-    cmt::context* cc   = cmt::thread::current().current_context();
+    BOOST_ASSERT( cmt::thread::current().current_context()->next == 0 );
     { boost::unique_lock<cmt::spin_yield_lock> lock(m_blist_lock);
-      
-      cmt::context* tail = get_tail(m_blist, next);
-      BOOST_ASSERT( tail == cc ); 
-      
+      get_tail(m_blist, next);
       if( next ) {
         next->next_blocked = 0;
         next->ctx_thread->unblock( next );
