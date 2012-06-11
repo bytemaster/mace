@@ -21,6 +21,9 @@ ENDIF(UNIX)
 #add_executable( jsonv  jsonv.cpp  )
 #target_link_libraries( jsonv ${libraries} )
 
+add_executable( json_io json_io.cpp )
+target_link_libraries(json_io ${libraries} )
+
 add_executable( tcpc  tcpc.cpp  )
 target_link_libraries( tcpc ${libraries} )
 add_executable( tcps  tcps.cpp  )

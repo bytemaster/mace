@@ -46,9 +46,43 @@ class const_iterator;
       value_base( const value_base& );
       ~value_base();
 
+    /**
+     *  @return true if integer indexes are valid
+     */
     bool           is_array()const;
+    /**
+     *  @return true if named key/value pairs are valid.
+     */
+    bool           is_object()const;
+    /**
+     *  @return true if the stored object is callable
+     */
     bool           is_function()const;
-    size_t         size()const;
+
+    /**
+     *  @return true if the number is signed.
+     */
+    bool           is_signed()const;
+    /**
+     *  @return true for numbers (int/real) and bool
+     */
+    bool           is_number()const;
+    /**
+     *  @return true if the underlying type is a double/float
+     */
+    bool           is_real()const;
+    /**
+     *  @return true for strings
+     */
+    bool           is_string()const;
+
+    /**
+     *  If array or object, the number of fields.
+     *  Otherwise -1
+     */
+    int64_t         size()const;
+
+    std::string     type_name()const;
 
     /**
      *  If a struct, iterates over fields

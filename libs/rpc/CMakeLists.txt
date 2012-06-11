@@ -12,6 +12,7 @@ add_subdirectory( examples )
 SET( libraries  mace_cmt )
 SET( sources 
         src/connection_base.cpp
+        src/json/json_io.cpp
 
 #        src/json/connection.cpp
 #        src/json/tcp_connection.cpp
