@@ -3,7 +3,7 @@
 #include<iostream>
 #include <utility>
   
-template<template<typename> Interface>
+template<template<typename,bool> class Interface>
 class value_base {
   public:
   template<typename T>
@@ -24,13 +24,13 @@ class value_base {
   value_base():impl(0){}
   ~value_base(){delete impl;}
 
-  struct holder_base {
+  struct holder_base : virtual public Interface<void,false> {
     virtual holder_base*  clone_holder_helper() = 0;
   };
 
   template<typename T>
-  struct holder : public my_interface<T>, virtual public holder_base {
-    holder( T&& v ):T( std::move(std::forward<T>(v)) ){};
+  struct holder : public Interface<T,true>, public holder_base {
+    holder( T&& v ):Interface<T,true>( std::move(std::forward<T>(v)) ){};
     holder_base* clone_holder_helper() { return new holder(*this); }
   };
 
@@ -48,25 +48,25 @@ class value_base {
   holder_base*  impl;
 };
 
-template<typename T>
+template<template<typename,bool> class T>
 struct value{};
 
 
-template<typename T=void>
-struct  my_interface {
+template<typename T=void,bool impl=false>
+struct  my_interface{
     virtual ~my_interface() {}
     virtual int add( int ) = 0;
     virtual int add( double, std::string )  = 0;
     virtual int sub( int ) = 0;
-}
+};
 
 template<typename T>
-struct my_interface : public T, virtual my_interface<> {
+struct my_interface<T,true> : public T, virtual public my_interface<>{
     template<typename... Args>
     my_interface(Args&& ...args):T( std::forward<Args>(args)... ){}
-    virtual int add( int )                 { return T::add(i);     }
-    virtual int add( double, std::string ) { return T::add( d, s); }
-    virtual int sub( int )                 { return T::sub( i );   }
+    virtual int add( int i)                 { return T::add(i);     }
+    virtual int add( double d, std::string s) { return T::add( d, s); }
+    virtual int sub( int i)                 { return T::sub( i );   }
 };
 
 template<>
@@ -87,18 +87,18 @@ struct value<my_interface> : public value_base<my_interface>  {
   
   // this is what the macro would most expand
   template<typename... Args>
-  auto add(Args&&... args) -> decltype(  ((my_interface*)0)->add( std::forward<Args>(args)... ) ) {
+  auto add(Args&&... args) -> decltype(  ((my_interface<>*)0)->add( std::forward<Args>(args)... ) ) {
     return impl->add( std::forward<Args>(args)... );
   }
   // this is what the macro would most expand
   template<typename... Args>
-  auto sub(Args&&... args) -> decltype(  ((my_interface*)0)->sub( std::forward<Args>(args)... ) ) {
+  auto sub(Args&&... args) -> decltype(  ((my_interface<>*)0)->sub( std::forward<Args>(args)... ) ) {
     return impl->sub( std::forward<Args>(args)... );
   }
 };
 
 
-class test {
+struct test {
     int add( int i )  { return i + 5; }
     int add( double, std::string ) { return 6; }
     int sub( int i ) { return i - 5; }
