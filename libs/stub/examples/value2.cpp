@@ -3,7 +3,7 @@
 #include<iostream>
 #include <utility>
   
-template<typename Interface>
+template<template<typename> Interface>
 class value_base {
   public:
   template<typename T>
@@ -24,11 +24,12 @@ class value_base {
   value_base():impl(0){}
   ~value_base(){delete impl;}
 
-  struct holder_base : virtual public Interface {
+  struct holder_base {
     virtual holder_base*  clone_holder_helper() = 0;
   };
+
   template<typename T>
-  struct holder : public T, public holder_base {
+  struct holder : public my_interface<T>, virtual public holder_base {
     holder( T&& v ):T( std::move(std::forward<T>(v)) ){};
     holder_base* clone_holder_helper() { return new holder(*this); }
   };
@@ -50,12 +51,22 @@ class value_base {
 template<typename T>
 struct value{};
 
-class my_interface {
-  public:
-    virtual ~my_interface() {};
+
+template<typename T=void>
+struct  my_interface {
+    virtual ~my_interface() {}
     virtual int add( int ) = 0;
-    virtual int add( double, std::string ) = 0;
+    virtual int add( double, std::string )  = 0;
     virtual int sub( int ) = 0;
+}
+
+template<typename T>
+struct my_interface : public T, virtual my_interface<> {
+    template<typename... Args>
+    my_interface(Args&& ...args):T( std::forward<Args>(args)... ){}
+    virtual int add( int )                 { return T::add(i);     }
+    virtual int add( double, std::string ) { return T::add( d, s); }
+    virtual int sub( int )                 { return T::sub( i );   }
 };
 
 template<>
@@ -87,7 +98,7 @@ struct value<my_interface> : public value_base<my_interface>  {
 };
 
 
-class test : virtual public my_interface {
+class test {
     int add( int i )  { return i + 5; }
     int add( double, std::string ) { return 6; }
     int sub( int i ) { return i - 5; }
