@@ -15,7 +15,6 @@ namespace mace { namespace stub {
     template<template<interface_kind,typename> class Interface>
     class abstract_holder : virtual public Interface<abstract_interface,void> {
       public:
-        virtual abstract_holder*  clone_holder_helper() = 0;
         virtual abstract_holder*  clone_holder_helper(char*) = 0;
         virtual abstract_holder*  move_holder_helper(char*) = 0;
     };
@@ -52,13 +51,11 @@ namespace mace { namespace stub {
           std::cerr<<"default holder called..\n";
         }
 
-
       private:
         template<template<interface_kind,typename> class I>
         friend class any;
         abstract_holder<Interface>* clone_holder_helper( char* p ) { std::cerr<<"-----------IN PLACE CLONE___----\n"; return new (p) holder(*this); }
-        abstract_holder<Interface>* move_holder_helper( char* p ) { std::cerr<<"-----------IN PLACE CLONE___----\n"; return new (p) holder(std::move(this->val)); }
-        abstract_holder<Interface>* clone_holder_helper( )         { std::cerr<<"---------- CLONE---------------\n";return new holder(*this); }
+        abstract_holder<Interface>* move_holder_helper( char* p )  { std::cerr<<"-----------IN PLACE CLONE___----\n"; return new (p) holder(std::move(this->val)); }
     };
 
     // store by value on the heap
@@ -177,8 +174,7 @@ namespace mace { namespace stub {
   template<template<interface_kind,typename> class Interface>
   class any : public detail::holder<Interface,detail::abstract_holder<Interface>**> {
     private:
-      typedef detail::abstract_holder<Interface>         abstract_holder;
-    //  typedef detail::holder<Interface,abstract_holder**> base_type;
+      typedef detail::abstract_holder<Interface>         		     abstract_holder;
       typedef detail::holder<Interface,detail::abstract_holder<Interface>**> base_type;
 
       friend abstract_holder* get_holder( any* a ) {
@@ -192,148 +188,58 @@ namespace mace { namespace stub {
       abstract_holder* impl;
 
     public:
-    using base_type::operator+=;
-    using base_type::operator<<;
-
-    template<typename T>
-    any( T&& v )
-    :any_store<abstract_holder**>(&impl)
-    {
-      //TODO: ASSERT T is not a pointer
-      static_assert( sizeof(impl_place) >= sizeof(detail::holder<Interface,T>),"hi" );
-      impl = new ((char*)impl_place) detail::holder<Interface,typename std::remove_reference<T>::type>(std::forward<T>(v));
-     // std::cerr<<" this "<<this<<"                                  "<<impl<<std::endl;
-      //this->val.v = new (impl) detail::holder<Interface,typename std::remove_reference<T>::type>(std::forward<T>(v));
-    }
-
-    any( any& v )
-    :any_store<abstract_holder**>(&impl) {
-      impl = v.impl->clone_holder_helper((char*)impl_place);
-    //  std::cerr<<" this "<<this<<"                                  "<<impl<<std::endl;
-       // this->val.v = get_holder(&v)->clone_holder_helper((char*)impl);
-    }
-
-    any( const any& v )
-    :any_store<abstract_holder**>(&impl) {
-   //     std::cerr<<"const copy any "<<this;
-      impl = v.impl->clone_holder_helper((char*)impl_place);
-   //   std::cerr<<" this "<<this<<"                                  "<<impl<<std::endl;
-    //    this->val.v = get_holder(&v)->clone_holder_helper((char*)impl);
-    }
-    
-
-    any( any&& v )
-    :any_store<abstract_holder**>(&impl)/*,base_type( &impl )*/ {
-      impl = v.impl->move_holder_helper((char*)impl_place);
-      //memcpy( impl_place,v.impl_place,sizeof(v.impl_place));
-      v.impl = 0;
-      //std::cerr<<" this "<<this<<"                                  "<<impl<<std::endl;
-      //std::cerr<<"move copy any "<<this<<std::endl;
-      //impl = v.impl;
-      //v.impl = 0;
-        //this->val.v = get_holder(&v)->clone_holder_helper((char*)impl);
-      //  memset(v.impl,0,sizeof(v.impl)); 
-    }
-    /*
-    :any_store<abstract_holder*>(get_holder(this)),base_type(get_holder(this)) {
-      memcpy(impl,v.impl,sizeof(impl));
-      memset(v.impl,0,sizeof(v.impl)); 
-      this->val.v = v.val.v;
-      v.val.v = 0;
-    }
-    */
-
-    /* Perhaps this should not be allowed... otherwise
-     * we have a potential for 'null' any's
-     *
-     * creating an 'any or null?' type may be interesting...
-     * optional_any! 
-    any()
-    :base_type(get_holder(this)) {
-      memset( impl, 0, sizeof(impl) );
-    }
-    */
-
-    ~any(){
-    //  std::cerr<<this<<" ~any\n";
-//      std::cerr<<get_holder(this)<<" ~any holder\n";  
-    //  std::cerr<<" this "<<this<<"                                  "<<impl<<std::endl;
-      if(impl) impl->~abstract_holder();;
-      /*
-      if( ((int*)impl)[0] ) {
-        std::cerr<<"this val.v"<<this->val.v<<std::endl;
-        if( this->val.v ) this->val.v->~abstract_holder();
+      template<typename T>
+      any( T&& v )
+      :any_store<abstract_holder**>(&impl)
+      {
+        static_assert( sizeof(impl_place) >= sizeof(detail::holder<Interface,T>),"hi" );
+        impl = new ((char*)impl_place) detail::holder<Interface,typename std::remove_reference<T>::type>(std::forward<T>(v));
       }
-      */
-    }
-
-    template<typename T>
-    any& operator=( T&& v ) {
-       // destroy old holder
-    //  if( is_set(*this) ) 
-      //  get_holder(this)->~abstract_holder();
-
-      // create new holder
-     // static_assert( sizeof(impl) >= sizeof(detail::holder<Interface,T>(std::forward<T>(v))),"hi" );
-      //new (impl) detail::holder<Interface,T>(std::forward<T>(v));
-      return *this;
-    }
-
-    any& operator=(const any& v) {
-      if( this != & v ) {
-   //     if( is_set(*this) ) 
-      //    get_holder(this)->~abstract_holder();
-     //   if( is_set(&v) )
-      //    get_holder(&v)->clone_holder_helper((char*)impl);
-     //   else 
-     //     memset( impl, 0, sizeof(impl) );
+      
+      any( any& v )
+      :any_store<abstract_holder**>(&impl) {
+        impl = v.impl->clone_holder_helper((char*)impl_place);
       }
-      return *this;
-    }
+      
+      any( const any& v )
+      :any_store<abstract_holder**>(&impl) {
+        impl = v.impl->clone_holder_helper((char*)impl_place);
+      }
 
-    any& operator=( any&& v ) {
-      // swap holders...memcpy should be safe because the holders only
-      // holder pointers or references.
-   /*
-      char temp[sizeof(impl)];
-      memcmp( temp, impl, sizeof(impl) );
-      memcmp( impl, v.impl, sizeof(impl) );
-      memcmp( v.impl, temp, sizeof(impl) );
-      */
-      return *this;
-    }
-    
-    /**
-     *  @brief True if an object has been set.
-     *
-     *  This is a free function because the interface on any could
-     *  be 'anything' and we cannot corrupt it.
-     */
-    //static bool is_set( const any& a ) {
-    //{ return 0 != ((void*)a.impl)[0]; }
+      any( any&& v )
+      :any_store<abstract_holder**>(&impl)/*,base_type( &impl )*/ {
+        impl = v.impl->move_holder_helper((char*)impl_place);
+        v.impl = 0;
+      }
 
-    /**
-     *  This is a free function because the interface on any could
-     *  be 'anything' and we cannot corrupt it.
-     *
-     *  @brief Free's the object contained in a, if any.
-     *
-     *  @post !is_set(a)
-     */
-    //static void clear( any& a ) { 
-    //   if( is_set(*this) ) 
-    //      get_holder(this)->~abstract_holder<Interface>();
-    //   memset( a.impl, 0, sizeof(a.impl) );
-   // }
-
+      ~any(){
+        if(impl) impl->~abstract_holder();;
+      }
+      
+      template<typename T>
+      any& operator=( T&& v ) {
+        return *this;
+      }
+      
+      any& operator=(const any& v) {
+        if( this != & v ) {
+        	if(impl) impl->~abstract_holder();;
+        	impl = v.impl->clone_holder_helper((char*)impl_place);
+        }
+        return *this;
+      }
+      any& operator=( any&& v ) {
+        if(impl) impl->~abstract_holder();
+        impl = v.impl->move_holder_helper((char*)impl_place);
+        v.impl = 0;
+        return *this;
+      }
   };
 
-  /*
   template<template<interface_kind,typename> class Interface>
   std::ostream& operator<<( std::ostream& os, const any<Interface>& a ) {
-    return os << static_cast<const my_interface<>&>(a);
+    return a.val->operator<<(os);
   }
-  */
 
 } } 
 

@@ -13,7 +13,7 @@ struct  my_interface{
     virtual int add( double, std::string )  = 0;
     virtual int sub( int ) = 0;
     virtual my_interface& operator+=( int x ) = 0;
-    virtual std::ostream& print( std::ostream& os )const =0;
+    virtual std::ostream& operator<<( std::ostream& os )const =0;
 };
 
 // T could be a reference or pointer, any_store handles those cases...
@@ -26,15 +26,9 @@ struct my_interface<forward_interface,T> : virtual public any_store<T>,
     virtual int add( int i)                   { return this->val->add(i);     }
     virtual int add( double d, std::string s) { return this->val->add( d, s); }
     virtual int sub( int i)                   { return this->val->sub( i );   }
-    virtual std::ostream& print( std::ostream& os )const { return os <<*(this->val); }
+    virtual std::ostream& operator<<( std::ostream& os )const { return this->val->operator<<(os); }
     virtual my_interface<abstract_interface>& operator+=( int x ) { *(this->val) +=(x); return *this; }
 };
-
-template<typename T>              
-std::ostream& operator<<( std::ostream& os, my_interface<forward_interface,T>& i ){
-  return os << *(i.val);
-}
-
 
 static int c = 0;
 struct test {
@@ -61,8 +55,15 @@ struct test {
 
   test& operator+=(int x) { v += x; return *this; }
 
+std::ostream& operator<<( std::ostream& os )const { return os << v; }
+ 
+
   test(){ ++c; std::cerr<<"EXIT\n"; exit(1); }
 };
+
+std::ostream& operator<<(std::ostream& o, const test& t ) {
+	return o << t.v;
+}
 
 int main( int argc, char** argv ) {
   {
@@ -92,8 +93,8 @@ std::cerr<<" ------------POINTER TEST--------------\n";
   
 std::cerr<<" ------------ADD TEST--------------\n";
   v5 += 30000;
-  std::cerr<<v5.add(1000)<<std::endl;
-  v5.print(std::cerr);
+//  std::cerr<<v5.add(1000)<<std::endl;
+  std::cerr<<v5<<v4<<v3;
   } 
 
   std::cerr<<"SIZE: "<<sizeof(any<my_interface>)<<std::endl;
