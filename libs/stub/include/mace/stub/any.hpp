@@ -3,6 +3,7 @@
 #include<utility>
 #include <string.h>
 #include <iostream>
+#include <assert.h>
 
 namespace mace { namespace stub {
 
@@ -10,6 +11,9 @@ namespace mace { namespace stub {
     abstract_interface,
     forward_interface
   };
+
+  template<template<interface_kind,typename> class Interface>
+  class any;
 
   namespace detail {
     template<template<interface_kind,typename> class Interface>
@@ -25,45 +29,33 @@ namespace mace { namespace stub {
         template<typename V>
         holder( V&& v )
         :Interface<forward_interface,T>::virtual_storage_type(std::forward<V>(v)),
-         Interface<forward_interface,T>( )
-         {
-          std::cerr<<"                          create holder at ";
-          std::cerr<<(void*)this<<std::endl;
-        };
+         Interface<forward_interface,T>( ){}
+
         ~holder() {}
 
         holder( const holder& v ) 
         :Interface<forward_interface,T>::virtual_storage_type(v),
-         Interface<forward_interface,T>(v) {
-          std::cerr<<"\t\t                                             copy holder "<<this<<std::endl;
-        }
+         Interface<forward_interface,T>(v) {}
         holder( typename Interface<forward_interface,T>::virtual_storage_type&& v )
         :Interface<forward_interface,T>::virtual_storage_type(std::move(v)),
-         Interface<forward_interface,T>() {
-          std::cerr<<"\t\t                                             copy holder "<<this<<std::endl;
-        }
+         Interface<forward_interface,T>() {}
         holder( holder& v ) 
-        :Interface<forward_interface,T>::virtual_storage_type(v.val)
-        {
-          std::cerr<<"\t\t                                             copy holder "<<this<<std::endl;
-        }
-        holder(){ 
-          std::cerr<<"default holder called..\n";
-        }
+        :Interface<forward_interface,T>::virtual_storage_type(v.val) {}
+        holder(){}
 
       private:
         template<template<interface_kind,typename> class I>
         friend class any;
-        abstract_holder<Interface>* clone_holder_helper( char* p ) { std::cerr<<"-----------IN PLACE CLONE___----\n"; return new (p) holder(*this); }
-        abstract_holder<Interface>* move_holder_helper( char* p )  { std::cerr<<"-----------IN PLACE CLONE___----\n"; return new (p) holder(std::move(this->val)); }
+        abstract_holder<Interface>* clone_holder_helper( char* p ){ return new (p) holder(*this); }
+        abstract_holder<Interface>* move_holder_helper( char* p ) { return new (p) holder(std::move(this->val)); }
     };
 
     // store by value on the heap
     template<typename T>
     struct any_store {
-      any_store( T&& _v):v(new T(std::move(_v))){ std::cerr<<"store move T"<<this<<"\n"; }
-      any_store( const T& _v):v(new T(_v)){ std::cerr<<"store const & T"<<this<<"\n"; }
-      any_store( T& _v):v(new T(_v)){ std::cerr<<"store T& "<<this<<"\n"; }
+      any_store( T&& _v):v(new T(std::move(_v))){}
+      any_store( const T& _v):v(new T(_v)){}
+      any_store( T& _v):v(new T(_v)){}
       any_store( const any_store& a )
       :v(new T(*a.v)){}
 
@@ -98,9 +90,7 @@ namespace mace { namespace stub {
     // pointers and ref store directly
     template<typename T>
     struct any_store<T*> {
-      any_store( T* _v):v(_v){
-        std::cerr<<"storing ptr "<<v<<std::endl;
-      }
+      any_store( T* _v):v(_v){}
       any_store( const any_store& a )
       :v(a.v){}
     
@@ -144,18 +134,88 @@ namespace mace { namespace stub {
      // private:
       T& v;
     };
+    
+    /**
+     *  Implements the store as a polymorphic holder
+     */
+    template<template<interface_kind,typename> class Interface>
+    struct any_store< any<Interface>* >  {
+      protected:
+        typedef detail::abstract_holder<Interface> abstract_interface;
+        const abstract_interface* const to_T()const { return reinterpret_cast<const abstract_interface*>( &impl_place[2*sizeof(void*)] ); }
+        abstract_interface* to_T()      {  return reinterpret_cast<abstract_interface*>( &impl_place[2*sizeof(void*)] ); }
+
+        char impl_place[sizeof(detail::holder<Interface,abstract_holder<Interface>*>)];
+      public:
+        template<typename P>
+        any_store(P&& v ) {
+           new (&impl_place[0]) detail::holder<Interface,typename std::remove_reference<P>::type>( std::forward<P>(v) );
+        }
+        any_store( const any_store& c ){
+           c.to_T()->clone_holder_helper( (char*)impl_place );
+        }
+        any_store( any_store& c ){
+           c.to_T()->clone_holder_helper( (char*)impl_place );
+        }
+        any_store( any_store&& c ) {
+          c.to_T()->move_holder_helper( &impl_place[0] );
+        }
+        ~any_store() {
+           abstract_interface* t = to_T();
+           t->~abstract_interface();
+        }
+        any_store& operator=( const any_store& c ) {
+           if( &c != this ) {
+             to_T()->~abstract_interface();
+        	   c.to_T()->clone_holder_helper((char*)impl_place);
+           }
+           return *this;
+        }
+        template<typename T>
+        any_store& operator=( const T& c ) {
+           if( &c != this ) {
+             to_T()->~T();
+             new (&impl_place[0]) detail::holder<Interface,typename std::remove_reference<T>::type>( std::forward<T>(c) );
+           }
+           return *this;
+        }
+        template<typename T>
+        any_store& operator=( T&& c ) {
+           to_T()->~T();
+           new (&impl_place[0]) detail::holder<Interface,typename std::remove_reference<T>::type>( std::forward<T>(c) );
+           return *this;
+        }
+
+        any_store& operator=( any_store&& c ) {
+           char tmp[sizeof(impl_place)];
+           to_T()->move_holder_helper(tmp);
+           c.to_T()->move_holder_helper(impl_place);
+           reinterpret_cast<abstract_interface*>(&tmp[2*sizeof(void*)])->move_holder_helper(c.impl_place);
+           return *this;
+        }
+
+
+        abstract_interface* operator->()             { return to_T(); }
+        const abstract_interface* operator->()const  { return to_T(); }
+       
+        abstract_interface& operator*(){ return *to_T(); }
+        const abstract_interface& operator*()const{ return *to_T(); }
+    };
   }
+ 
+  
 
   template<typename T>
   struct any_store {
     typedef any_store<T> virtual_storage_type;
     template<typename V>
     any_store( V&& v ):val(std::forward<V>(v)){}
-
     any_store( const any_store& v ):val(v.val){}
-    any_store( any_store&& v ):val(std::move(val)){}
+    any_store( any_store& v ):val(v.val){}
+    any_store( any_store&& v ):val(std::move(v.val)){}
 
-    any_store():val(T()){ std::cerr<<"default any store: "<<this<<std::endl;}
+    any_store():val(T()){}
+
     // normalizes calling convention to pointer semantics
     // determines where to store the data
     detail::any_store<T> val;
@@ -172,68 +232,44 @@ namespace mace { namespace stub {
    *  use of InterfaceType.
    */
   template<template<interface_kind,typename> class Interface>
-  class any : public detail::holder<Interface,detail::abstract_holder<Interface>**> {
+  class any : public detail::holder<Interface, any<Interface>* > {
     private:
-      typedef detail::abstract_holder<Interface>         		     abstract_holder;
-      typedef detail::holder<Interface,detail::abstract_holder<Interface>**> base_type;
-
-      friend abstract_holder* get_holder( any* a ) {
-        return static_cast<abstract_holder*>((void*)a->impl);
-      }
-
-      friend const abstract_holder* const get_holder( const any* a ) {
-        return static_cast<const abstract_holder* const>((void*)a->impl);
-      }
-      char impl_place[sizeof(detail::holder<Interface,abstract_holder*>)];
-      abstract_holder* impl;
+      typedef detail::abstract_holder<Interface> abstract_holder;
 
     public:
+
       template<typename T>
       any( T&& v )
-      :any_store<abstract_holder**>(&impl)
-      {
-        static_assert( sizeof(impl_place) >= sizeof(detail::holder<Interface,T>),"hi" );
-        impl = new ((char*)impl_place) detail::holder<Interface,typename std::remove_reference<T>::type>(std::forward<T>(v));
-      }
+      :any_store<any*>( std::forward<T>(v) ){}
       
       any( any& v )
-      :any_store<abstract_holder**>(&impl) {
-        impl = v.impl->clone_holder_helper((char*)impl_place);
-      }
+      :any_store<any*>( static_cast<any_store<any*>&>(v) ){}
       
       any( const any& v )
-      :any_store<abstract_holder**>(&impl) {
-        impl = v.impl->clone_holder_helper((char*)impl_place);
-      }
+      :any_store<any*>( static_cast<const any_store<any*>&>(v) ) {}
 
       any( any&& v )
-      :any_store<abstract_holder**>(&impl)/*,base_type( &impl )*/ {
-        impl = v.impl->move_holder_helper((char*)impl_place);
-        v.impl = 0;
-      }
-
-      ~any(){
-        if(impl) impl->~abstract_holder();;
-      }
+      :any_store<any*>( static_cast<any_store<any*>&&>(v))  {}
       
       template<typename T>
       any& operator=( T&& v ) {
+        static_cast<any_store<any<Interface>*>&>(*this) = std::move(v);
         return *this;
       }
       
       any& operator=(const any& v) {
         if( this != & v ) {
-        	if(impl) impl->~abstract_holder();;
-        	impl = v.impl->clone_holder_helper((char*)impl_place);
+           static_cast<any_store<any<Interface>*>&>(*this) =  static_cast<const any_store<any<Interface>*>&>(v);
         }
         return *this;
       }
       any& operator=( any&& v ) {
-        if(impl) impl->~abstract_holder();
-        impl = v.impl->move_holder_helper((char*)impl_place);
-        v.impl = 0;
+        static_cast<any_store<any<Interface>*>&>(*this) = static_cast<any_store<any<Interface>*>&&>(v);
         return *this;
       }
+
+    private: 
+      any(); // not implemented, should not be used.
   };
 
   template<template<interface_kind,typename> class Interface>

@@ -14,6 +14,7 @@ struct  my_interface{
     virtual int sub( int ) = 0;
     virtual my_interface& operator+=( int x ) = 0;
     virtual std::ostream& operator<<( std::ostream& os )const =0;
+    virtual int operator()( int x ) = 0;
 };
 
 // T could be a reference or pointer, any_store handles those cases...
@@ -28,7 +29,12 @@ struct my_interface<forward_interface,T> : virtual public any_store<T>,
     virtual int sub( int i)                   { return this->val->sub( i );   }
     virtual std::ostream& operator<<( std::ostream& os )const { return this->val->operator<<(os); }
     virtual my_interface<abstract_interface>& operator+=( int x ) { *(this->val) +=(x); return *this; }
+    virtual int operator()( int x ) { return this->val->operator()(x); }
 };
+
+
+
+
 
 static int c = 0;
 struct test {
@@ -49,6 +55,9 @@ struct test {
     ++c;
     std::cerr<<"                                 move from "<<&t<<" to "<<this<<std::endl;
   }
+
+  int operator()(int x ) { std::cerr<<" OPERATOR("<<x<<") called!"; return x*x; }
+
     int add( int i )  { std::cerr<<"###############  add this "<<this<<"                                               v: "<<v<<std::endl; return i + 5; }
     int add( double, std::string ) { return 6; }
     int sub( int i ) { return i - 5; }
@@ -67,6 +76,20 @@ std::ostream& operator<<(std::ostream& o, const test& t ) {
 
 int main( int argc, char** argv ) {
   {
+  std::cerr<<"sizeof(any<my_interface>): "<<sizeof(any<my_interface>)<<std::endl;
+  std::cerr<<"sizeof(test): "<<sizeof(test)<<std::endl;
+  std::cerr<<"sizeof(any_store<any<my_interface>*>): "<<sizeof(any_store<any<my_interface>*>)<<std::endl;
+  std::cerr<<"sizeof(detail::holder<my_interface,test>): "<<sizeof(detail::holder<my_interface,test>)<<std::endl;
+
+std::cerr<<" ----------- CREATE FROM TEMP ------\n";
+  any<my_interface> mt = test(2);
+std::cerr<<" ------------MOVE TEST--------------\n\n";
+  any<my_interface> v3  = std::move(mt);
+  v3.add(99);
+
+  any<my_interface>  a=test(9);
+  a.add(5);
+
 std::cerr<<" ------------INIT REF TEST--------------\n";
   test t(1);
   any<my_interface> v = t;
@@ -79,12 +102,7 @@ std::cerr<<" ------------COPY TEST--------------\n";
   any<my_interface> v2 = v;
   std::cerr<<v2.add(88);
 
-std::cerr<<" ----------- CREATE FROM TEMP ------\n";
-  any<my_interface> mt = test(2);
-std::cerr<<" ------------MOVE TEST--------------\n";
-  any<my_interface> v3  = std::move(mt);
-  v3.add(99);
-std::cerr<<" ------------POINTER TEST--------------\n";
+std::cerr<<" ------------POINTER TEST--------------\n\n";
   any<my_interface> v4 = &t;
   std::cerr<<v4.add(1000)<<std::endl;
   any<my_interface> v5 = v4;
@@ -95,13 +113,15 @@ std::cerr<<" ------------ADD TEST--------------\n";
   v5 += 30000;
 //  std::cerr<<v5.add(1000)<<std::endl;
   std::cerr<<v5<<v4<<v3;
+  std::cerr<<"---------------- Calling Functor! -------------\n";
+  std::cerr<<"v5(6) == "<<v5(6)<<std::endl;
+//  v4 = [=](int x){ std::cerr<<"Hello Lambda "<<x<<"\n"; };
   } 
 
-  std::cerr<<"SIZE: "<<sizeof(any<my_interface>)<<std::endl;
-  std::cerr<<"tSIZE: "<<sizeof(test)<<std::endl;
-  std::cerr<<"tSIZE: "<<sizeof(detail::holder<my_interface,test>)<<std::endl;
-
   std::cerr<<"C: "<<c<<std::endl;
+
+
+  
   return 0;
 }
 
