@@ -5,15 +5,15 @@
 
 namespace mace { namespace reflect {
 
-    value_base::value_base()  { new (held) detail::place_holder(); }
-    value_base::~value_base() { get_holder()->~place_holder(); }
-    value_base::value_base(const value_base& copy) 
+    inline value_base::value_base()  { new (held) detail::place_holder(); }
+    inline value_base::~value_base() { get_holder()->~place_holder(); }
+    inline value_base::value_base(const value_base& copy) 
     { copy.get_holder()->clone( held ); }
 
-    bool           value_base::is_array()const {
+    inline bool           value_base::is_array()const {
       return get_holder()->is_array();
     }
-    size_t         value_base::size()const {
+    inline int64_t         value_base::size()const {
       return get_holder()->size();
     }
 
@@ -22,16 +22,16 @@ namespace mace { namespace reflect {
      *  If a map, over keys
      *  if an array, over indexes
      */
-    iterator       value_base::begin() {
+    inline iterator       value_base::begin() {
       return get_holder()->begin();
     }
-    const_iterator value_base::begin()const {
+    inline const_iterator value_base::begin()const {
       return get_holder()->begin();
     }
-    iterator       value_base::end() {
+    inline iterator       value_base::end() {
       return iterator();
     }
-    const_iterator value_base::end()const  {
+    inline const_iterator value_base::end()const  {
       return const_iterator();
     }
 
@@ -42,12 +42,12 @@ namespace mace { namespace reflect {
       return reinterpret_cast<detail::place_holder*>(held);
     }
 
-    const char* value_base::type()const { return get_holder()->type(); }
+    inline const char* value_base::type()const { return get_holder()->type(); }
   
-    void value_base::visit( read_value_visitor&& v )const {
+    inline void value_base::visit( read_value_visitor&& v )const {
       get_holder()->visit( std::forward<read_value_visitor>(v) );
     }
-    void value_base::visit( write_value_visitor&& v ) {
+    inline void value_base::visit( write_value_visitor&& v ) {
       get_holder()->visit( std::forward<write_value_visitor>(v) );
     }
 
@@ -63,7 +63,7 @@ namespace mace { namespace reflect {
       visit( set_visitor<T>( std::forward<const T>(v) ) );
     }
 
-    bool value_base::operator!()const {
+    inline bool value_base::operator!()const {
       return get_holder()->type() == 0;
     }
 
@@ -81,7 +81,7 @@ namespace mace { namespace reflect {
     }
 
 
-    bool value_base::has_field( const std::string& field )const{
+    inline bool value_base::has_field( const std::string& field )const{
       return get_holder()->has_field(field); 
     }
 

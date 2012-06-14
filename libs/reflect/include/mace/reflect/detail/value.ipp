@@ -4,10 +4,10 @@
 
 namespace mace { namespace reflect {
 
-    value::value( const value_cref& c) {
+    inline value::value( const value_cref& c) {
        *this =  c.get_holder()->copy();
     }
-    value::value( const value_ref& c) {
+    inline value::value( const value_ref& c) {
        *this =  c.get_holder()->copy();
     }
 
@@ -23,7 +23,7 @@ namespace mace { namespace reflect {
       new(held) typename detail::select_holder<T>::type(std::forward<T>(v));
     }
 
-    value::value( value&& v ) {
+    inline value::value( value&& v ) {
       memcpy( held, v.held, sizeof(held) );
       new(v.held) detail::place_holder();
     }
@@ -72,10 +72,10 @@ namespace mace { namespace reflect {
         return *this = v.get_holder()->copy();
      }
 
-     value_cref value::operator[]( const std::string& field )const { 
+     inline value_cref value::operator[]( const std::string& field )const { 
        return get_holder()->get_field(field); 
      }
-     value_ref  value::operator[]( const std::string& field ) { 
+     inline value_ref  value::operator[]( const std::string& field ) { 
        return get_holder()->get_field(field);            
      }
 

@@ -18,18 +18,18 @@ namespace mace { namespace reflect {
       new (held) typename detail::select_holder<const T&>::type(v);
     }
 
-    value_cref::value_cref( const value& v ) {
+    inline value_cref::value_cref( const value& v ) {
         v.get_holder()->cref().get_holder()->clone(held);
     }
 
 
-    value_cref value_cref::operator[]( const std::string& field )const {
+    inline value_cref value_cref::operator[]( const std::string& field )const {
       return get_holder()->get_field( field );
     }
 
-    value_cref::value_cref( const value_cref& c ):value_base(c){}
+    inline value_cref::value_cref( const value_cref& c ):value_base(c){}
 
-    value_cref::value_cref( value_cref&& t ) {
+    inline value_cref::value_cref( value_cref&& t ) {
       memcpy( held, t.held, sizeof(held) );
       new (t.held) detail::place_holder(); 
     }

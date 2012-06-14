@@ -5,22 +5,22 @@
 
 namespace mace { namespace reflect {
 
-    std::string iterator::key()const  { return itr->key();  }
-    value_ref   iterator::value()const { return itr->value(); }
+    inline std::string iterator::key()const  { return itr->key();  }
+    inline value_ref   iterator::value()const { return itr->value(); }
 
     // 0 == end
-    iterator::iterator( detail::iterator_impl_base* i )
+    inline iterator::iterator( detail::iterator_impl_base* i )
     :itr(i){}
 
-    iterator::iterator( const iterator& i )
+    inline iterator::iterator( const iterator& i )
     :itr(i.itr->clone()){}
 
-    iterator::iterator( iterator&& i )
+    inline iterator::iterator( iterator&& i )
     :itr(i.itr) { i.itr = 0; }
 
-    iterator::~iterator(){ delete itr; }
+    inline iterator::~iterator(){ delete itr; }
 
-    iterator& iterator::operator=( const iterator& i ) {
+    inline iterator& iterator::operator=( const iterator& i ) {
       if( this != &i ) {
         delete itr;
         itr = i.itr->clone();
@@ -28,10 +28,10 @@ namespace mace { namespace reflect {
       return *this;
     }
     
-    iterator& iterator::operator++(int) { itr->next(); return *this; }
-    iterator& iterator::operator++()    { itr->next(); return *this; }
+    inline iterator& iterator::operator++(int) { itr->next(); return *this; }
+    inline iterator& iterator::operator++()    { itr->next(); return *this; }
 
-    bool iterator::operator == ( const iterator& i )const {
+    inline bool iterator::operator == ( const iterator& i )const {
       if( itr == i.itr ) return true;
       if( itr == 0 ) return i.itr->equals(itr);
       return itr->equals(i.itr); 

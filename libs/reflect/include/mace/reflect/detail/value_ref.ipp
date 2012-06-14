@@ -4,14 +4,14 @@
 #include <mace/reflect/detail/get_field.hpp>
 
 namespace mace { namespace reflect {
-     value_ref::value_ref( const value_ref& r ):value_base(r){}
+     inline value_ref::value_ref( const value_ref& r ):value_base(r){}
 
-     value_ref::value_ref( value_ref&& v ) {
+     inline value_ref::value_ref( value_ref&& v ) {
         memcpy( held, v.held, sizeof(held) ); 
         new (v.held) detail::place_holder();
      }
 
-     value_ref::operator value_cref()const {
+     inline value_ref::operator value_cref()const {
         return get_holder()->cref();
      }
 
@@ -27,10 +27,10 @@ namespace mace { namespace reflect {
          return *this;
      }
 
-     value_cref value_ref::operator[]( const std::string& field )const { 
+     inline value_cref value_ref::operator[]( const std::string& field )const { 
        return get_holder()->get_field(field); 
      }
-     value_ref  value_ref::operator[]( const std::string& field ) { 
+     inline value_ref  value_ref::operator[]( const std::string& field ) { 
        return get_holder()->get_field(field);            
      }
 
