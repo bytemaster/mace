@@ -173,7 +173,7 @@ namespace mace { namespace rpc { namespace json {
   template<typename T, typename Stream, typename Filter>
   void to_json( const std::vector<char>& v, Stream& os, Filter& f ) {
     if( v.size() )
-        to_json( base64_encode(&v.front(),v.size() ), os, f );
+        to_json( base64_encode((unsigned char*)&v.front(),v.size() ), os, f );
     else
         to_json( base64_encode(0,0), os, f );
   }

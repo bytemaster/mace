@@ -44,7 +44,7 @@ namespace mace { namespace rpc {
               try {
                  R result;
                  function_filter<Connection> f(con);
-                 result = IODelegate::template unpack<R,BOOST_TYPEOF(f)>( f, d );
+                 result = IODelegate::template unpack<R,decltype(f)>( f, d );
                  prom->set_value( std::move( result ) );
               } catch ( ... ) {
                  prom->set_exception( boost::current_exception() );

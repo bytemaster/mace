@@ -44,6 +44,9 @@ namespace mace { namespace cmt {
         //cmt::actor_interface::set_vtable( *this->m_vtable, 
         //                  *boost::any_cast<mace::stub::ptr<OtherInterface,OtherDelegate>&>(this->m_ptr), this );
       }
+
+      actor( const actor& cpy )
+      :actor_base(cpy){ }
   };
 
 } } // namespace mace::cmt

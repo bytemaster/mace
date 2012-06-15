@@ -1,5 +1,7 @@
 #include <mace/cmt/actor.hpp>
 #include <mace/cmt/log/log.hpp>
+#include <functional>
+#include <mace/cmt/thread.hpp>
 
 
 class calculator {
@@ -29,9 +31,9 @@ int main( int argc, char** argv ) {
   mace::cmt::actor<calculator> act2(ap, at );
 
   mace::cmt::thread* tt = mace::cmt::thread::create( "test_thread" );
-  tt->async( std::bind(test, act) ).wait();
-  tt->async( std::bind(test, act2) ).wait();
-  at->async( std::bind(test, act2) ).wait();
+  tt->async( boost::bind(test, act) ).wait();
+  tt->async( boost::bind(test, act2) ).wait();
+  at->async( boost::bind(test, act2) ).wait();
 
   //test(act);
   test(act2);
