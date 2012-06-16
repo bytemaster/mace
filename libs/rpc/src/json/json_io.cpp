@@ -64,9 +64,12 @@ namespace mace { namespace rpc { namespace json {
   std::string unescape_string( const std::string s ) {
     std::string out; out.reserve(s.size());
     for( auto i = s.begin(); i != s.end(); ++i ) {
-      if( *i != '\\' ) out += *i;
+      if( *i != '\\' ) {
+        if( *i != '"' ) out += *i;
+      }
       else {
-        ++i; if( i == out.end() ) return out;
+        ++i; 
+        if( i == out.end() ) return out;
         switch( *i ) {
           case 't' : out += '\t'; break;
           case 'n' : out += '\n'; break;
@@ -89,6 +92,57 @@ namespace mace { namespace rpc { namespace json {
     }
     return out;
   }
+
+  /**
+   *  Any unescaped quotes are dropped. 
+   *  Because unescaped strings are always shorter, we can simply reuse
+   *  the memory of s.
+   *  
+   *  @param s a null terminated string that contains one or more escape chars
+   */
+  char* inplace_unescape_string( char* s ) {
+    while( *s == '\"' ) ++s;
+    char* out = s;
+    for( auto i = s; *i != '\0'; ++i ) {
+      if( *i != '\\' ) {
+        if( *i != '"' ) {
+            *out = *i;
+            ++out; 
+        }
+      }
+      else {
+        ++i; 
+        if( *i == '\0' ) { *out = '\0'; return s; }
+        switch( *i ) {
+          case 't' : *out = '\t'; ++out; break;
+          case 'n' : *out = '\n'; ++out; break;
+          case 'r' : *out = '\r'; ++out; break;
+          case '\\': *out = '\\'; ++out; break;
+          case '"' : *out = '"'; ++out; break;
+          case 'x' : { 
+            ++i; if( *i == '\0' ){ *out = '\0'; return s; }
+            char c = from_hex(*i);           
+            ++i; if( *i == '\0' ){ *out = c; ++out; *out = '\0'; return s; }
+            c = c<<4 | from_hex(*i);           
+            *out = c;
+            ++out;
+            break;
+          }
+          default:
+            *out = '\\';
+            ++out; 
+            *out = *i;
+            ++out;
+        }
+      }
+    }
+    *out = '\0';
+    return s;
+  }
+
+
+
+
 
   /**
    *  JSON Parsing Strategy 
@@ -402,23 +456,31 @@ void int_from_json( T& v, char* itr, char* end, error_collector& e ) {
   char* t = i;
   while( t != ie ) { if( *t == '.' ) break; ++t; }
 
-  if( t != ie ) { wlog( "Converting real to int" ); }
-
   if( !std::is_signed<T>::value ) {
     if( *i == '-' ) {  wlog( "signed value for unsigned field" ); }
-    uint64_t bv = boost::lexical_cast<uint64_t>(i);
-    if( bv < std::numeric_limits<T>::min() || 
-        bv > std::numeric_limits<T>::max() ) {
-      wlog( "truncating value" );
-    }
-    v = static_cast<T>(bv);
+      if( t == ie ) {
+        uint64_t bv = boost::lexical_cast<uint64_t>(i);
+        if( bv < std::numeric_limits<T>::min() || 
+            bv > std::numeric_limits<T>::max() ) {
+          wlog( "truncating value" );
+        }
+        v = static_cast<T>(bv);
+      } else {
+        wlog( "Converting real to int" ); 
+        v =  static_cast<T>(boost::lexical_cast<double>(i));
+      }
   } else {
-    int64_t bv = boost::lexical_cast<int64_t>(i);
-    if( bv < std::numeric_limits<T>::min() || 
-        bv > std::numeric_limits<T>::max() ) {
-      wlog( "truncating value" );
+    if( t == ie ) {
+        int64_t bv = boost::lexical_cast<int64_t>(i);
+        if( bv < std::numeric_limits<T>::min() || 
+            bv > std::numeric_limits<T>::max() ) {
+          wlog( "truncating value" );
+        }
+        v = static_cast<T>(bv);
+    } else {
+        wlog( "Converting real to int" ); 
+        v =  static_cast<T>(boost::lexical_cast<double>(i));
     }
-    v = static_cast<T>(bv);
   }
 }
 
@@ -475,8 +537,10 @@ void from_json( bool& v, char* itr, char* end, error_collector& e ) {
 }
 void from_json( std::string& v, char* itr, char* end, error_collector& e) {
   // TODO: implace unescape
-  if( *itr == '"' ) { v = unescape_string(std::string(itr,end)); }
-  else {
+  if( *itr == '"' ) { 
+    temp_set move_end(end,'\0');
+    v = inplace_unescape_string(itr);
+  } else {
     wlog( "unescaped string! " );
     v = std::string(itr,end);
   }

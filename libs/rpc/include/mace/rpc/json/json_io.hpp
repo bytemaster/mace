@@ -138,19 +138,11 @@ namespace mace { namespace rpc { namespace json {
   }
   template<typename K, typename V, typename Stream, typename Filter >
   void to_json( const std::pair<K,V>& v, Stream& os, Filter& f ) {
-    os <<"{\"first\":";
+    os <<'[';
     to_json( f(v.first), os, f );
-    os <<",\"second\":";
+    os <<',';
     to_json( f(v.second), os, f );
-    os<<'}';
-  }
-  template<typename V, typename Stream, typename Filter >
-  void to_json( const std::pair<std::string,V>& v, Stream& os, Filter& f ) {
-    os << '{';
-    to_json( f(v.first),os,f);
-    os<<':';
-    to_json( f(v.second),os,f);
-    os<<'}';
+    os<<']';
   }
 
   template<typename T, typename Stream, typename Filter >
@@ -234,6 +226,10 @@ namespace mace { namespace rpc { namespace json {
     static inline void to_json( const T& v, Stream& os, Filter& f ) {
       mace::reflect::reflector<T>::visit( to_json_visitor<T,Stream,Filter>( v, os, f ) );
     }
+    template<typename T,typename Filter> 
+    inline static void from_json( T& v, char* itr, char* end, error_collector& ec, Filter& f ) {
+      from_json_reflected( v, itr, end, ec, f );
+    }
   };
 
   template<bool IsFusionSeq> struct if_fusion_seq {
@@ -241,11 +237,19 @@ namespace mace { namespace rpc { namespace json {
     inline static void to_json( const T& v, Stream& os, Filter& f ) {
         to_json_sequence( v, os, f );
     }
+    template<typename T, typename Filter> 
+    inline static void from_json( T& v, char*s, char* e, Filter& f ) {
+        from_json_sequence( v, s,e, f );
+    }
   };
   template<> struct if_fusion_seq<false> {
     template<typename T,typename Stream, typename Filter> 
     inline static void to_json( const T& v, Stream& os, Filter& f ) {
       if_reflected<typename mace::reflect::reflector<T>::is_defined>::to_json(v,os,f);
+    }
+    template<typename T,typename Filter> 
+    inline static void from_json( T& v, char* itr, char* end, error_collector& ec, Filter& f ) {
+      if_reflected<typename mace::reflect::reflector<T>::is_defined>::from_json(v,itr,end,ec,f);
     }
   };
    
@@ -255,41 +259,15 @@ namespace mace { namespace rpc { namespace json {
     if_fusion_seq< boost::fusion::traits::is_sequence<filtered_type>::value >::to_json(filter(v),os,filter);
   }
 
-  /*
-  template<typename T, typename Stream, typename F>
-  void from_json( int64_t& i, Stream& in, F&)     {i=detail::parse_int(in); }
-  template<typename T, typename Stream, typename F>
-  void from_json( uint64_t& i, Stream& in, F&)    {i=detail::parse_uint(in);}
-  template<typename T, typename Stream, typename F>
-  void from_json( int32_t& i, Stream& in, F&)     {i=detail::parse_int(in); }
-  template<typename T, typename Stream, typename F>
-  void from_json( uint32_t& i, Stream& in, F&)    {i=detail::parse_uint(in);}
-  template<typename T, typename Stream, typename F>
-  void from_json( int16_t& i, Stream& in, F&)     {i=detail::parse_int(in); }
-  template<typename T, typename Stream, typename F>
-  void from_json( uint16_t& i, Stream& in, F&)    {i=detail::parse_uint(in);}
-  template<typename T, typename Stream, typename F>
-  void from_json( int8_t& i, Stream& in, F&)      {i=detail::parse_int(in); }
-  template<typename T, typename Stream, typename F>
-  void from_json( uint8_t& i, Stream& in, F&)     {i=detail::parse_uint(in);}
-  template<typename T, typename Stream, typename F>
-  void from_json( bool& i, Stream& in, F&) {
-    char c; 
-    string s;
-    in.read(&c,1);
-    while( c != ' ' && c !=','
-    switch( c ) {
-      case '0':
 
-      case 't':
-
-      case 'f':
-    }
+  template<typename T,typename Filter>
+  void from_json( T& v, char* s, char* e, error_collector& ec, Filter& f ) {
+    slog( "OTHER" );
+    typedef typename std::remove_reference<decltype(f(v))>::type filtered_type;
+    filtered_type ft;
+    if_fusion_seq< boost::fusion::traits::is_sequence<filtered_type>::value >::from_json(ft,s,e,ec,f);
+    v = f( ft );
   }
-  */
-
-
-
 
 
 

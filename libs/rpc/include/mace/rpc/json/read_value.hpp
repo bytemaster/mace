@@ -2,6 +2,8 @@
 #define _MACE_RPC_JSON_READ_VALUE_HPP_
 #include <vector>
 #include <mace/rpc/varint.hpp>
+#include <mace/rpc/filter.hpp>
+#include <mace/reflect/value.hpp>
 
 namespace mace { namespace rpc { namespace json {
 
@@ -130,6 +132,8 @@ class error_collector : public boost::exception {
     uint32_t m_eclass[num_error_classes];
     std::vector<parse_error>   m_errors;
 };
+ std::string unescape_string( const std::string s );
+ char* inplace_unescape_string( char* );
 
 /**
  *  @param val    reference to the value to be read
@@ -216,53 +220,289 @@ void from_json( signed_int& v, char* itr, char* end, error_collector& e, F&  ){
 }
 
 
+template<typename Container, typename Filter>
+struct callback_data{
+  callback_data( Container& c, Filter& f, error_collector& e )
+  :container(c),filter(f),ec(e),count(0){}
+
+  Container&       container;
+  Filter&          filter;
+  error_collector& ec;
+  int              count;
+};
+
+template<typename Container,typename Filter, typename In, typename Out>
+void push_back( char* start, char* end, void* data ) {
+  callback_data<Container,Filter>& d = *((callback_data<Container,Filter>*)data);
+  Out o;
+  if( !std::is_same<In,Out>::value ) {
+    In tmp;
+    from_json( tmp, start, end, d.ec, d.filter );
+    d.filter(tmp,o);
+  } else {
+    from_json( o, start, end, d.ec, d.filter );
+  }
+  d.container.push_back(std::move(o));
+}
+template<typename Container,typename Filter, typename In, typename Out>
+void insert( char* start, char* end, void* data ) {
+  callback_data<Container,Filter>& d = *((callback_data<Container,Filter>*)data);
+  Out o;
+  if( !std::is_same<In,Out>::value ) {
+      In tmp;
+      from_json( tmp, start, end, d.ec, d.filter );
+      d.filter(tmp,o);
+  } else {
+      from_json( o, start, end, d.ec, d.filter );
+  }
+  d.container.insert(std::move(o));
+}
+template<typename K, typename V,typename Filter, typename In, typename Out>
+void set_pair( char* start, char* end, void* data ) {
+  callback_data<std::pair<K,V>,Filter>& d = *((callback_data<std::pair<K,V>,Filter>*)data);
+  typedef decltype( d.filter(V()) ) second_filter;
+  slog( "%1%  '%2%'", d.count, std::string(start,end) );
+  typedef decltype( d.filter(K()) ) first_filter;
+  switch( d.count ) {
+    case 0: 
+      if( std::is_same<K,first_filter>::value ) { 
+        from_json( d.container.first, start, end, d.ec, d.filter ); 
+      } else {
+        first_filter tmp; 
+        from_json( tmp, start, end, d.ec, d.filter ); 
+        d.filter(tmp,d.container.first);
+      }
+      break;
+    case 1: 
+      if( std::is_same<V,second_filter>::value ){ 
+        from_json( d.container.second, start, end, d.ec, d.filter );
+      } else {
+        second_filter tmp; 
+        from_json( tmp, start, end, d.ec, d.filter ); 
+        //d.filter(tmp,d.container.second);
+      }
+      break;
+    default:
+      wlog( "Extra values in pair" );
+  }
+  ++d.count;
+}
+
+template<typename Container,typename Filter, typename In, typename Out>
+void insert_key( char* name, char* start, char* end, void* data ) {
+  callback_data<Container,Filter>& d = *((callback_data<Container,Filter>*)data);
+  In tmp;
+  from_json( tmp, start, end, d.ec, d.filter );
+  Out o;
+  d.filter(tmp,o);
+  d.container[inplace_unescape_string(name)] = std::move(o);
+}
+
 /**
  *  parses a sequence of values calling 'push_back(f(T()))' 
  */
 template<typename Container, typename InType, typename OutType, typename F>
-void from_json( Container& v, char* itr, char* end, error_collector& e, F& f ) {
-/*
-  if( *itr == '[' && *(end-1) == ']' ) {
-    char* start = itr + 1; // array values start after [ 
-    char* ae    = end - 1; // array values end before ]
-
-    char* next;
-    // read one value from the buffer
-    start = read_value( start, ae, next );
-    while( start != ae ) {
-      InType tmp;
-      char* r = from_json( tmp, start, next, e, f  );
-      if( r != start ) { // we consumed something... success@
-        v.push_back(OutType);
-        f(tmp,v.back());
-      }
-      if( r != next ) {
-        wlog( "unused bytes..." );
-      }
-      BOOST_ASSERT( next <= ae );
-    }
-  } else {
-    using namespace mace::rpc::json::errors;
-    if( e.ignore( type_mismatch ) ) {
-       // if recover, try to parse it as a single T  
-       if( e.recover( type_mismatch ) ) {
-       }
-       if( e.report( type_mismatch ) ) {
-          e.post_error( type_mismatch, "Expected Array", itr, end );
-       }
-    }
+void from_json( Container& v, char* itr, char* end, error_collector& ec, F& f ) {
+  if( *itr == '[' && *(end-2) == ']' ) {
+    slog( "Yep, its an array" );
+    callback_data<Container,F> d(v,f,ec);
+    void (*callback)(char*,char*,void*) = &push_back<Container,F,InType,OutType>;
+    read_values( itr+1, end -2, ec, callback, &d );
   }
-  */
- return 0;
+  else {
+    elog( "'%1%' is not an array", itr );
+  }
 }
 
 template<typename T, typename F>
 void from_json( std::vector<T>& v, char* itr, char* end, error_collector& e, F& f ) {
-  typedef std::remove_reference<decltype( f(T()) )> filtered_type;
-  char* post = from_json<std::vector<T>,filtered_type,F>( v, itr, end, e, f );
-
-  return end;
+  v.clear();
+  typedef typename std::remove_reference<decltype( f(T()) )>::type filtered_type;
+  from_json<std::vector<T>,filtered_type,T,F>( v, itr, end, e, f );
 }
+template<typename T, typename F>
+void from_json( std::list<T>& v, char* itr, char* end, error_collector& e, F& f ) {
+  v.clear();
+  typedef typename std::remove_reference<decltype( f(T()) )>::type filtered_type;
+  from_json<std::list<T>,filtered_type,T,F>( v, itr, end, e, f );
+}
+
+template<typename T, typename F>
+void from_json( std::set<T>& v, char* itr, char* end, error_collector& ec, F& f ) {
+  v.clear();
+  typedef typename std::remove_reference<decltype( f(T()) )>::type filtered_type;
+  if( *itr == '[' && *(end-2) == ']' ) {
+    slog( "Yep, its an array..set" );
+    callback_data<std::set<T>,F> d(v,f,ec);
+    void (*callback)(char*,char*,void*) = &insert<std::set<T>,F,T,filtered_type>;
+    read_values( itr+1, end -2, ec, callback, &d );
+  }
+  else {
+    elog( "'%1%' is not an array..set", itr );
+  }
+}
+
+template<typename K, typename T, typename F>
+void from_json( std::pair<K,T>& v, char* itr, char* end, error_collector& ec, F& f ) {
+  if( *itr == '[' ) {
+    slog( "Yep, its an pair..set" );
+    callback_data<std::pair<K,T>,F> d(v,f,ec);
+    void (*callback)(char*,char*,void*) = &set_pair<K,T,F,T,void>;
+    read_values( itr+1, end, ec, callback, &d );
+    if( d.count < 2 ) {
+      wlog( "missing %1% element%2% from pair", 2-d.count, (d.count == 0 ? "'s" : "") );
+    }
+  }
+  else {
+    elog( "'%1%' is not an array..pair  '%2%'", itr, *(end-2) );
+  }
+}
+
+
+
+template<typename T, typename F>
+void from_json( std::map<std::string,T>& v, char* itr, char* end, error_collector& ec, F& f ) {
+  v.clear();
+  typedef typename std::remove_reference<decltype( f(T()) )>::type filtered_type;
+  if( *itr == '{' && *(end-2) == '}' ) {
+    slog( "Yep, its an object..map" );
+    callback_data<std::map<std::string,T>,F> d(v,f,ec);
+    void (*callback)(char*,char*,char*,void*) = &insert_key<std::map<std::string,T>,F,T,filtered_type>;
+    read_key_vals( itr+1, end -2, ec, callback, &d );
+  }
+  else {
+    elog( "'%1%' is not an array..map", itr );
+  }
+}
+
+template<typename K, typename T, typename F>
+void from_json( std::map<K,T>& v, char* itr, char* end, error_collector& ec, F& f ) {
+  v.clear();
+  typedef typename std::remove_reference<decltype( f(std::pair<K,T>()) )>::type filtered_type;
+  if( *itr == '[' && *(end-2) == ']' ) {
+    slog( "Yep, its an array..map" );
+    callback_data<std::map<K,T>,F> d(v,f,ec);
+    void (*callback)(char*,char*,void*) = &insert<std::map<K,T>,F,std::pair<K,T>,filtered_type>;
+    read_values( itr+1, end -2, ec, callback, &d );
+  }
+  else {
+    elog( "'%1%' is not an array..map", itr );
+  }
+}
+
+template<typename Filter>
+struct write_from_json_visitor : mace::reflect::write_value_visitor {
+  char* s; 
+  char* e;
+  Filter& f;
+  error_collector& ec;
+  write_from_json_visitor( char* _s, char* _e, error_collector& _ec, Filter& _f )
+  :s(_s),e(_e),ec(_ec),f(_f){}
+
+  virtual void operator()( mace::reflect::value_ref& v ){
+    slog("...SUB OBJ........" );
+    from_json_reflected( v, s, e, ec, f );
+  }
+  virtual void operator()( std::string& str ){
+    from_json( str, s, e, ec, f );
+  }
+  virtual void operator()( uint64_t& d ){
+    slog("............" );
+    from_json( d, s, e, ec, f );
+  }
+  virtual void operator()( int64_t& d ){
+    slog("............" );
+    from_json( d, s, e, ec, f );
+  }
+  virtual void operator()( uint32_t& d ){
+    slog("............" );
+    from_json( d, s, e, ec, f );
+  }
+  virtual void operator()( int32_t& d ){
+    slog("............" );
+    from_json( d, s, e, ec, f );
+  }
+  virtual void operator()( uint16_t& d ){
+    slog("............" );
+    from_json( d, s, e, ec, f );
+  };
+  virtual void operator()( int16_t& d ){
+    slog("............" );
+    from_json( d, s, e, ec, f );
+  }
+  virtual void operator()( uint8_t& d ){
+    slog("............" );
+    from_json( d, s, e, ec, f );
+  }
+  virtual void operator()( int8_t& d ){
+    slog("............" );
+    from_json( d, s, e, ec, f );
+  }
+  virtual void operator()( double& d ){
+    slog( "got double!" );
+    from_json( d, s, e, ec, f );
+  }
+  virtual void operator()( float& d ){
+    slog("............" );
+    from_json( d, s, e, ec, f );
+  }
+  virtual void operator()( bool& d ){
+    slog("............" );
+    from_json( d, s, e, ec, f );
+  }
+};
+
+template<typename Filter>
+void set_key( char* name, char* start, char* end, void* data ) {
+  callback_data<mace::reflect::value_ref,Filter>& d = *((callback_data<mace::reflect::value_ref,Filter>*)data);
+  slog( "key %1%   from %2%", name, start );
+  if( !d.container.has_field(name) ) {
+    wlog( "type does not have field %1%", name );
+  } else {
+    slog( "Type has field" );
+    d.container[name].visit(write_from_json_visitor<Filter>( start, end, d.ec, d.filter ));
+  }
+  /*
+  In tmp;
+  from_json( tmp, start, end, d.ec, d.filter );
+  Out o;
+  d.filter(tmp,o);
+  d.container[inplace_unescape_string(name)] = std::move(o);
+  */
+}
+template<typename Filter, typename In, typename Out>
+void push_back( char* start, char* end, void* data ) {
+  callback_data<Container,Filter>& d = *((callback_data<Container,Filter>*)data);
+  Out o;
+  if( !std::is_same<In,Out>::value ) {
+    In tmp;
+    from_json( tmp, start, end, d.ec, d.filter );
+    d.filter(tmp,o);
+  } else {
+    from_json( o, start, end, d.ec, d.filter );
+  }
+  d.container.push_back(std::move(o));
+}
+
+
+template<typename Filter>
+void from_json_reflected( mace::reflect::value_ref v, char* itr, char* end, error_collector& ec, Filter& f ) {
+  if( *itr == '{' && *(end-2) == '}' ) {
+    slog( "Yep, its an object. " );
+    callback_data<mace::reflect::value_ref,Filter> d(v,f,ec);
+    void (*callback)(char*,char*,char*,void*) = &set_key<Filter>;
+    read_key_vals( itr+1, end -2, ec, callback, &d );
+  } else if( *itr == '[' ) {
+    if( !v.is_array() ) {
+      elog( "value %1% is not an array", v.type_name() );
+    }
+    wlog( "Its an array??.. go into push back mode " );
+  }
+  else {
+    elog( "'%1%' is not an array..map", itr );
+  }
+}
+
 
 template<typename T>
 T from_json( const std::string& js ) {
@@ -270,7 +510,8 @@ T from_json( const std::string& js ) {
   d.push_back('\0');
   T v;
   error_collector e;
-  from_json( v, &d.front(), &d.front()+d.size(), e );
+  default_filter f;
+  from_json( v, &d.front(), &d.front()+d.size(), e, f );
   return v;
 }
 

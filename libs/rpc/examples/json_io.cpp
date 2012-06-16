@@ -35,6 +35,16 @@ void print_value( char* s, char* e, void* self ) {
   slog( "%2%] '%1%'", std::string(s,e), (*n) );
 }
 
+template<typename T>
+void print_vector( const T& v) {
+  for( auto i = v.begin(); i != v.end(); ++i )
+    slog( "%1%", *i );
+}
+template<typename T>
+void print_map( const T& v) {
+  for( auto i = v.begin(); i != v.end(); ++i )
+    slog( "%1% -> %2%", i->first, i->second );
+}
 
 int main( int argc, char** argv ) {
   nest n;
@@ -71,6 +81,50 @@ int main( int argc, char** argv ) {
   slog( "double %1% from \"-5.5\"", mace::rpc::json::from_json<double>("\"-5.5\"") ); 
   slog(".....");
   slog( "double %1% from \"-5.5\"", mace::rpc::json::from_json<double>("\"-5.5\"") ); 
+  {
+  std::pair<int,double> d = mace::rpc::json::from_json<std::pair<int,double> >("[5,6.7]");
+  slog( "pair<int,double>(%1%,%2%) from [5,6.7] ",d.first,d.second );
+  }{
+  std::pair<int,double> d = mace::rpc::json::from_json<std::pair<int,double> >("[5,6.7,8]");
+  slog( "pair<int,double>(%1%,%2%) from [5,6.7,8] ",d.first,d.second );
+  }{
+  std::pair<int,double> d = mace::rpc::json::from_json<std::pair<int,double> >("[5.8]");
+  slog( "pair<int,double>(%1%,%2%) from [5] ",d.first,d.second );
+  }{
+  std::pair<int,double> d = mace::rpc::json::from_json<std::pair<int,double> >("[]");
+  slog( "pair<int,double>(%1%,%2%) from [] ",d.first,d.second );
+  }{
+  auto d = mace::rpc::json::from_json<std::map<int,double> >("[[5,5.5],[6,6.6]]");
+  print_map(d); 
+
+  test t = mace::rpc::json::from_json<test>("{a:5.5,b:hello,c:[cow,pie,was,here]}");
+  slog( "read struct test" );
+  mace::rpc::json::to_json( t, std::cout, f );
+  }
+  return 0;
+
+  
+  {
+    auto vs = mace::rpc::json::from_json<std::vector<std::string> >( "[\"hello\",\"world\"]" );
+    print_vector( vs );
+  } {
+    auto vs = mace::rpc::json::from_json<std::vector<std::string> >( "[\"hello\",\"world\"]" );
+    print_vector(vs);
+  } {
+    auto vs = mace::rpc::json::from_json<std::list<std::string> >( "[\"list hello\",list world]" );
+    print_vector(vs);
+  } {
+    auto vs = mace::rpc::json::from_json<std::set<std::string> >( "[\"set hello\",set world]" );
+    print_vector(vs);
+  } {
+    auto vs = mace::rpc::json::from_json<std::map<std::string,std::string> >( "{\"set hello\":\"set world]\",\"good\":\"bad\"}" );
+    print_map(vs);
+  }{
+    auto vs = mace::rpc::json::from_json<std::map<std::string,std::string> >( "{set world,\"good\":\"bad\"}" );
+    print_map(vs);
+  }
+
+
 
 
   std::string l;

@@ -10,13 +10,14 @@ namespace mace { namespace rpc {
      */
     struct default_filter {
       template<typename T>
-      void operator()( T& r, T& v )const  { v = r; }
+      void operator()( const T& r, T& v )const  { v = r; }
 
       template<typename T>
       const bool is_filtered(const T*)const { return false; }
 
       template<typename T>
       inline const T& operator()( const T& v )const { return v; }
+
 
       template<typename T>
       inline T operator()( T&& v )const { return v; }
