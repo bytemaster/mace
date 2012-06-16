@@ -299,7 +299,7 @@ namespace mace { namespace stub {
 
   template<template<interface_kind,typename> class Interface>
   std::ostream& operator<<( std::ostream& os, const any<Interface>& a ) {
-    return a.val->operator<<(os);
+    return a.operator<<(os);
   }
 
 } } 

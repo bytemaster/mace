@@ -14,7 +14,7 @@ struct  sub_inter{
 
 // T could be a reference or pointer, any_store handles those cases...
 template<typename T>
-struct sub_inter<forward_interface,T> : virtual public any_store<T>,
+struct sub_inter<forward_interface,T> : virtual protected any_store<T>,
                                         virtual public sub_inter<abstract_interface> {
     virtual int sub( int i) { return this->val->sub(i);        }
 };
@@ -25,6 +25,7 @@ struct  my_interface : virtual public sub_inter<abstract_interface> {
     virtual ~my_interface() {}
     virtual int add( int ) = 0;
     virtual int add( double, std::string )  = 0;
+
     virtual my_interface& operator+=( int x ) = 0;
     virtual std::ostream& operator<<( std::ostream& os )const =0;
     virtual int operator()( int x ) = 0;
@@ -32,7 +33,7 @@ struct  my_interface : virtual public sub_inter<abstract_interface> {
 
 // T could be a reference or pointer, any_store handles those cases...
 template<typename T>
-struct my_interface<forward_interface,T> : virtual public any_store<T>,
+struct my_interface<forward_interface,T> : virtual protected any_store<T>,
                                            virtual public sub_inter<forward_interface,T>,
                                            virtual public my_interface<abstract_interface> {
 
@@ -40,6 +41,8 @@ struct my_interface<forward_interface,T> : virtual public any_store<T>,
     // these methods must implement those defined for my_interface<abstract_interface,void>
     virtual int add( int i)                   { return this->val->add(i);        }
     virtual int add( double d, std::string s) { return this->val->add( d, s);    }
+
+
     virtual std::ostream& operator<<( std::ostream& os )const { return this->val->operator<<(os); }
     virtual my_interface<abstract_interface>& operator+=( int x ) { *(this->val) +=(x); return *this; }
     virtual int operator()( int x )           { return this->val->operator()(x); }
