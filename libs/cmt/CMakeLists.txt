@@ -27,5 +27,5 @@ SETUP_LIBRARY( mace_cmt SOURCES ${sources}
                              LIBRARIES  ${libraries}
                              LIBRARY_TYPE STATIC )
 
-install( DIRECTORY include/boost/cmt DESTINATION include/boost )
-add_subdirectory( examples )
+install( DIRECTORY include/mace/cmt DESTINATION include/mace )
+#add_subdirectory( examples )

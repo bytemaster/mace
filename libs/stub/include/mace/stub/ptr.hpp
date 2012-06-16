@@ -29,6 +29,9 @@ namespace mace { namespace stub {
       ptr( ptr&& m ) 
       :m_vtable( std::move(m.m_vtable) ),m_ptr( std::move(m.m_ptr) ){}
 
+      ptr( const ptr& m ) 
+      :m_vtable( m.m_vtable),m_ptr( m.m_ptr ){}
+
       operator bool()const  { return m_vtable; }
       bool operator!()const { return !m_vtable; }
 

@@ -6,7 +6,7 @@ SET( libraries
     mace_cmt
     boost_context 
     ${pthread_library}
-    jemalloc
+    ${jemalloc_library}
     ${rt_library}
     ${Boost_THREAD_LIBRARY} 
     ${Boost_CHRONO_LIBRARY} 

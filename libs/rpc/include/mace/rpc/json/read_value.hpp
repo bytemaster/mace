@@ -62,6 +62,12 @@ class error_collector : public boost::exception {
     :m_errors(std::move(e.m_errors)){ 
       memcpy((char*)m_eclass,(char*)e.m_eclass, sizeof(m_eclass) );
     }
+    /*
+    error_collector( const error_collector&& e )
+    :m_errors(e.m_errors){
+      memcpy((char*)m_eclass,(char*)e.m_eclass, sizeof(m_eclass) );
+    }
+    */
     ~error_collector() throw() {
       try {
         m_errors.clear();
@@ -114,7 +120,7 @@ class error_collector : public boost::exception {
     void post_error( int32_t ec, std::string msg, char* s = 0, char* e = 0 ) {
       m_errors.push_back( parse_error( ec, std::move(msg), s, e ) ); 
       if( ec & m_eclass[throw_error_t] ) {
-        throw *this;
+        throw std::move(*this);
       }
     }
     const std::vector<parse_error>& get_errors()const {

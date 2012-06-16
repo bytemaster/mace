@@ -31,7 +31,7 @@ SET( sources
 #        src/http/server.cpp
              )
 
-install( DIRECTORY include/boost/rpc DESTINATION include/boost )
+install( DIRECTORY include/mace/rpc DESTINATION include/mace )
 
 SETUP_LIBRARY( mace_rpc SOURCES ${sources}
                          LIBRARIES  ${libraries}

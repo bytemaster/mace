@@ -53,8 +53,7 @@ namespace mace { namespace rpc {
           shared_session_creator( const std::shared_ptr<SessionType>& ss ):shared_session(ss){}
 
           virtual boost::any init_connection( const typename ConnectionType::ptr& con ) {
-            mace::stub::ptr<InterfaceType> session;
-            session = shared_session;
+            mace::stub::ptr<InterfaceType> session(shared_session);
             mace::stub::visit( session, typename ConnectionType::template add_interface_visitor<InterfaceType>( *con, session ) );
             return session;
           }
