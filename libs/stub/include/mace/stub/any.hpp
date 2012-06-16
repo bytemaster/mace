@@ -4,6 +4,7 @@
 #include <string.h>
 #include <iostream>
 #include <assert.h>
+#include <typeinfo>
 
 namespace mace { namespace stub {
 
@@ -19,7 +20,7 @@ namespace mace { namespace stub {
     template<template<interface_kind,typename> class Interface>
     class abstract_holder : virtual public Interface<abstract_interface,void> {
       public:
-        virtual abstract_holder*  clone_holder_helper(char*) = 0;
+        virtual abstract_holder*  clone_holder_helper(char*)const = 0;
         virtual abstract_holder*  move_holder_helper(char*) = 0;
     };
     
@@ -31,14 +32,14 @@ namespace mace { namespace stub {
         :Interface<forward_interface,T>::virtual_storage_type(std::forward<V>(v)),
          Interface<forward_interface,T>( ){}
 
-        ~holder() {}
-
         holder( const holder& v ) 
-        :Interface<forward_interface,T>::virtual_storage_type(v),
+        :Interface<forward_interface,T>::virtual_storage_type( static_cast<const typename Interface<forward_interface,T>::virtual_storage_type&>(v) ),
          Interface<forward_interface,T>(v) {}
+
         holder( typename Interface<forward_interface,T>::virtual_storage_type&& v )
         :Interface<forward_interface,T>::virtual_storage_type(std::move(v)),
          Interface<forward_interface,T>() {}
+
         holder( holder& v ) 
         :Interface<forward_interface,T>::virtual_storage_type(v.val) {}
         holder(){}
@@ -46,8 +47,8 @@ namespace mace { namespace stub {
       private:
         template<template<interface_kind,typename> class I>
         friend class any;
-        abstract_holder<Interface>* clone_holder_helper( char* p ){ return new (p) holder(*this); }
-        abstract_holder<Interface>* move_holder_helper( char* p ) { return new (p) holder(std::move(this->val)); }
+        abstract_holder<Interface>* clone_holder_helper( char* p )const { return new (p) holder(*this); }
+        abstract_holder<Interface>* move_holder_helper( char* p )       { return new (p) holder(std::move(this->val)); }
     };
 
     // store by value on the heap
@@ -216,6 +217,15 @@ namespace mace { namespace stub {
 
     any_store():val(T()){}
 
+    template<typename Type, typename AnyType>
+    friend Type& any_cast( AnyType& at );
+    template<typename Type, typename AnyType>
+    friend Type* any_cast( AnyType* at );
+
+    virtual const std::type_info&  __get_type_id()const  { return typeid(T); } 
+    virtual const void* const      __get_void_ptr()const { return &*val;     }
+    virtual void*                  __get_void_ptr()      { return &*val;     }
+
     // normalizes calling convention to pointer semantics
     // determines where to store the data
     detail::any_store<T> val;
@@ -237,7 +247,6 @@ namespace mace { namespace stub {
       typedef detail::abstract_holder<Interface> abstract_holder;
 
     public:
-
       template<typename T>
       any( T&& v )
       :any_store<any*>( std::forward<T>(v) ){}
@@ -271,6 +280,22 @@ namespace mace { namespace stub {
     private: 
       any(); // not implemented, should not be used.
   };
+
+  template<typename T, typename AnyType>
+  T& any_cast( AnyType& at ) {
+     if( at.__get_type_id()  == typeid(T) ) {
+       return *static_cast<T*>( at.___void_ptr() );
+     }
+     throw std::bad_cast();
+  }
+  template<typename T, typename AnyType>
+  T* any_cast( AnyType* at ) {
+     if( at && at->__get_type_id()  == typeid(T) ) {
+       return *static_cast<T*>( at.___void_ptr() );
+     }
+     return 0;
+  }
+  
 
   template<template<interface_kind,typename> class Interface>
   std::ostream& operator<<( std::ostream& os, const any<Interface>& a ) {

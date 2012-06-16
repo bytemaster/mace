@@ -9,14 +9,14 @@ using namespace mace::stub;
 template<interface_kind InterfaceKind=forward_interface, typename T=void>
 struct  sub_inter{
     virtual ~sub_inter() {}
-    virtual void sub( int ) = 0;
+    virtual int sub( int ) = 0;
 };
 
 // T could be a reference or pointer, any_store handles those cases...
 template<typename T>
 struct sub_inter<forward_interface,T> : virtual public any_store<T>,
                                         virtual public sub_inter<abstract_interface> {
-    virtual void sub( int i) { return this->val->sub(i);        }
+    virtual int sub( int i) { return this->val->sub(i);        }
 };
 
 // this interface is specialized below
@@ -44,9 +44,6 @@ struct my_interface<forward_interface,T> : virtual public any_store<T>,
     virtual my_interface<abstract_interface>& operator+=( int x ) { *(this->val) +=(x); return *this; }
     virtual int operator()( int x )           { return this->val->operator()(x); }
 };
-
-
-
 
 
 static int c = 0;
