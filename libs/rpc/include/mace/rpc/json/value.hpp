@@ -33,6 +33,15 @@ namespace mace { namespace rpc { namespace json {
        value( const array& a );
        value( const object& a );
        value( double v );
+       value( float v );
+       value( int8_t v );
+       value( int16_t v );
+       value( int32_t v );
+       value( int64_t v );
+       value( uint8_t v );
+       value( uint16_t v );
+       value( uint32_t v );
+       value( uint64_t v );
        value( bool v );
 
        operator int()const;

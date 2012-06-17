@@ -476,6 +476,7 @@ void set_key( char* name, char* start, char* end, void* data ) {
   d.container[inplace_unescape_string(name)] = std::move(o);
   */
 }
+/*
 template<typename Filter, typename In, typename Out>
 void push_back( char* start, char* end, void* data ) {
   callback_data<Container,Filter>& d = *((callback_data<Container,Filter>*)data);
@@ -489,6 +490,7 @@ void push_back( char* start, char* end, void* data ) {
   }
   d.container.push_back(std::move(o));
 }
+*/
 
 
 template<typename Filter>

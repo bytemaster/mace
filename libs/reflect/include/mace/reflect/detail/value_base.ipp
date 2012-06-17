@@ -98,6 +98,10 @@ namespace mace { namespace reflect {
       if( v ) return *v;
       BOOST_THROW_EXCEPTION( bad_value_cast() );
     }
+    inline std::string  value_base::type_name()const {
+      BOOST_ASSERT( !"Not Implemented" );
+      return std::string();
+    }
 
 
       template<typename P1>

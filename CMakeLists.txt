@@ -17,7 +17,6 @@ FIND_PACKAGE(Boost COMPONENTS thread date_time system filesystem program_options
 
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
 
 INCLUDE( SetupTargetMacros )

@@ -224,6 +224,15 @@ value::value():val(null_t()){}
 value::value( const value& c ):val(c.val){}
 value::value( const std::string& v ):val( v ){}
 value::value( double v ):val( v ){}
+value::value( float v ):val( (double)v ){}
+value::value( int8_t v ):val( (double)v ){}
+value::value( int16_t v ):val( (double)v ){}
+value::value( int32_t v ):val( (double)v ){}
+value::value( int64_t v ):val( (double)v ){}
+value::value( uint8_t v ):val( (double)v ){}
+value::value( uint16_t v ):val( (double)v ){}
+value::value( uint32_t v ):val( (double)v ){}
+value::value( uint64_t v ):val( (double)v ){}
 value::value( bool v ):val( v ){}
 value::value( const object& v ):val( v ){}
 value::value( const array& v ):val( v ){}

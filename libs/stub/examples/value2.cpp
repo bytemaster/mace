@@ -64,9 +64,9 @@ template<typename T>
 struct my_interface<T,true> : public T, virtual public my_interface<>{
     template<typename... Args>
     my_interface(Args&& ...args):T( std::forward<Args>(args)... ){}
-    virtual int add( int i)                 { return T::add(i);     }
+    virtual int add( int i)                   { return T::add(i);     }
     virtual int add( double d, std::string s) { return T::add( d, s); }
-    virtual int sub( int i)                 { return T::sub( i );   }
+    virtual int sub( int i)                   { return T::sub( i );   }
 };
 
 template<>
