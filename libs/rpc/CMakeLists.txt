@@ -1,10 +1,11 @@
+include_directories( include )
 include_directories( ../json/include )
 include_directories( ../cmt/include )
 include_directories( ../stub/include )
 include_directories( ../reflect/include )
 include_directories( ../context/include )
 include_directories( ../atomic/include )
-include_directories( include )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 #include_directories( ../network/include )
 
 IF( ENABLE_EXAMPLES MATCHES ON )
@@ -15,7 +16,7 @@ SET( libraries  mace_cmt )
 SET( sources 
         src/connection_base.cpp
         src/json/json_io.cpp
-        src/json/value.cpp
+        src/value.cpp
 
 #        src/json/connection.cpp
 #        src/json/tcp_connection.cpp
