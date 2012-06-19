@@ -1,7 +1,9 @@
 #define BOOST_TEST_MODULE MACE_RPC_VALUE
 #include <boost/test/unit_test.hpp>
 #include <mace/rpc/value.hpp>
+#include <mace/rpc/value_io.hpp>
 #include <boost/fusion/include/make_vector.hpp>
+#include <mace/rpc/json/json_io.hpp>
 
 using namespace mace::rpc;
 
@@ -74,20 +76,20 @@ BOOST_AUTO_TEST_CASE( value_vector ) {
   BOOST_REQUIRE( value_cast<int>(v[2]) == 3 );
 }
 BOOST_AUTO_TEST_CASE( value_struct ) {
-  value v = test_sub();
+  test_sub ts;
+  ts.sub.a = "__AA";
+  value v = ts;
   BOOST_REQUIRE( v.type() == std::string("object" ) );
   BOOST_REQUIRE( value_cast<std::string>(v["d"]) == "ddd" );
-  BOOST_REQUIRE( value_cast<std::string>(v["sub"]["a"]) == "aaa" );
-  BOOST_REQUIRE( value_cast<std::string>(v["sub"]["a"]) == "aaa" );
+  BOOST_REQUIRE( value_cast<std::string>(v["sub"]["a"]) == "__AA" );
 
   test_s o;
   unpack( v["sub"], o );
-  BOOST_REQUIRE( o.a == "aaa" );
+  BOOST_REQUIRE( o.a == "__AA" );
   test_sub s;
   unpack( v, s );
-  BOOST_REQUIRE( s.sub.a == "aaa" );
-  BOOST_REQUIRE( value_cast<test_s>(v["sub"]).a == "aaa" );
-  BOOST_REQUIRE( value_cast<test_s>(v).a == "aaa" );
+  BOOST_REQUIRE( s.sub.a == "__AA" );
+  BOOST_REQUIRE( value_cast<test_s>(v["sub"]).a == "__AA" );
 }
 
 BOOST_AUTO_TEST_CASE( value_seq ) {
@@ -106,4 +108,20 @@ BOOST_AUTO_TEST_CASE( value_seq ) {
   BOOST_REQUIRE( boost::fusion::at_c<0>(out) == boost::fusion::at_c<0>(f)  );
   BOOST_REQUIRE( boost::fusion::at_c<1>(out) == boost::fusion::at_c<1>(f)  );
   BOOST_REQUIRE( boost::fusion::at_c<2>(out) == boost::fusion::at_c<2>(f)  );
+}
+
+BOOST_AUTO_TEST_CASE( value_from_json ) {
+  test_sub s;
+  s.d = "world";
+  s.sub.a = "moo";
+  s.sub.b = 44;
+  s.sub.c = 55.5;
+  auto js = mace::rpc::json::json_io::pack(s);
+  json::error_collector ec;
+  value v = json::to_value(std::move(js),ec);
+  auto out = value_cast<test_sub>(v);
+  BOOST_REQUIRE(out.d == s.d);
+  BOOST_REQUIRE(out.sub.a == s.sub.a);
+  BOOST_REQUIRE(out.sub.b == s.sub.b);
+  BOOST_REQUIRE(out.sub.c == s.sub.c);
 }

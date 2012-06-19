@@ -394,6 +394,17 @@ namespace mace { namespace rpc { namespace json {
   mace::rpc::value to_value( char* start, char* end, error_collector& ec );
 
   struct json_io {
+    template<typename T>
+    static std::vector<char> pack( const T& v ) {
+      default_filter f;
+      std::stringstream ss;
+      to_json( v, ss, f );
+      std::string s = ss.str();
+      std::vector<char> rv(s.size());
+      if( s.size() )
+        memcpy(  &rv.front(), s.c_str(), s.size());
+      return rv;
+    }
     template<typename T, typename Filter>
     static std::vector<char> pack( Filter& f, const T& v ) {
       std::stringstream ss;

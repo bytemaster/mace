@@ -40,8 +40,15 @@ namespace mace { namespace rpc {
         value( std::string&& );
         value( std::string& );
         value( const std::string& );
+
         value( object&& o );
+        value( const object& o );
+        value( object& o );
+
         value( array&& a );
+        value( array& a );
+        value( const array& a );
+
         ~value();
 
         value& operator=( value&& v );

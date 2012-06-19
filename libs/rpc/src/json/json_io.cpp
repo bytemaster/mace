@@ -101,8 +101,8 @@ namespace mace { namespace rpc { namespace json {
    *  @param s a null terminated string that contains one or more escape chars
    */
   char* inplace_unescape_string( char* s ) {
+    while( *s == '"' ) ++s;
     char* out = s;
-    while( *s == '\"' ) ++s;
 
     for( auto i = s; *i != '\0'; ++i ) {
       if( *i != '\\' ) {
@@ -347,6 +347,9 @@ char* read_key_val( object& obj, bool sc, char* in, char* end, mace::rpc::json::
   if( *name != '"' ) {
     temp_set ntemp(name_end,'\0');
     wlog( "unquoted name '%1%'", name );
+  } else {
+    temp_set ntemp(name_end,'\0');
+    name = inplace_unescape_string(name);
   }
 
   char* col_end = 0;
@@ -391,7 +394,8 @@ char* read_key_val( object& obj, bool sc, char* in, char* end, mace::rpc::json::
   }
   temp_set ntemp(name_end,'\0');
   temp_set vtemp(val_end,'\0');
-  obj.fields.push_back( key_val( std::string( name, name_end ), to_value( val, val_end, ec ) ) );
+  //slog( "name: '%1%'", std::string(name,name_end) );
+  obj.fields.push_back( key_val( name, to_value( val, val_end, ec ) ) );
   return val_end;
 }
 
@@ -424,6 +428,7 @@ mace::rpc::value to_value( std::vector<char>&& v, error_collector& ec  ) {
  *      any errors that occur while parsing the string.
  */
 mace::rpc::value to_value( char* start, char* end, error_collector& ec ) {
+  //slog( "to_value '%1%'", std::string(start,end) );
   if( start == end ) return value();
 
   char* ve = 0;
@@ -437,7 +442,8 @@ mace::rpc::value to_value( char* start, char* end, error_collector& ec ) {
     case '{': {
       object o;
       read_key_vals( o, s+1, ve -1, ec );
-      return o;
+      value v = std::move(o);
+      return v;
     }
     case '0':
     case '1':
@@ -488,6 +494,7 @@ mace::rpc::value to_value( char* start, char* end, error_collector& ec ) {
     }
 
     default:
+      wlog( "return unable to parse... return as string" );
       return value( std::string( s, ve) );
   }
 }

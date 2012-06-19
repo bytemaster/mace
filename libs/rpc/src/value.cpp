@@ -117,6 +117,18 @@ value::value( object&& o ){
 value::value( array&& a ){
   new (holder) detail::value_holder_impl<array>(std::move(a));
 }
+value::value( const array& a ){
+  new (holder) detail::value_holder_impl<array>(a);
+}
+value::value( array& a ){
+  new (holder) detail::value_holder_impl<array>(a);
+}
+value::value( const object& a ){
+  new (holder) detail::value_holder_impl<object>(a);
+}
+value::value( object& a ){
+  new (holder) detail::value_holder_impl<object>(a);
+}
 
 value& value::operator=( value&& v ){
   char tmp[sizeof(holder)];
