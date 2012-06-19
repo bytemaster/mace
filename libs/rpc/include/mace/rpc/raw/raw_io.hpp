@@ -205,7 +205,6 @@ namespace mace { namespace rpc { namespace raw {
         template<typename T, T p>
         void operator()( const char* name )const {
            apply_unpack_filter( f, s, c.*p );
-           //raw::unpack( f, s, c.*p );
         }
         Filter&             f;
         Class&              c;
@@ -522,7 +521,6 @@ namespace mace { namespace rpc { namespace raw {
       raw::unpack( f, ds, tmp );
       return tmp;
     }
-
   };
 
 } } // mace::rpc

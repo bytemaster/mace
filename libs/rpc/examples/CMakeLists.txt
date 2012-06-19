@@ -1,5 +1,4 @@
 SET( libraries 
-    #/usr/local/lib/tcmalloc/libtcmalloc.a
     mace_cmt
     mace_rpc
     boost_context 

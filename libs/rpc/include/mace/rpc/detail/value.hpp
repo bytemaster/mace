@@ -59,21 +59,21 @@ namespace mace { namespace rpc {
     };
 
     struct value_holder {
-      virtual ~value_holder(){}
-      virtual const char* type()const             { return "null"; }
-      virtual void visit( const_visitor&& v )const{ v();           }
-      virtual void visit( visitor&& v )           { v();           }
+      virtual ~value_holder();
+      virtual const char* type()const;
+      virtual void visit( const_visitor&& v )const;
+      virtual void visit( visitor&& v );
 
-      virtual void clear()                             {}
-      virtual size_t size()const                       { return 0; }
-      virtual void resize( size_t )                    { throw std::runtime_error( std::string("value not an array") ); }
-      virtual void reserve( size_t )                   { throw std::runtime_error( std::string("value not an array or object") ); }
-      virtual value& at( size_t )                      { throw std::runtime_error( std::string("value not an array") ); }
-      virtual const value& at( size_t )const           { throw std::runtime_error( std::string("value not an array") ); }
-      virtual void push_back( value&& v )              { throw std::runtime_error( std::string("value not an array") ); }
+      virtual void clear();
+      virtual size_t size()const;
+      virtual void resize( size_t );
+      virtual void reserve( size_t );
+      virtual value& at( size_t );
+      virtual const value& at( size_t )const;
+      virtual void push_back( value&& v );
 
-      virtual value_holder* move_helper( char* c )     { return new(c) value_holder(); }
-      virtual value_holder* copy_helper( char* c )const{ return new(c) value_holder(); }
+      virtual value_holder* move_helper( char* c );
+      virtual value_holder* copy_helper( char* c )const;
     };
 
     // fundamental values...
@@ -126,7 +126,6 @@ namespace mace { namespace rpc {
       virtual void clear();
       virtual size_t size()const;
 
-      // TODO: pack object to val
       template<typename V>
       value_holder_impl( V&& v ):val( std::forward<V>(v) ){}
 
@@ -147,7 +146,6 @@ namespace mace { namespace rpc {
       virtual const value& at( size_t i)const;
       virtual void push_back( value&& v );
 
-      // TODO: pack array to val
       template<typename V>
       value_holder_impl( V&& v ):val( std::forward<V>(v) ){}
 

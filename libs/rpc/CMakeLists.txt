@@ -11,6 +11,9 @@ INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 IF( ENABLE_EXAMPLES MATCHES ON )
 add_subdirectory( examples )
 ENDIF()
+IF( ENABLE_TESTS MATCHES ON )
+add_subdirectory( tests )
+ENDIF()
 
 SET( libraries  mace_cmt )
 SET( sources 

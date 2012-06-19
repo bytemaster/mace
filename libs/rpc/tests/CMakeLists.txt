@@ -1,0 +1,12 @@
+SET( libraries 
+    mace_rpc
+    boost_context 
+    ${pthread_library}
+    ${Boost_THREAD_LIBRARY} 
+    ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} 
+    ${Boost_ASIO_LIBRARY} 
+    ${Boost_SYSTEM_LIBRARY} 
+    ${Boost_SIGNALS_LIBRARY})
+
+add_executable( value_test value_test.cpp )
+target_link_libraries( value_test ${libraries} )

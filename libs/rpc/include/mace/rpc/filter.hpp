@@ -9,15 +9,23 @@ namespace mace { namespace rpc {
      *  Implements the bare minimum Filter concept.
      */
     struct default_filter {
+      /**
+       *  Given input T convert and assign to output v.
+       */
       template<typename T>
       void operator()( const T& r, T& v )const  { v = r; }
 
+      /**
+       *  @return true if filtered for a particular type.
+       */
       template<typename T>
       const bool is_filtered(const T*)const { return false; }
 
+      /**
+       *  Pack filter, given input type return output type.
+       */
       template<typename T>
       inline const T& operator()( const T& v )const { return v; }
-
 
       template<typename T>
       inline T operator()( T&& v )const { return v; }

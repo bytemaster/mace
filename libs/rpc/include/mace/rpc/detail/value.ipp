@@ -1,94 +1,10 @@
 #include <mace/rpc/value.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/fusion/support/is_sequence.hpp>
 #include <boost/lexical_cast.hpp>
+#include <mace/rpc/value_io.hpp>
 
 namespace mace { namespace rpc {
-
-  namespace detail {
-      void value_holder_impl<array>::resize( size_t s )               { val.fields.resize(s);  }
-      void value_holder_impl<array>::reserve( size_t s )              { val.fields.reserve(s); }
-      value& value_holder_impl<array>::at( size_t i)                  { return val.fields[i]; }
-      const value& value_holder_impl<array>::at( size_t i)const       { return val.fields[i]; }
-      value_holder* value_holder_impl<array>::move_helper( char* c ){ return new(c) value_holder_impl( std::move(val) ); }
-      value_holder* value_holder_impl<array>::copy_helper( char* c )const{ return new(c) value_holder_impl(val);              }
-
-      void value_holder_impl<array>::clear()                        { val.fields.clear();        }
-      size_t value_holder_impl<array>::size()const                  { return val.fields.size();  }
-      void value_holder_impl<array>::visit( const_visitor&& v )const { v(val); }
-      void value_holder_impl<array>::visit( visitor&& v )            { v(val); }
-      void value_holder_impl<array>::push_back( value&& v )          { val.fields.push_back( std::move(v) ); }
-
-
-      void value_holder_impl<object>::visit( const_visitor&& v )const { v(val); }
-      void value_holder_impl<object>::visit( visitor&& v )            { v(val); }
-      value_holder* value_holder_impl<object>::move_helper( char* c ) { return new(c) value_holder_impl( std::move(val) ); }
-      value_holder* value_holder_impl<object>::copy_helper( char* c )const { return new(c) value_holder_impl(val);              }
-      void value_holder_impl<object>::reserve( size_t s )             { val.fields.reserve(s); }
-
-      void value_holder_impl<object>::clear()                         { val = object(); }
-      size_t value_holder_impl<object>::size()const                   { return val.fields.size();  }
-
-
-    template<typename T, bool IsReflected=false, bool IsSeq=false>
-    struct deduce_holder {
-      typedef value_holder_impl<T> type;
-    };
-
-    template<>
-    struct deduce_holder< std::string> {
-      typedef value_holder_impl<std::string> type;
-    };
-
-    template<>
-    struct deduce_holder< array > {
-      typedef value_holder_impl<array> type;
-    };
-
-    template<>
-    struct deduce_holder< object > {
-      typedef value_holder_impl<object> type;
-    };
-
-    template<typename T>
-    struct deduce_holder< std::vector<T> > {
-      typedef value_holder_impl<array> type;
-    };
-
-    template<typename T>
-    struct deduce_holder< std::list<T> > {
-      typedef value_holder_impl<array> type;
-    };
-
-    template<typename T>
-    struct deduce_holder< std::set<T> > {
-      typedef value_holder_impl<array> type;
-    };
-
-    template<typename K, typename V>
-    struct deduce_holder< std::pair<K,V> > {
-      typedef value_holder_impl<array> type;
-    };
-
-    template<typename K, typename V>
-    struct deduce_holder< std::map<K,V> > {
-      typedef value_holder_impl<array> type;
-    };
-
-    template<typename V>
-    struct deduce_holder< std::map<std::string,V> > {
-      typedef value_holder_impl<object> type;
-    };
-
-    template<typename Sequence>
-    struct deduce_holder<Sequence,false,true> {
-      typedef value_holder_impl<array> type;
-    };
-
-    template<typename Object>
-    struct deduce_holder<Object,true,false> {
-      typedef value_holder_impl<object> type;
-    };
-  } // namespace detail
 
     /**
      *  Converts T to a value using reflection if
@@ -96,10 +12,8 @@ namespace mace { namespace rpc {
      */
     template<typename T>
     value::value( T&& v ) {
-      typedef typename detail::deduce_holder<T,
-                mace::reflect::reflector<T>::is_defined::value,
-                boost::fusion::traits::is_sequence<T>::value>::type  holder_type;
-      holder_type* ht = new (holder) holder_type( std::forward<T>(v) );
+      new (holder) detail::value_holder(); 
+      mace::rpc::pack( *this, std::forward<T>(v) );
     }
 
     template<typename T>
@@ -205,6 +119,46 @@ namespace mace { namespace rpc {
       object& m_out;
     };
 
+    namespace detail {
+        template<bool IsSeq=false>
+        struct cast_if_seq {
+          template<typename T>
+          static T cast( detail::value_holder* h, const value& v ) {
+             T out;
+             h->visit(cast_visitor<T>(out));
+             return out;
+          }
+        };
+        template<>
+        struct cast_if_seq<true> {
+          template<typename T>
+          static T cast( detail::value_holder* h, const value& v ) {
+             return unpack<T>(v);
+          }
+        };
+
+        template<typename IsReflected=boost::false_type>
+        struct cast_if_reflected {
+          template<typename T>
+          static T cast( detail::value_holder* h, const value& v ) {
+             return detail::cast_if_seq<boost::fusion::traits::is_sequence<T>::value>::template cast<T>(h,v);
+             /*
+             T out;
+             h->visit(cast_visitor<T>(out));
+             return out;
+             */
+          }
+        };
+
+        template<>
+        struct cast_if_reflected<boost::true_type> {
+          template<typename T>
+          static T cast( detail::value_holder* h, const value& v ) {
+             return unpack<T>(v);
+          }
+        };
+    };
+
 
     /**
      *  Convert from value v to T
@@ -225,9 +179,8 @@ namespace mace { namespace rpc {
      */
     template<typename T>
     T value_cast( const value& v ) {
-      T out;
-      detail::value_holder* vh = ((detail::value_holder*)&v.holder[0])->visit(cast_visitor<T>(out));
-      return out;
+      auto h = ((detail::value_holder*)&v.holder[0]);
+      return detail::cast_if_reflected<typename mace::reflect::reflector<T>::is_defined>::template cast<T>(h,v);
     }
 
 

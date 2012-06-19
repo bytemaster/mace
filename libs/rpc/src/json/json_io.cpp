@@ -1,6 +1,6 @@
 #include <string>
 #include <mace/cmt/log/log.hpp>
-#include <mace/rpc/json/read_value.hpp>
+#include <mace/rpc/json/json_io.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace mace { namespace rpc { namespace json {
@@ -101,8 +101,9 @@ namespace mace { namespace rpc { namespace json {
    *  @param s a null terminated string that contains one or more escape chars
    */
   char* inplace_unescape_string( char* s ) {
-    while( *s == '\"' ) ++s;
     char* out = s;
+    while( *s == '\"' ) ++s;
+
     for( auto i = s; *i != '\0'; ++i ) {
       if( *i != '\\' ) {
         if( *i != '"' ) {
@@ -139,23 +140,6 @@ namespace mace { namespace rpc { namespace json {
     *out = '\0';
     return s;
   }
-
-
-
-
-
-  /**
-   *  JSON Parsing Strategy 
-   *  1) don't 'expand' a json value unless we need it.
-   *  2) don't copy strings unless necessary
-   * 
-   *  Giving any stream, read 'one value' as defined by matching "", int, double, true, false,  
-   *  matching [] or matching {}
-   *
-   *  Return a string and a value type.
-   */
-
-
 
 /**
  *   Ignores leading white space.
@@ -282,7 +266,7 @@ struct temp_set {
  * A,B,C
  * Warn on extra ',' or missing ','
  */
-void  read_values( char* in, char* end, mace::rpc::json::error_collector& ec, void (*on_value)(char*,char*,void*), void* self ) {
+void  read_values( array& a, char* in, char* end, mace::rpc::json::error_collector& ec ) {
   char* ve = 0;
   char* v = mace::rpc::json::read_value( in, end, ve );
   while( *v == ',' ) {
@@ -291,7 +275,7 @@ void  read_values( char* in, char* end, mace::rpc::json::error_collector& ec, vo
   }
   if( v == ve ) return; // no values
 
-  { temp_set temp(ve,'\0'); on_value( v, ve, self ); }
+  { temp_set temp(ve,'\0'); a.fields.push_back( to_value( v, ve, ec ) ); }
 
   char* c;
   char* ce = 0;
@@ -306,7 +290,7 @@ void  read_values( char* in, char* end, mace::rpc::json::error_collector& ec, vo
     if( *c != ',' ) // we got a value when expecting ','
     {
        wlog( "missing ," );
-       temp_set temp(ce,'\0'); on_value( c, ce, self );
+       temp_set temp(ce,'\0'); a.fields.push_back( to_value(c, ce, ec) );
        ve = ce;
        continue; // start back at start
     }
@@ -323,7 +307,7 @@ void  read_values( char* in, char* end, mace::rpc::json::error_collector& ec, vo
       wlog( "trailing comma at c->ce" );
     } else { // got value
       temp_set temp(ve,'\0'); 
-      on_value( v, ve, self ); 
+      a.fields.push_back( to_value( v, ve, ec) );
     }
   } while( ve < end );// expect comma + value | ''
 }
@@ -333,7 +317,7 @@ void  read_values( char* in, char* end, mace::rpc::json::error_collector& ec, vo
  *  Reads an optional ',' followed by key : value, returning the next input position
  *  @param sc - start with ','
  */
-char* read_key_val( bool sc, char* in, char* end, mace::rpc::json::error_collector& ec, void(*on_key)(char*,char*,char*,void*), void* self ) {
+char* read_key_val( object& obj, bool sc, char* in, char* end, mace::rpc::json::error_collector& ec ) {
   char* name_end = 0;
   char* name = in;
   do {
@@ -407,150 +391,105 @@ char* read_key_val( bool sc, char* in, char* end, mace::rpc::json::error_collect
   }
   temp_set ntemp(name_end,'\0');
   temp_set vtemp(val_end,'\0');
-  on_key( name, val, val_end, self );
+  obj.fields.push_back( key_val( std::string( name, name_end ), to_value( val, val_end, ec ) ) );
   return val_end;
 }
 
 // first_key =::  '' | "name" : VALUE  *list_key
 // list_key       '' | ',' "name" : VALUE
-void read_key_vals( char* in, char* end, mace::rpc::json::error_collector& ec, void(*on_key)(char*,char*,char*,void*), void* s) {
+void read_key_vals( object& obj, char* in, char* end, mace::rpc::json::error_collector& ec ) {
   bool ex_c = false;
   char* kv_end = in;
   do {
     //slog( "%1% bytes to read", (end-kv_end) );
-    kv_end = read_key_val( ex_c, kv_end, end, ec, on_key, s );
+    kv_end = read_key_val( obj, ex_c, kv_end, end, ec );
     ex_c = true;
   } while( kv_end < end );
 }
 
 
 
-
-template<typename T>
-void real_from_json( T& v, char* itr, char* end, error_collector& e ) {
-  char* i = itr;
-  char* ie = end;
-  if( *itr == '"' ) { ++i; --ie; --ie;
-    wlog( "quoted string to number '%1%'", std::string(itr,end) );
-  }
-  temp_set move_end(ie,'\0');
-  auto bv = boost::lexical_cast<double>(i);
-  if( bv < -std::numeric_limits<T>::max() || 
-      bv > std::numeric_limits<T>::max() ) {
-    wlog( "Loss of presision" );
-  }
-  v = static_cast<T>(bv);
+/**
+ *  @brief adaptor for to_value( char*, char*, error_collector& )
+ */
+mace::rpc::value to_value( std::vector<char>&& v, error_collector& ec  ) {
+  if( v.size() == 0 ) return value();
+  return to_value( &v.front(), &v.front() + v.size(), ec );
 }
 
-template<typename T>
-void int_from_json( T& v, char* itr, char* end, error_collector& e ) {
-  char* i = itr;
-  char* ie = end;
-  if( *itr == '"' ) { ++i; --ie; --ie; 
-    slog( "'%1%'", std::string(i,ie) );
-    wlog( "quoted string to number" );
-  }
-  temp_set move_end(ie,'\0');
+/**
+ *  Returns a mace::rpc::value containing from the json string.
+ *
+ *  @param ec - determines how to respond to parse errors and logs
+ *      any errors that occur while parsing the string.
+ */
+mace::rpc::value to_value( char* start, char* end, error_collector& ec ) {
+  if( start == end ) return value();
 
-  // check to see if we have a float number
-  char* t = i;
-  while( t != ie ) { if( *t == '.' ) break; ++t; }
-
-  if( !std::is_signed<T>::value ) {
-    if( *i == '-' ) {  wlog( "signed value for unsigned field" ); }
-      if( t == ie ) {
-        uint64_t bv = boost::lexical_cast<uint64_t>(i);
-        if( bv < std::numeric_limits<T>::min() || 
-            bv > std::numeric_limits<T>::max() ) {
-          wlog( "truncating value" );
-        }
-        v = static_cast<T>(bv);
-      } else {
-        wlog( "Converting real to int" ); 
-        v =  static_cast<T>(boost::lexical_cast<double>(i));
-      }
-  } else {
-    if( t == ie ) {
-        int64_t bv = boost::lexical_cast<int64_t>(i);
-        if( bv < std::numeric_limits<T>::min() || 
-            bv > std::numeric_limits<T>::max() ) {
-          wlog( "truncating value" );
-        }
-        v = static_cast<T>(bv);
-    } else {
-        wlog( "Converting real to int" ); 
-        v =  static_cast<T>(boost::lexical_cast<double>(i));
+  char* ve = 0;
+  char* s = read_value( start, end, ve );
+  switch( s[0] ) {
+    case '[': {
+      array a;
+      read_values( a, s+1, ve -1, ec );
+      return a;
     }
+    case '{': {
+      object o;
+      read_key_vals( o, s+1, ve -1, ec );
+      return o;
+    }
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9': {
+      temp_set move_end(ve,'\0');
+      for( char* n = s+1; n != ve; ++n ) {
+        if( *n == '.' ) {
+          return boost::lexical_cast<double>(s);
+        }
+      }
+      return boost::lexical_cast<uint64_t>(s);
+    }
+    case '-': {
+      temp_set move_end(ve,'\0');
+      for( char* n = s+1; n != ve; ++n ) {
+        if( *n == '.' ) {
+          return boost::lexical_cast<double>(s);
+        }
+      }
+      return boost::lexical_cast<int64_t>(s);
+    }
+    case '.': {
+      temp_set move_end(ve,'\0');
+      return boost::lexical_cast<int64_t>(s);
+    }
+    case '\"': {
+      temp_set move_end(ve,'\0');
+      return inplace_unescape_string( s );  
+    }
+    case 'n': {
+      temp_set move_end(ve,'\0');
+      if( strcmp(s,"null" ) ) return value();
+    }
+    case 't': {
+      temp_set move_end(ve,'\0');
+      if( strcmp(s,"true" ) ) return true;
+    }
+    case 'f': {
+      temp_set move_end(ve,'\0');
+      if( strcmp(s,"false" ) ) return false;
+    }
+
+    default:
+      return value( std::string( s, ve) );
   }
 }
-
-void from_json( int32_t& v, char* itr, char* end, error_collector& e ) { 
-  int_from_json(v,itr,end,e);
-}
-void from_json( uint32_t& v, char* itr, char* end, error_collector& e ) { 
-  int_from_json(v,itr,end,e);
-}
-void from_json( int64_t& v, char* itr, char* end, error_collector& e ) { 
-  int_from_json(v,itr,end,e);
-}
-void from_json( uint64_t& v, char* itr, char* end, error_collector& e ) { 
-  int_from_json(v,itr,end,e);
-}
-void from_json( int16_t& v, char* itr, char* end, error_collector& e ) { 
-  int_from_json(v,itr,end,e);
-}
-void from_json( uint16_t& v, char* itr, char* end, error_collector& e ) { 
-  int_from_json(v,itr,end,e);
-}
-void from_json( int8_t& v, char* itr, char* end, error_collector& e ) { 
-  int_from_json(v,itr,end,e);
-}
-void from_json( uint8_t& v, char* itr, char* end, error_collector& e ) { 
-  int_from_json(v,itr,end,e);
-}
-void from_json( double& v, char* itr, char* end, error_collector& e ) { 
-  real_from_json(v,itr,end,e);
-}
-void from_json( float& v, char* itr, char* end, error_collector& e ) { 
-  real_from_json(v,itr,end,e);
-}
-void from_json( bool& v, char* itr, char* end, error_collector& e ) { 
-  char* i = itr;
-  char* se = end;
-  if( *itr == '"' ) { 
-    ++i;
-    --se;
-    wlog( "bool from string" );
-  }
-  temp_set move_end(se,'\0');
-
-  if( strcmp( i, "true" ) == 0 ){
-    v = true;
-  } else if( strcmp( i, "false" ) == 0 ) {
-    v = false;
-  } else {
-    wlog( "bool from number ?? " );
-    double b=0;
-    from_json(b,i,se,e);
-    v = (b != 0);
-  }
-}
-void from_json( std::string& v, char* itr, char* end, error_collector& e) {
-  // TODO: implace unescape
-  if( *itr == '"' ) { 
-    temp_set move_end(end,'\0');
-    v = inplace_unescape_string(itr);
-  } else {
-    wlog( "unescaped string! " );
-    v = std::string(itr,end);
-  }
-}
-
-
-
-
-
-
-
 
 } } }

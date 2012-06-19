@@ -25,6 +25,23 @@ namespace mace { namespace rpc {
         value( value&& m );
         value( const value& m );
         value( value& m );
+        value( char* c );
+        value( int8_t );
+        value( int16_t );
+        value( int32_t );
+        value( int64_t );
+        value( uint8_t );
+        value( uint16_t );
+        value( uint32_t );
+        value( uint64_t );
+        value( double );
+        value( float );
+        value( bool );
+        value( std::string&& );
+        value( std::string& );
+        value( const std::string& );
+        value( object&& o );
+        value( array&& a );
         ~value();
 
         value& operator=( value&& v );
@@ -53,21 +70,18 @@ namespace mace { namespace rpc {
         void         resize( size_t s );
         void         reserve( size_t s );
         void         push_back( value&& v );
-        value&       operator[]( uint32_t idx );
-        const value& operator[]( uint32_t idx )const;
+        value&       operator[]( int32_t idx );
+        const value& operator[]( int32_t idx )const;
 
         /** gets the stored type **/
         const char*  type()const;
 
+
+      private:
         /** throws exceptions on errors **/
         template<typename T>
         friend T value_cast( const value& v );
 
-      private:
-        /** gathers and reports errors according to policy 
-        template<typename T>
-        friend T value_cast( const value& v, cast_error& ce );
-        */
         char holder[sizeof(detail::value_holder_impl<object>)];
     };
 
