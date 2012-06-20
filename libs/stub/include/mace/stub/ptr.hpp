@@ -27,10 +27,10 @@ namespace mace { namespace stub {
       :m_vtable(std::make_shared<vtable_type>()) {}
 
       ptr( ptr&& m ) 
-      :m_vtable( std::move(m.m_vtable) ),m_ptr( std::move(m.m_ptr) ){}
+      :m_ptr( std::move(m.m_ptr) ),m_vtable( std::move(m.m_vtable) ){}
 
       ptr( const ptr& m ) 
-      :m_vtable( m.m_vtable),m_ptr( m.m_ptr ){}
+      :m_ptr( m.m_ptr ),m_vtable( m.m_vtable){}
 
       operator bool()const  { return m_vtable; }
       bool operator!()const { return !m_vtable; }
