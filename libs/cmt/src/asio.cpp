@@ -43,9 +43,9 @@ namespace mace { namespace cmt { namespace asio {
     boost::asio::io_service& default_io_service() {
         static boost::asio::io_service*      io = new boost::asio::io_service();
         static boost::asio::io_service::work the_work(*io);
-        static boost::thread                 io_t([=]{io->run();});
-    //    static boost::thread                 io_t2(boost::bind(&boost::asio::io_service::run, io));
-    //    static boost::thread                 io_t3(boost::bind(&boost::asio::io_service::run, io));
+        static boost::thread                 io_t([=]{ slog( "run ios!" ); io->run(); slog( "done run" ); });
+        static boost::thread                 io_t2([=]{ slog( "run ios!" ); io->run(); slog( "done run" ); });
+        static boost::thread                 io_t3([=]{ slog( "run ios!" ); io->run(); slog( "done run" ); });
         return *io;
     }
 

@@ -29,3 +29,4 @@ SETUP_LIBRARY( mace_cmt SOURCES ${sources}
 
 install( DIRECTORY include/mace/cmt DESTINATION include/mace )
 add_subdirectory( examples )
+add_subdirectory( tests )
