@@ -47,64 +47,45 @@
           template<typename T, typename VTableType>
           class set_visitor {
             public:
-              set_visitor( VTableType& vt, T& self, actor_base* ab )
-              :m_actor(ab),m_self(self),vtbl(vt){}
+              set_visitor( VTableType& vt, T& self, detail::actor_base* _a )
+              :m_self(self),vtbl(vt),a(_a){}
 
               template<typename MemberPtr, MemberPtr m>
               void operator()( const char* name )const {
                 typedef typename boost::function_types::result_type<MemberPtr>::type member_ref;
                 typedef typename boost::remove_reference<member_ref>::type member;
-                (vtbl.*m).set_delegate( &m_self, member::template get_member_ptr<T>(),m_actor );
+                (vtbl.*m).set_delegate( &m_self, member::template get_member_ptr<T>(), a );
               }
             private:
-              template<typename Member>
-              struct assign {
-                assign( T& _v, Member& _m, actor_base* ab ):v(_v),m(_m),a(ab){}
-
-                template<typename MemberPtr>
-                void operator=( const MemberPtr& p ) {
-                  m.set_delegate( &v, p, a );
-                }
-                private:
-                  actor_base*   a;
-                  T&            v;
-                  Member&       m;
-              };
-              actor_base*         m_actor;
-              T&                  m_self;
-              VTableType&         vtbl;
+              T&          m_self;
+              VTableType& vtbl;
+              detail::actor_base* a;
           };
+          
+          /**
+           *  This specialization is for the case of one stub::ptr<T> pointing to
+           *  another stub::ptr<Other> 
+           */
           template<typename Interface, typename Delegate, typename VTableType>
           class set_visitor<mace::stub::vtable<Interface,Delegate>, VTableType> {
             public:
               typedef mace::stub::vtable<Interface,Delegate> T;
 
-              set_visitor( VTableType& vt, T& self, actor_base* ab )
-              :m_actor(ab), m_self(self),vtbl(vt){}
+              set_visitor( VTableType& vt, T& self, detail::actor_base* _a )
+              :m_self(self),vtbl(vt),a(_a){}
 
-              template<typename M, M m>
+              template<typename MemberPtr, MemberPtr m> 
               void operator()( const char* name )const {
-                assign<M> a(m_self,vtbl.*m, m_actor);
-                M::template get_member_ptr<T>( a );
+                slog( "%1% set delegate", name );
+                typedef typename boost::function_types::result_type<MemberPtr>::type member_ref;
+                typedef typename boost::remove_reference<member_ref>::type member;
+                (vtbl.*m) = boost::bind( boost::ref( m_self.* member::template get_member_ptr<T>()), _1 );
+                (vtbl.*m).set_actor(a);
               }
             private:
-              template<typename Member>
-              struct assign {
-                assign( T& _v, Member& _m, actor_base* ab ):v(_v),m(_m),a(ab){}
-
-                template<typename MemberPtr>
-                void operator=( MemberPtr p ) {
-                    m.set_actor(a);
-                    m = boost::bind(std::ref(v.*p), _1 );
-                }
-                private:
-                 actor_base* a;
-                 T&          v;
-                 Member&     m;
-              };
-              actor_base*   m_actor;
-              T&            m_self;
-              VTableType&   vtbl;
+              T&    m_self;
+              VTableType& vtbl;
+              detail::actor_base* a;
           };
          
           #endif 
@@ -136,14 +117,12 @@
       };
 
       template<typename T, typename VTableType>
-      static void set_vtable( VTableType& vtable, T& value, detail::actor_base* ab ) {
-        mace::stub::vtable_reflector<typename VTableType::interface_type,typename VTableType::delegate_type>::visit( 
-                    detail::actor_interface::set_visitor<T,VTableType>(vtable,value,ab) );
+      static void set_vtable( VTableType& vtable, T& value, detail::actor_base* a ) {
+        mace::stub::vtable_reflector<typename VTableType::interface_type,actor_interface>::visit( detail::actor_interface::set_visitor<T,VTableType>(vtable,value,a) );
       }
       template<typename T, typename VTableType>
-      static void set_vtable( VTableType& vtable, const T& value, detail::actor_base* ab ) {
-        mace::stub::vtable_reflector<typename VTableType::interface_type, typename VTableType::delegate_type>::visit( 
-                    detail::actor_interface::set_visitor<T,VTableType>(vtable,value,ab) );
+      static void set_vtable( VTableType& vtable, const T& value, detail::actor_base* a ) {
+        mace::stub::vtable_reflector<typename VTableType::interface_type,actor_interface>::visit( detail::actor_interface::set_visitor<T,VTableType>(vtable,value,a) );
       }
     };
 

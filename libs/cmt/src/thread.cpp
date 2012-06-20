@@ -181,7 +181,7 @@ namespace mace { namespace cmt {
             * detect quit/cancel operations and throw an exception.
             */
            void check_fiber_exceptions() {
-              if( current->canceled ) {
+              if( current && current->canceled ) {
                 BOOST_THROW_EXCEPTION( error::task_canceled() );
               } else if( done )  {
                 BOOST_THROW_EXCEPTION( error::thread_quit() );

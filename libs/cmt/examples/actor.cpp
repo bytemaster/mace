@@ -37,6 +37,7 @@ int main( int argc, char** argv ) {
 
   //test(act);
   test(act2);
+  mace::cmt::usleep(100000);
 
   tt->quit();
   at->quit();

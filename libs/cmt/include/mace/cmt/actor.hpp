@@ -40,13 +40,13 @@ namespace mace { namespace cmt {
       :actor_base(t) {
         this->m_ptr.reset( new boost::any(v) );
         *(this->m_ptr) = v;
-        /// @todo fix this
-        //cmt::actor_interface::set_vtable( *this->m_vtable, 
-        //                  *boost::any_cast<mace::stub::ptr<OtherInterface,OtherDelegate>&>(this->m_ptr), this );
+        cmt::actor_interface::set_vtable( *this->m_vtable, 
+                                          *boost::any_cast<mace::stub::ptr<OtherInterface,OtherDelegate>&>(*this->m_ptr.get()), this );
       }
 
       actor( const actor& cpy )
-      :actor_base(cpy){ }
+      :mace::stub::ptr<InterfaceType,mace::cmt::actor_interface>(cpy),actor_base(cpy)
+      { }
   };
 
 } } // namespace mace::cmt
