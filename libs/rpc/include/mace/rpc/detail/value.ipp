@@ -25,7 +25,7 @@ namespace mace { namespace rpc {
     }
 
     template<typename T>
-    struct cast_visitor : detail::const_visitor {
+    struct cast_visitor : const_visitor {
       cast_visitor( T& out )
       :m_out(out){}
       virtual void operator()( const int8_t& v      ){ m_out = boost::numeric_cast<T>(v); }
@@ -48,7 +48,7 @@ namespace mace { namespace rpc {
     };
 
     template<>
-    struct cast_visitor<std::string> : detail::const_visitor {
+    struct cast_visitor<std::string> : const_visitor {
       cast_visitor( std::string& out )
       :m_out(out){}
       virtual void operator()( const int8_t& v      ){ m_out = boost::lexical_cast<std::string>(v); }
@@ -72,7 +72,7 @@ namespace mace { namespace rpc {
     };
 
     template<>
-    struct cast_visitor<array> : detail::const_visitor {
+    struct cast_visitor<array> : const_visitor {
       cast_visitor( array& out )
       :m_out(out){}
       virtual void operator()( const int8_t& v      ){ throw std::bad_cast();}
@@ -96,7 +96,7 @@ namespace mace { namespace rpc {
     };
 
     template<>
-    struct cast_visitor<object> : detail::const_visitor {
+    struct cast_visitor<object> : const_visitor {
       cast_visitor( object& out )
       :m_out(out){}
       virtual void operator()( const int8_t& v      ){ throw std::bad_cast();}

@@ -1,6 +1,7 @@
 #ifndef _MACE_RPC_JSON_DETAIL_TO_JSON_HPP_
 #define _MACE_RPC_JSON_DETAIL_TO_JSON_HPP_
 #include <mace/reflect/reflect.hpp>
+#include <mace/rpc/value.hpp>
 
 namespace mace { namespace rpc { namespace json { 
 
@@ -10,6 +11,9 @@ namespace mace { namespace rpc { namespace json {
   void to_json( const T&, Stream& os, Filter& f );
 
   //! [Define base cases]
+  template<typename T, typename Stream, typename Filter>
+  void to_json( const mace::rpc::value&, Stream& os, Filter& f );
+
   template<typename T, typename Stream, typename Filter>
   void to_json( const std::vector<T>& v, Stream& os, Filter& f );
 
@@ -150,6 +154,7 @@ namespace mace { namespace rpc { namespace json {
      }
   };
 
+
   /**
    *  Apply to any boost::fusion::sequence
    */
@@ -208,6 +213,48 @@ namespace mace { namespace rpc { namespace json {
   void to_json( const T& v, Stream& os, Filter& filter ) {
     typedef typename std::remove_reference<decltype(filter(v))>::type filtered_type;
     if_fusion_seq<boost::fusion::traits::is_sequence<filtered_type>::value>::to_json(filter(v),os,filter);
+  }
+
+  template<typename Stream>
+  struct value_visitor : const_visitor {
+    value_visitor( Stream& s ):os(s){}
+    Stream& os;
+    virtual void operator()( const int8_t& v      ){ os << v; }
+    virtual void operator()( const int16_t& v     ){ os << v; }
+    virtual void operator()( const int32_t& v     ){ os << v; }
+    virtual void operator()( const int64_t& v     ){ os << v; }
+    virtual void operator()( const uint8_t& v     ){ os << v; }
+    virtual void operator()( const uint16_t& v    ){ os << v; }
+    virtual void operator()( const uint32_t& v    ){ os << v; }
+    virtual void operator()( const uint64_t& v    ){ os << v; }
+    virtual void operator()( const float& v       ){ os << v; }
+    virtual void operator()( const double& v      ){ os << v; }
+    virtual void operator()( const bool& v        ){ os << v ? "true" : "false"; }
+    virtual void operator()( const std::string& v ){ os << '"' << escape_string(v) <<'"'; }
+    virtual void operator()( const object& o ){
+      os << '{';
+        for( uint32_t i = 0; i < o.fields.size(); ++i ) {
+          if( i ) os <<',';
+          (*this)( os.fields[i].key );
+          os<<':';
+          os.fields[i].val.visit( value_visitor(*this) );
+        }
+      os << '}';
+    }
+    virtual void operator()( const array& o ){
+      os << '[';
+        for( uint32_t i = 0; i < o.fields.size(); ++i ) {
+          if( i ) os <<',';
+          os.fields[i].visit( value_visitor(*this) );
+        }
+      os << ']';
+    }
+    virtual void operator()( ){ os << "null"; }
+  };
+
+  template<typename Stream, typename Filter>
+  void to_json( const mace::rpc::value& v, Stream& os, Filter& f ) {
+    v.visit( value_visitor<Stream>(os) );
   }
 
 } // detail 

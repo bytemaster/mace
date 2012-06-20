@@ -9,18 +9,24 @@ namespace mace { namespace rpc { namespace tcp {
   template<typename InterfaceType, typename ConnectionType>
   class server : public mace::rpc::server<InterfaceType,ConnectionType> {
     public:
-      typedef ConnectionType            connection_type;
+      typedef ConnectionType                 connection_type;
+      typedef boost::asio::ip::tcp::endpoint endpoint_type;
 
       template<typename SessionType>
       server( const boost::function<std::shared_ptr<SessionType>()>& sg, uint16_t port )
       :mace::rpc::server<InterfaceType,ConnectionType>( sg ) {
-        listen_complete = cmt::async( [=](){ this->listen(port); } );
+        init(port);
       }
 
       template<typename SessionType>
       server( const std::shared_ptr<SessionType>& shared_session, uint16_t port )
       :mace::rpc::server<InterfaceType,ConnectionType>( shared_session ) {
-        listen_complete = cmt::async( [=](){ this->listen(port); } );
+        init(port);
+      }
+      template<typename SessionType>
+      server( SessionType* shared_session, uint16_t port )
+      :mace::rpc::server<InterfaceType,ConnectionType>( shared_session ) {
+        init(port);
       }
 
       ~server() {
@@ -30,6 +36,10 @@ namespace mace { namespace rpc { namespace tcp {
         }catch(...){
           elog( "%1%", boost::current_exception_diagnostic_information() );
         }
+      }
+
+      endpoint_type local_endpoint()const {
+        return acc->local_endpoint();
       }
 
     private:
@@ -43,12 +53,15 @@ namespace mace { namespace rpc { namespace tcp {
         connections.erase( c );
       }
 
-      void listen( uint16_t p ) {
-        slog( "listen! %1%", p );
+      void init(uint16_t port) {
+        acc = boost::make_shared<boost::asio::ip::tcp::acceptor>( 
+                  boost::ref(mace::cmt::asio::default_io_service()),
+                             endpoint_type( boost::asio::ip::tcp::v4(),port) );
+        listen_complete = cmt::async( [=](){ this->listen(); } );
+      }
+
+      void listen() {
         try {
-          acc = boost::make_shared<boost::asio::ip::tcp::acceptor>( 
-                    boost::ref(mace::cmt::asio::default_io_service()),
-                    boost::asio::ip::tcp::endpoint( boost::asio::ip::tcp::v4(),p) );
           boost::system::error_code ec;
           do {
               socket_t::ptr iosp(new socket_t());

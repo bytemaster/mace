@@ -183,6 +183,8 @@ value&       value::operator[]( const char* key ) {
   }
   throw std::bad_cast();
 }
+value&       value::operator[]( const std::string& key )      { return (*this)[key.c_str()]; }
+const value& value::operator[]( const std::string& key )const { return (*this)[key.c_str()]; }
 const value& value::operator[]( const char* key )const {
   auto i = find(key);
   if( i == end() ) throw std::out_of_range(key);
@@ -212,5 +214,10 @@ const value& value::operator[]( int32_t idx )const {
 }
 
 const char* value::type()const { return gh(holder)->type(); }
+
+    void  value::visit( const_visitor&& v )const {
+      auto h = ((detail::value_holder*)&holder[0]);
+      h->visit( std::move(v) );
+    }
 
 } } // namepace mace::rpc

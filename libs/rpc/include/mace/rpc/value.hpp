@@ -68,6 +68,8 @@ namespace mace { namespace rpc {
         /** avoid creating temporary string just for comparisons! **/
         value&       operator[]( const char* key );
         const value& operator[]( const char* key )const;
+        value&       operator[]( const std::string& key );
+        const value& operator[]( const std::string& key )const;
 
         /** array & object interface **/
         void         clear();
@@ -83,7 +85,7 @@ namespace mace { namespace rpc {
         /** gets the stored type **/
         const char*  type()const;
 
-
+        void         visit( const_visitor&& v )const;
       private:
         /** throws exceptions on errors **/
         template<typename T>

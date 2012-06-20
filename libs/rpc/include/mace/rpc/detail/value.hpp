@@ -20,26 +20,26 @@ namespace mace { namespace rpc {
     std::string           type;
     std::vector<value>    fields;
   };
+  struct const_visitor {
+    virtual void operator()( const int8_t& v      ){};
+    virtual void operator()( const int16_t& v     ){};
+    virtual void operator()( const int32_t& v     ){};
+    virtual void operator()( const int64_t& v     ){};
+    virtual void operator()( const uint8_t& v     ){};
+    virtual void operator()( const uint16_t& v    ){};
+    virtual void operator()( const uint32_t& v    ){};
+    virtual void operator()( const uint64_t& v    ){};
+    virtual void operator()( const float& v       ){};
+    virtual void operator()( const double& v      ){};
+    virtual void operator()( const bool& v        ){};
+    virtual void operator()( const std::string& v ){};
+    virtual void operator()( const object&  ){};
+    virtual void operator()( const array&  ){};
+    virtual void operator()( ){};
+  };
 
 
   namespace detail {
-    struct const_visitor {
-      virtual void operator()( const int8_t& v      ){};
-      virtual void operator()( const int16_t& v     ){};
-      virtual void operator()( const int32_t& v     ){};
-      virtual void operator()( const int64_t& v     ){};
-      virtual void operator()( const uint8_t& v     ){};
-      virtual void operator()( const uint16_t& v    ){};
-      virtual void operator()( const uint32_t& v    ){};
-      virtual void operator()( const uint64_t& v    ){};
-      virtual void operator()( const float& v       ){};
-      virtual void operator()( const double& v      ){};
-      virtual void operator()( const bool& v        ){};
-      virtual void operator()( const std::string& v ){};
-      virtual void operator()( const object&  ){};
-      virtual void operator()( const array&  ){};
-      virtual void operator()( ){};
-    };
     struct visitor {
       virtual void operator()( int8_t& v      ){};
       virtual void operator()( int16_t& v     ){};

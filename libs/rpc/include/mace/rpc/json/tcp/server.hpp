@@ -32,6 +32,10 @@ namespace mace { namespace rpc { namespace json { namespace tcp {
       template<typename SessionType>
       server( const std::shared_ptr<SessionType>& shared_session, uint16_t port )
       :mace::rpc::tcp::server<Interface,connection_type>( shared_session, port ){}
+
+      template<typename SessionType>
+      server( SessionType* shared_session, uint16_t port )
+      :mace::rpc::tcp::server<Interface,connection_type>( shared_session, port ){}
   };
 #endif
 

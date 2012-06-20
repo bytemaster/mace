@@ -32,8 +32,12 @@ namespace mace { namespace rpc {
 
       template<typename SessionType>
       server( const std::shared_ptr<SessionType>& shared_session )
-      :sc( new shared_session_creator<SessionType>(shared_session) ){}
+      :sc( new shared_session_creator< std::shared_ptr<SessionType> >(shared_session) ){}
 
+      template<typename SessionType>
+      server( SessionType* shared_session )
+      :sc( new shared_session_creator<SessionType*>(shared_session) ){}
+     
     protected:
       template<typename SessionType>
       struct session_creator_impl : public session_creator {
@@ -50,14 +54,14 @@ namespace mace { namespace rpc {
 
       template<typename SessionType>
       struct shared_session_creator : public session_creator {
-          shared_session_creator( const std::shared_ptr<SessionType>& ss ):shared_session(ss){}
+          shared_session_creator( const SessionType& ss ):shared_session(ss){}
 
           virtual boost::any init_connection( const typename ConnectionType::ptr& con ) {
             mace::stub::ptr<InterfaceType> session(shared_session);
             mace::stub::visit( session, typename ConnectionType::template add_interface_visitor<InterfaceType>( *con, session ) );
             return session;
           }
-          std::shared_ptr<SessionType> shared_session;
+          SessionType shared_session;
       };
   };
 
