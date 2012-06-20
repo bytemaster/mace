@@ -8,21 +8,15 @@
 #include <boost/function_types/result_type.hpp>
 
 namespace mace { namespace rpc { namespace json {
-  struct named_parameters{};
-  // namespace detail
+
   /**
-   * If Seq size is 1 and it inherits from named_parameters then Seq will be
-   * sent as named parameters.
+   *  @brief specialize this template for your type to
+   *         indicate that the struct is a 'named parameter' type.
    */
-  template<typename Seq>
-  struct has_named_params : 
-     public boost::mpl::if_c<
-              (boost::is_base_of<named_parameters, 
-                                 typename boost::fusion::traits::deduce<
-                                     typename boost::fusion::result_of::front<Seq>::type >::type>::value 
-              && (1 ==  boost::fusion::result_of::size<Seq>::value))
-     , boost::true_type, boost::false_type>::type 
-  { };
+  template<typename T>
+  struct has_named_parameters{
+    typedef boost::false_type type; 
+  };
 
 } } }
 

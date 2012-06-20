@@ -20,13 +20,18 @@ ENDIF(UNIX)
 #add_executable( jsonv  jsonv.cpp  )
 #target_link_libraries( jsonv ${libraries} )
 
-add_executable( json_io json_io.cpp )
-target_link_libraries(json_io ${libraries} )
+#add_executable( json_io json_io.cpp )
+#target_link_libraries(json_io ${libraries} )
 
 add_executable( tcpc  tcpc.cpp  )
 target_link_libraries( tcpc ${libraries} )
 add_executable( tcps  tcps.cpp  )
 target_link_libraries( tcps ${libraries} )
+
+add_executable( json_tcpc  json_tcpc.cpp  )
+target_link_libraries( json_tcpc ${libraries} )
+add_executable( json_tcps  json_tcps.cpp  )
+target_link_libraries( json_tcps ${libraries} )
 
 add_executable( udpc  udpc.cpp  )
 target_link_libraries( udpc ${libraries} )

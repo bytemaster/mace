@@ -2,10 +2,11 @@
 #define _MACE_RPC_JSON_TCP_CONNECTION_HPP_
 #include <mace/rpc/json/tcp/detail/connection.hpp>
 #include <mace/rpc/tcp/connection.hpp>
+#include <mace/rpc/json/io.hpp>
 
 namespace mace { namespace rpc { namespace json { namespace tcp {
 
-    template<typename IODelegate>
+    template<typename IODelegate = json::io>
     class connection : public mace::rpc::tcp::connection<IODelegate> {
       public:
         typedef std::shared_ptr<connection> ptr;

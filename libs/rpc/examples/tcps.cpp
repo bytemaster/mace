@@ -15,8 +15,11 @@ int main( int argc, char** argv ) {
   try {
     auto s = std::make_shared<calculator>();
     mace::rpc::raw::tcp::server<calculator>  serv( s, boost::lexical_cast<int>(argv[1]) );
+    slog( "cmt::exec" );
     mace::cmt::exec();
   } catch ( ... ) {
     std::cerr << boost::current_exception_diagnostic_information() << std::endl;
   }
+  slog( "exiting..." );
+  return -1;
 };

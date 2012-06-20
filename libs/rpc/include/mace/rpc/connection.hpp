@@ -107,7 +107,7 @@ namespace mace { namespace rpc {
         rpc_recv_functor( Functor f, connection& c )
         :m_func(f),m_con(c){ }
       
-        message operator()( const message& m ) {
+        message operator()( message& m ) {
           message reply;
           reply.id = m.id;
           try {

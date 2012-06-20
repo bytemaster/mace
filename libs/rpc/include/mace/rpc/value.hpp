@@ -104,6 +104,17 @@ namespace mace { namespace rpc {
       key_val( const key_val& m )
       :key(m.key),val(m.val){}
 
+      key_val& operator=( key_val&& k ) {
+        key = std::move(k.key);
+        val = std::move(k.val);
+        return *this;
+      }
+      key_val& operator=( const key_val& k ) {
+        key = k.key;
+        val = k.val;
+        return *this;
+      }
+
       std::string key;
       value       val;
     };

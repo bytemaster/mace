@@ -20,6 +20,14 @@ namespace mace { namespace rpc { namespace json {
         };
     };
 
+    struct error_object {
+      int         code;
+      std::string message;
+      std::string data;
+    };
+
 } } } // namespace mace::rpc::json
+
+MACE_REFLECT( mace::rpc::json::error_object, (code)(message)(data) )
 
 #endif // _MACE_RPC_JSON_ERRORS_HPP_

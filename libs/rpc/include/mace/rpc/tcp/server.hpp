@@ -1,8 +1,8 @@
 #ifndef _MACE_RPC_TCP_SERVER_HPP_
 #define _MACE_RPC_TCP_SERVER_HPP_
 #include <mace/rpc/server.hpp>
-#include <mace/cmt/asio/tcp/socket.hpp>
 #include <mace/cmt/asio.hpp>
+#include <mace/cmt/asio/tcp/socket.hpp>
 
 namespace mace { namespace rpc { namespace tcp {
 
@@ -14,13 +14,13 @@ namespace mace { namespace rpc { namespace tcp {
       template<typename SessionType>
       server( const boost::function<std::shared_ptr<SessionType>()>& sg, uint16_t port )
       :mace::rpc::server<InterfaceType,ConnectionType>( sg ) {
-        listen_complete = cmt::async( boost::bind(&server::listen,this,port) ); 
+        listen_complete = cmt::async( [=](){ this->listen(port); } );
       }
 
       template<typename SessionType>
       server( const std::shared_ptr<SessionType>& shared_session, uint16_t port )
       :mace::rpc::server<InterfaceType,ConnectionType>( shared_session ) {
-        listen_complete = cmt::async( boost::bind(&server::listen,this,port) ); 
+        listen_complete = cmt::async( [=](){ this->listen(port); } );
       }
 
       ~server() {
@@ -44,11 +44,11 @@ namespace mace { namespace rpc { namespace tcp {
       }
 
       void listen( uint16_t p ) {
+        slog( "listen! %1%", p );
         try {
-          acc = std::make_shared<boost::asio::ip::tcp::acceptor>( 
-                    std::ref(cmt::asio::default_io_service()), 
+          acc = boost::make_shared<boost::asio::ip::tcp::acceptor>( 
+                    boost::ref(mace::cmt::asio::default_io_service()),
                     boost::asio::ip::tcp::endpoint( boost::asio::ip::tcp::v4(),p) );
-
           boost::system::error_code ec;
           do {
               socket_t::ptr iosp(new socket_t());
@@ -66,7 +66,7 @@ namespace mace { namespace rpc { namespace tcp {
         }
       }
 
-      std::shared_ptr<boost::asio::ip::tcp::acceptor>  acc;
+      boost::shared_ptr<boost::asio::ip::tcp::acceptor>  acc;
       mace::cmt::future<void>                            listen_complete;
       std::map<typename ConnectionType::ptr,boost::any>  connections;
   };

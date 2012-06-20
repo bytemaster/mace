@@ -18,6 +18,8 @@ int main( int argc, char** argv ) {
      mace::rpc::client<calculator> c;
      c.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4::from_string( argv[1]), 
                 boost::lexical_cast<uint16_t>(argv[2]) ) );
+
+     slog( "adding 5 + 6..." );
      slog( "result: %1%", c->add( 5, 6 ).wait() );
      slog( "result: %1%", c->add( 6, 7 ).wait() );
      slog( "result: %1%", c->add( 7, 8 ).wait() );

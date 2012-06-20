@@ -6,7 +6,7 @@
 
 namespace mace { namespace rpc  {
 
-  typedef boost::function<message(const message&)> method;
+  typedef boost::function<message(message&)> method;
 
   namespace detail { class connection_base; }
   

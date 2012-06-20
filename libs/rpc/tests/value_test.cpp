@@ -3,7 +3,7 @@
 #include <mace/rpc/value.hpp>
 #include <mace/rpc/value_io.hpp>
 #include <boost/fusion/include/make_vector.hpp>
-#include <mace/rpc/json/json_io.hpp>
+#include <mace/rpc/json/io.hpp>
 
 using namespace mace::rpc;
 
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE( value_from_json ) {
   s.sub.a = "moo";
   s.sub.b = 44;
   s.sub.c = 55.5;
-  auto js = mace::rpc::json::json_io::pack(s);
+  auto js = mace::rpc::json::io::pack(s);
   json::error_collector ec;
   value v = json::to_value(std::move(js),ec);
   auto out = value_cast<test_sub>(v);

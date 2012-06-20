@@ -1,58 +1,10 @@
-#ifndef _MACE_RPC_RAW_RAW_IO_HPP_
-#define _MACE_RPC_RAW_RAW_IO_HPP_
-#include <mace/rpc/filter.hpp>
+#ifndef _MACE_RPC_JSON_DETAIL_TO_JSON_HPP_
+#define _MACE_RPC_JSON_DETAIL_TO_JSON_HPP_
 #include <mace/reflect/reflect.hpp>
-#include <sstream>
-#include <iostream>
-#include <map>
-#include <iomanip>
-#include <sstream>
-
-#include <boost/optional.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/algorithm.hpp>
-#include <boost/fusion/support/is_sequence.hpp>
-#include <boost/fusion/include/size.hpp>
-
-#include <mace/rpc/varint.hpp>
-#include <mace/rpc/base64.hpp>
-
-#include <mace/rpc/value.hpp>
-#include <mace/rpc/value_io.hpp>
-#include <mace/rpc/json/error_collector.hpp>
 
 namespace mace { namespace rpc { namespace json { 
 
-  /**
-   *  @brief escapes non-printable or illegal characters.
-   *
-   *  Converts " to "\""
-   *  Converts '\n' to "\n"
-   *  Converts '\t' to "\t"
-   *  Converts '\r' to "\r"
-   *  Converts '\' to "\\"
-   *  Converts unprintable characters to \x[HEX]
-   *
-   *  @note This method does not add the begining and ending quotes,
-   *        it merely escapes the 'internal' part of the string.
-   */
-  std::string escape_string( const std::string s );
-
-  /**
-   *  @brief the inverse of escape_string()
-   *  
-   *   ASSERT( s == unescape_string(escape_string(s)) )
-   */
-  std::string unescape_string( const std::string s );
-
-  /**
-   *  Because escaped strings are always equal to or larger than
-   *  the unescaped strings, you can reuse the same memory
-   *  to unescape 'inplace' to avoid a copy.
-   *
-   *  @return a null terminated string starting at str.
-   */
-  char*       inplace_unescape_string( char* str );
+  namespace detail {
 
   template<typename T, typename Stream, typename Filter>
   void to_json( const T&, Stream& os, Filter& f );
@@ -113,6 +65,8 @@ namespace mace { namespace rpc { namespace json {
   void to_json( const signed_int& i,     Stream& os, Filter& f ) { os << i.value;                 }
   template<typename Stream, typename Filter>
   void to_json( const unsigned_int& i,   Stream& os, Filter& f ) { os << i.value;                 }
+  template<typename Stream, typename Filter>
+  void to_json( const json::string& s,   Stream& os, Filter& f ) { os << s.json_data;             }
   //! [Define base cases]
 
   //! [Define a visitor]
@@ -243,7 +197,7 @@ namespace mace { namespace rpc { namespace json {
         to_json_sequence( v, os, f );
     }
   };
-  template<> struct if_fusion_seq<false> {
+  template<> struct if_fusion_seq<0> {
     template<typename T,typename Stream, typename Filter> 
     inline static void to_json( const T& v, Stream& os, Filter& f ) {
       if_reflected<typename mace::reflect::reflector<T>::is_defined>::to_json(v,os,f);
@@ -253,181 +207,10 @@ namespace mace { namespace rpc { namespace json {
   template<typename T, typename Stream, typename Filter>
   void to_json( const T& v, Stream& os, Filter& filter ) {
     typedef typename std::remove_reference<decltype(filter(v))>::type filtered_type;
-    if_fusion_seq< boost::fusion::traits::is_sequence<filtered_type>::value >::to_json(filter(v),os,filter);
+    if_fusion_seq<boost::fusion::traits::is_sequence<filtered_type>::value>::to_json(filter(v),os,filter);
   }
 
-
-  /**
-   *   Returns the first non-whitespace char.
-   */
-  template<typename Iterator>
-  bool skip_whitespace( Iterator& in, const Iterator& e ) {
-     if( in == e ) 
-       return false;
-     char c = *in;
-     // ignore leading whitespace
-     while( c == ' ' || c == '\t' || c == '\n' || c == '\r' ) {
-       ++in;
-       if( in == e ) 
-         return false;
-       c = *in;
-     }
-     return true;
-  }
-
-  /**
-   *   @tparam Iterator - an input iterator
-   *
-   *   Ignores leading white space.
-   *   If it starts with [" or { reads until matching ]" or }
-   *   If it starts with something else it reads until [{",}]: or whitespace only
-   *        allowing a starting - or a single .
-   *
-   *   Once you have a valid range, use 'from_json' to load the json into
-   *   an object.
-   *
-   *   @note internal json syntax errors are not caught, only bracket errors 
-   *         are caught by this method.  This makes it easy for error recovery
-   *         when values are read sequentially.
-   *
-   *   @return a null-terminated vector<char> containing the first 'valid' json value
-   */
-  template<typename Iterator>
-  std::vector<char> read_value( Iterator itr, const Iterator& end ) {
-     std::vector<char> buf;
-     if( !skip_whitespace(itr,end) ) return buf;
-
-     bool found_dot = false;
-     // check for literal vs object, array or string
-     switch( *itr ) {
-       case '[':
-       case '{':
-       case '"':
-         break;
-       default: {  // literal
-         // read until non-literal character
-         // allow it to start with - 
-         // allow only one '.' 
-         while( itr != end ) {
-           switch( *itr ) {
-             case '[': 
-             case '{': 
-             case '}': 
-             case ']':
-             case '"': 
-             case ',': 
-             case ':': 
-             case ' ': 
-             case '\t': 
-             case '\n': 
-             case '\r': 
-               return buf;
-             case '.':
-               if( found_dot ) 
-                  return buf;
-               found_dot = true;
-               break;
-             case '-':
-               if( buf.size() ) { buf.push_back('\0'); return buf; }
-           }
-           buf.push_back(*itr);
-           ++itr;
-         }
-         buf.push_back('\0'); 
-         return buf; 
-       }
-     } // end literal check
-
-     int depth = 0;
-     bool in_quote = false;
-     bool in_escape = false;
-     // read until closing ]} or " ignoring escaped "
-     while( itr != end ) {
-       if( !in_quote ) {
-         switch( *itr ) {
-           case '[':
-           case '{': ++depth;         break;
-           case ']':
-           case '}': --depth;         break;
-           case '"': 
-             ++depth;
-             in_quote = true; 
-             break;
-           default: // do nothing;
-             break;
-         }
-       } else { // in quote
-         switch( *itr ) {
-           case '"': if( !in_escape ) {
-             --depth;
-             in_quote = false;
-             break;
-           }
-           case '\\': 
-             in_escape = !in_escape;
-             break;
-           default:
-             in_escape = false;
-         }
-       }
-       buf.push_back(*itr);
-       ++itr;
-       if( !depth )  {
-         buf.push_back('\0'); 
-         return buf; 
-       }
-    }
-    if( depth != 0 ) {
-     // TODO: Throw Parse Error!
-     std::cerr<<"Parse Error!\n";
-    }
-    buf.push_back('\0'); 
-    return buf;
-  }
-
-
-
-  /**
-   *  Converts a json string to rpc::value and reports errors
-   */
-  mace::rpc::value to_value( std::vector<char>&& d, error_collector& ec );
-  mace::rpc::value to_value( char* start, char* end, error_collector& ec );
-
-  struct json_io {
-    template<typename T>
-    static std::vector<char> pack( const T& v ) {
-      default_filter f;
-      std::stringstream ss;
-      to_json( v, ss, f );
-      std::string s = ss.str();
-      std::vector<char> rv(s.size());
-      if( s.size() )
-        memcpy(  &rv.front(), s.c_str(), s.size());
-      return rv;
-    }
-    template<typename T, typename Filter>
-    static std::vector<char> pack( Filter& f, const T& v ) {
-      std::stringstream ss;
-      to_json( v, ss, f );
-      std::string s = ss.str();
-      std::vector<char> rv(s.size());
-      if( s.size() )
-        memcpy(  &rv.front(), s.c_str(), s.size());
-      return rv;
-    }
-
-    template<typename T, typename Filter>
-    static T unpack( Filter& f, std::vector<char>&& d ) {
-      T tmp;
-      json::error_collector ec;
-      // convert json string into rpc::value
-      mace::rpc::value v = to_value( std::move(d), ec );
-      // convert rpc value into T applying filter f
-      mace::rpc::unpack( f, v, tmp );
-      return tmp;
-    }
-  };
-
+} // detail 
 } } } // mace::rpc::json
 
-#endif // MACE_RPC_RAW_RAW_IO_HPP
+#endif

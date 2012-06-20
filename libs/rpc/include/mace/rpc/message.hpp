@@ -22,7 +22,7 @@ namespace mace { namespace rpc {
     boost::optional<int32_t>  id;         ///< Used to track response
     error_type                err;        ///< 0 for no error
     std::string               meth;       ///< NULL for response
-    datavec                   data;       ///< parameters or result
+    datavec                   data;       ///< parameters,result, or error message
 
     inline message( message&& m )
     :id(m.id),

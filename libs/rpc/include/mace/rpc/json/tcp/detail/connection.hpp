@@ -1,5 +1,5 @@
-#ifndef _MACE_RPC_RAW_TCP_DETAIL_CONNECTION_HPP
-#define _MACE_RPC_RAW_TCP_DETAIL_CONNECTION_HPP
+#ifndef _MACE_RPC_JSON_TCP_DETAIL_CONNECTION_HPP
+#define _MACE_RPC_JSON_TCP_DETAIL_CONNECTION_HPP
 #include <mace/rpc/tcp/detail/connection.hpp>
 #include <mace/rpc/raw/message.hpp>
 #include <mace/rpc/raw/raw_io.hpp>
