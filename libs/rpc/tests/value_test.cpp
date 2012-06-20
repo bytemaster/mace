@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE( int_test ) {
   BOOST_REQUIRE( v.type() == std::string("int32_t" ) );
 }
 BOOST_AUTO_TEST_CASE( string_test ) {
-  mace::rpc::value v = "Hello World";
+  mace::rpc::value v = std::string("Hello World");
   BOOST_REQUIRE( v.type() == std::string("string" ) );
   mace::rpc::value v2 = std::string("Hello World");
   BOOST_REQUIRE( v2.type() == std::string("string" ) );
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE( value_vector ) {
   vec.push_back(1);
   vec.push_back(2);
   vec.push_back(3);
-  mace::rpc::value v = vec;
+  mace::rpc::value v = value(vec);
   BOOST_REQUIRE( v.type() == std::string("array" ) );
   BOOST_REQUIRE( v.size() == 3 );
   BOOST_REQUIRE( value_cast<int>(v[0]) == 1 );
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE( value_vector ) {
 BOOST_AUTO_TEST_CASE( value_struct ) {
   test_sub ts;
   ts.sub.a = "__AA";
-  value v = ts;
+  value v = value(ts);
   BOOST_REQUIRE( v.type() == std::string("object" ) );
   BOOST_REQUIRE( value_cast<std::string>(v["d"]) == "ddd" );
   BOOST_REQUIRE( value_cast<std::string>(v["sub"]["a"]) == "__AA" );
@@ -93,12 +93,12 @@ BOOST_AUTO_TEST_CASE( value_struct ) {
 }
 
 BOOST_AUTO_TEST_CASE( value_seq ) {
-  value v = boost::fusion::make_vector( 5, "Hello World", 6.6 );
+  value v = value(boost::fusion::make_vector( 5, "Hello World", 6.6 ));
   BOOST_REQUIRE( value_cast<int>(v[0]) == 5 );
   BOOST_REQUIRE( value_cast<std::string>(v[1]) == "Hello World" );
   BOOST_REQUIRE( value_cast<double>(v[2]) ==  6.6 );
   auto f = boost::fusion::make_vector( 5, "Hello World", 6.6 );
-  value v2 = f;
+  value v2 = value(f);
   BOOST_REQUIRE( value_cast<int>(v2[0]) == 5 );
   BOOST_REQUIRE( value_cast<std::string>(v2[1]) == "Hello World" );
   BOOST_REQUIRE( value_cast<double>(v2[2]) ==  6.6 );

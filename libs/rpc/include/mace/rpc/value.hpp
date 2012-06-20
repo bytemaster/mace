@@ -55,7 +55,7 @@ namespace mace { namespace rpc {
         value& operator=( const value& v );
 
         template<typename T>
-        value( T&& v );
+        explicit value( T&& v );
 
         template<typename T>
         value& operator=( T&& v );
