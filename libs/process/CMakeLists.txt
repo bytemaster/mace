@@ -1,0 +1,6 @@
+IF( ENABLE_EXAMPLES MATCHES ON )
+add_subdirectory( examples )
+ENDIF()
+IF( ENABLE_TESTS MATCHES ON )
+#add_subdirectory( tests )
+ENDIF()
