@@ -13,3 +13,5 @@ target_link_libraries( chroot_setup ${libraries} )
 
 add_executable( create_child create_child.cpp )
 target_link_libraries( create_child ${libraries} )
+add_executable( shell shell.cpp )
+target_link_libraries( shell ${libraries} )

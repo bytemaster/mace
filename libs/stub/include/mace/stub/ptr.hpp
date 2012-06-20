@@ -52,7 +52,7 @@ namespace mace { namespace stub {
       template<typename OtherInterface,typename OtherDelegate>
       ptr( const ptr<OtherInterface,OtherDelegate>& p )
       :m_ptr(p),m_vtable(std::make_shared<vtable_type>()) {
-        InterfaceDelegate::set_vtable( *m_vtable, *boost::any_cast<ptr<OtherInterface,OtherDelegate>&>(m_ptr.get()) );
+        InterfaceDelegate::set_vtable( *m_vtable, *boost::any_cast<ptr<OtherInterface,OtherDelegate>&>(*m_ptr.get()) );
       }
 
       const vtable_type& operator*()const  { return *m_vtable;  } 
