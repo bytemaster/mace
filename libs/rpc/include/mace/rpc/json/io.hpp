@@ -138,6 +138,16 @@ namespace mace { namespace rpc { namespace json {
     auto i = io::pack(v);
     return std::string(&i.front(),i.size());
   }
+  std::string pretty_print( std::vector<char>&& json, uint8_t indent = 2 );
+
+  /**
+   *  Similar to to_string, except that arrays and objects are
+   *  nested and indented.
+   */
+  template<typename T>
+  std::string to_pretty_string( const T& v, uint8_t indent = 2 ) {
+    return pretty_print( io::pack(v), indent );
+  }
 
 } } } // mace::rpc::json
 
