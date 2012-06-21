@@ -180,7 +180,11 @@ value&       value::operator[]( const char* key ) {
     }
     o->val.fields.push_back( key_val(key) );
     return o->val.fields.back().val;
+  } else if (strcmp(gh(holder)->type(), "null" ) == 0 ) {
+    new (holder) detail::value_holder_impl<object>(object());
+    return (*this)[key];
   }
+  wlog( "expected object, got %1%", gh(holder)->type() );
   throw std::bad_cast();
 }
 value&       value::operator[]( const std::string& key )      { return (*this)[key.c_str()]; }

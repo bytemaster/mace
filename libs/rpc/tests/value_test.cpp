@@ -125,3 +125,9 @@ BOOST_AUTO_TEST_CASE( value_from_json ) {
   BOOST_REQUIRE(out.sub.b == s.sub.b);
   BOOST_REQUIRE(out.sub.c == s.sub.c);
 }
+
+BOOST_AUTO_TEST_CASE( value_new_index ) {
+  value v;
+  v["area"] = 5.5;
+  BOOST_REQUIRE( value_cast<double>(v["area"]) == 5.5 );
+}

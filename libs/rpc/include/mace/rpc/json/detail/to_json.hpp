@@ -235,9 +235,9 @@ namespace mace { namespace rpc { namespace json {
       os << '{';
         for( uint32_t i = 0; i < o.fields.size(); ++i ) {
           if( i ) os <<',';
-          (*this)( os.fields[i].key );
+          (*this)( o.fields[i].key );
           os<<':';
-          os.fields[i].val.visit( value_visitor(*this) );
+          o.fields[i].val.visit( value_visitor(*this) );
         }
       os << '}';
     }
@@ -245,7 +245,7 @@ namespace mace { namespace rpc { namespace json {
       os << '[';
         for( uint32_t i = 0; i < o.fields.size(); ++i ) {
           if( i ) os <<',';
-          os.fields[i].visit( value_visitor(*this) );
+          o.fields[i].visit( value_visitor(*this) );
         }
       os << ']';
     }
