@@ -124,6 +124,8 @@ namespace mace { namespace rpc {
 
 } } // mace::rpc
 
+MACE_REFLECT_TYPEINFO( mace::rpc::value )
+
 #include <mace/rpc/detail/value.ipp>
 
 #endif
