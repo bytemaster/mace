@@ -3,9 +3,12 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <boost/fusion/support/deduce_sequence.hpp>
 #include <boost/fusion/sequence/io.hpp>
 #include <mace/reflect/reflect.hpp>
 #include <mace/rpc/json/io.hpp>
+#include <mace/cmt/thread.hpp>
+#include <mace/stub/ptr.hpp>
 
 namespace mace { namespace rpc { namespace json {
 
@@ -34,7 +37,7 @@ class cli {
        { return methods[name]; }
 
        void start() {  
-          read_done = mace::cmt::async( boost::bind( &cli::read_loop, this ) );
+          read_done = mace::cmt::async( [=](){ this->read_loop(); } );
        }
 
    private:
@@ -96,7 +99,7 @@ class cli {
            std::string operator()( const std::string& cli )
            {
               typedef typename boost::fusion::traits::deduce_sequence<Seq>::type param_type;
-              mace::rpc::default_filter f;
+              mace::rpc::function_filter<void> f;
               auto v = json::io::pack( f, wait_future( m_func(json::io::unpack<param_type>(f, std::vector<char>(cli.begin(),cli.end()))) ));
               if( v.size() )
                   return std::string( &v.front(), v.size() );

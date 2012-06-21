@@ -11,7 +11,7 @@
   #include <boost/fusion/functional/generation/make_fused_function_object.hpp>
   #include <boost/fusion/functional/generation/make_unfused.hpp>
   #include <boost/typeof/typeof.hpp>
-  #include <mace/stub/void.hpp>
+  #include <mace/void.hpp>
   #include <boost/signals.hpp>
   #include <mace/stub/vtable.hpp>
 
@@ -190,7 +190,7 @@ template<typename R, typename Class BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
 struct actor_member<R(Class::*)(PARAM_TYPES)const> : public detail::actor_member_base
 {
   // boost::result_of
-  typedef typename mace::stub::adapt_void<R>::result_type                    result_type;
+  typedef typename mace::adapt_void<R>::result_type                    result_type;
   typedef mace::cmt::future<result_type>                             future_type;
   typedef actor_member                                           self_type;
   typedef boost::fusion::vector<PARAM_TYPES>                     fused_params;
@@ -216,13 +216,13 @@ struct actor_member<R(Class::*)(PARAM_TYPES)const> : public detail::actor_member
   }
   template<typename T>
   actor_member& operator=( const T& d )  {
-    m_delegate = mace::stub::adapt_void<R,T>(d);
+    m_delegate = mace::adapt_void<R,T>(d);
     return *this;
   }
   template<typename C, typename M>
   void set_delegate(  C* s, M m, detail::actor_base* ab ) {
     this->m_actor = ab;
-    m_delegate = mace::stub::adapt_void<R, boost::function<R(const fused_params&)> >(
+    m_delegate = mace::adapt_void<R, boost::function<R(const fused_params&)> >(
                     boost::fusion::make_fused_function_object( 
                                     boost::bind(m,s PARAM_PLACE_HOLDERS ) ));
   }
@@ -233,7 +233,7 @@ struct actor_member<R(Class::*)(PARAM_TYPES)const> : public detail::actor_member
 template<typename R, typename Class  BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
 struct actor_member<R(Class::*)(PARAM_TYPES)> : public detail::actor_member_base
 {
-  typedef typename mace::stub::adapt_void<R>::result_type                result_type;
+  typedef typename mace::adapt_void<R>::result_type                result_type;
   typedef mace::cmt::future<result_type>                             future_type;
   typedef actor_member                                      self_type;
   typedef boost::fusion::vector<PARAM_TYPES>                 fused_params;
@@ -257,13 +257,13 @@ struct actor_member<R(Class::*)(PARAM_TYPES)> : public detail::actor_member_base
   }
   template<typename T>
   actor_member& operator=( const T& d )  {
-    m_delegate = mace::stub::adapt_void<R,T>(d);
+    m_delegate = mace::adapt_void<R,T>(d);
     return *this;
   }
   template<typename C, typename M>
   void set_delegate(  C* s, M m, detail::actor_base* ab ) {
     this->m_actor = ab;
-    m_delegate = mace::stub::adapt_void<R, boost::function<R(const fused_params&)> >(
+    m_delegate = mace::adapt_void<R, boost::function<R(const fused_params&)> >(
                       boost::fusion::make_fused_function_object( 
                                        boost::bind(m,s PARAM_PLACE_HOLDERS ) ));
   }
@@ -275,7 +275,7 @@ struct actor_member<R(Class::*)(PARAM_TYPES)> : public detail::actor_member_base
 template<typename R, typename Class  BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
 struct actor_member< boost::signal<R(PARAM_TYPES)> (Class::*) >  : public detail::actor_member_base
 {
-  typedef typename mace::stub::adapt_void<R>::result_type                result_type;
+  typedef typename mace::adapt_void<R>::result_type                result_type;
   typedef mace::cmt::future<result_type>                             future_type;
   typedef actor_member                                      self_type;
   typedef boost::fusion::vector<PARAM_TYPES>                 fused_params;
@@ -304,19 +304,19 @@ struct actor_member< boost::signal<R(PARAM_TYPES)> (Class::*) >  : public detail
   // emits locally, but does not forward to delegate
   future_type emit( const fused_params& fp ) {
     scoped_block_signal block_reverse(m_reverse_con);
-    return mace::stub::adapt_void<R,boost::function<R(const fused_params&)> >(
+    return mace::adapt_void<R,boost::function<R(const fused_params&)> >(
             boost::fusion::make_fused_function_object( std::ref(m_signal) ) )(fp);
   }
 
   template<typename T>
   actor_member& operator=( const T& d )  {
-    m_delegate = mace::stub::adapt_void<R,T>(d);
+    m_delegate = mace::adapt_void<R,T>(d);
     return *this;
   }
 
   template<typename Functor>
   boost::signals::connection connect( const Functor& f ) {
-    boost::signals::connection c = m_signal.connect(mace::stub::adapt_void<R,Functor>(f) );
+    boost::signals::connection c = m_signal.connect(mace::adapt_void<R,Functor>(f) );
     if( m_connect_delegate )
         m_connect_delegate(m_signal.num_slots());
     return c;
@@ -358,7 +358,7 @@ struct actor_member< boost::signal<R(PARAM_TYPES)> (Class::*) >  : public detail
         emit_or_throw( signal_type& s ):sig(s){}
         result_type operator()( const fused_params& p ) {
           if( int(sig.num_slots()) -1 > 0 ) { // do not count our reverse connection
-            return mace::stub::adapt_void<R, boost::function<R(const fused_params&)> >(
+            return mace::adapt_void<R, boost::function<R(const fused_params&)> >(
                       boost::fusion::make_fused_function_object(std::ref(sig)))(p);
           }
           BOOST_THROW_EXCEPTION( no_connected_slots() );

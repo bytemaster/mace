@@ -1,8 +1,8 @@
-#ifndef __MACE_STUB_VOID_HPP__
-#define __MACE_STUB_VOID_HPP__
+#ifndef __MACE_VOID_HPP__
+#define __MACE_VOID_HPP__
 #include <iostream>
 
-namespace mace { namespace stub {
+namespace mace { 
     /**
      * @brief A type to replace void in generic code.
      *
@@ -18,7 +18,7 @@ namespace mace { namespace stub {
 
     /**
      *  @brief Converts functors returning void to functors returning 
-     *         @ref mace::stub::void_t 
+     *         @ref mace::void_t 
      *
      *  Generic code that deals with functions returning void is a special case
      *  that requires many work arounds.  This class adapts a void(FusionSeq) functor
@@ -28,7 +28,10 @@ namespace mace { namespace stub {
     struct adapt_void {
         typedef R result_type;
 
-        adapt_void( const Functor _f):f(_f){}
+        //template<typename F>
+        //adapt_void( F&& _f):f(std::forward<F>(_f)){}
+
+        adapt_void( const Functor& _f):f(_f){}
 
         template<typename Seq>
         result_type operator()( const Seq& seq )const {
@@ -44,7 +47,10 @@ namespace mace { namespace stub {
     template<typename Functor>
     struct adapt_void<void,Functor> {
         typedef void_t result_type;
-        adapt_void( const Functor _f):f(_f){}
+        //template<typename F>
+        //adapt_void( F&& _f):f(std::forward<F>(_f)){}
+
+        adapt_void( const Functor& _f):f(_f){}
 
         template<typename Seq>
         result_type operator()( const Seq& seq )const {
@@ -57,6 +63,6 @@ namespace mace { namespace stub {
         Functor f;
     };
     #endif
-} }
+} 
 
 #endif

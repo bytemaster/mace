@@ -31,7 +31,7 @@
 #include <boost/function_types/result_type.hpp>
 
 
-#include <mace/reflect/void.hpp>
+#include <mace/void.hpp>
 #include <mace/reflect/typeinfo.hpp>
 
 namespace mace { 

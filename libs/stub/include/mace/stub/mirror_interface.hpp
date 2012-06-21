@@ -9,7 +9,7 @@
   #include <boost/fusion/container/generation/make_vector.hpp>
   #include <boost/fusion/functional/generation/make_fused_function_object.hpp>
   #include <boost/fusion/functional/generation/make_unfused.hpp>
-  #include <mace/stub/void.hpp>
+  #include <mace/void.hpp>
   #include <mace/stub/vtable.hpp>
   #include <boost/type_traits/function_traits.hpp>
   #include <boost/type_traits/remove_pointer.hpp>
@@ -18,6 +18,8 @@
   #include <boost/function.hpp>
 
   namespace mace { namespace stub {
+    using mace::void_t;
+
     /**
      *  @brief Specialized to mirror the member 
      *         variable/method pointed to by MemberPtr

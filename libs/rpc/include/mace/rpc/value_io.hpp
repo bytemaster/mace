@@ -235,15 +235,17 @@ namespace mace { namespace rpc {
     struct if_reflected {
       template<typename T,typename Filter>
       static inline void pack( Filter& f,mace::rpc::value& s, const T& v ) { 
-        std::stringstream ss; ss << v;
-        mace::rpc::pack(f,s,f(mace::rpc::base64_encode((unsigned char const*)ss.str().c_str(),ss.str().size())));
+        wlog( "warning, ignoring unknown type" );
+       // std::stringstream ss; ss << v;
+       // mace::rpc::pack(f,s,f(mace::rpc::base64_encode((unsigned char const*)ss.str().c_str(),ss.str().size())));
       }
       template<typename T,typename Filter>
       static inline void unpack( Filter& f, const mace::rpc::value& s, T& v ) { 
-        std::string str;
-        mace::rpc::unpack(f,s,str);
-        std::stringstream ss(mace::rpc::base64_decode(str)); 
-        ss >> v;
+        wlog( "warning, ignoring unknown type" );
+       // std::string str;
+       // mace::rpc::unpack(f,s,str);
+       // std::stringstream ss(mace::rpc::base64_decode(str)); 
+       // ss >> v;
       }
     };
     template<>
@@ -497,13 +499,13 @@ namespace mace { namespace rpc {
 
   template<typename T> 
   void pack( mace::rpc::value& jsv, const T& v )  {
-    default_filter f;
+    function_filter<void> f;
     pack( f, jsv, v );
   }
 
   template<typename T> 
   void unpack( const mace::rpc::value& jsv, T& v ) {
-    default_filter f;
+    function_filter<void> f;
     unpack( f, jsv, v );
   }
   template<typename T> 

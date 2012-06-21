@@ -31,6 +31,23 @@ namespace mace { namespace rpc {
       inline T operator()( T&& v )const { return v; }
     };
 
+    template<typename T, typename Connection>
+    struct ffilter {
+      inline T operator()( T&& v, Connection& )const { return v; }
+    };
+    template<typename Signature, typename Connection>
+    struct ffilter<boost::function<Signature>,Connection> {
+      auto operator()( const boost::function<Signature>& v, Connection& m_con ) -> decltype( ((Connection*)0)->add_method(v)) {
+        return m_con.add_method( v );
+      }
+    };
+    template<typename Signature>
+    struct ffilter<boost::function<Signature>,void> {
+      auto operator()( const boost::function<Signature>& v) -> std::string {
+        return "";
+      }
+    };
+
     /**
      *  @tparam Connection must implement the following expressions:
      *
@@ -39,16 +56,14 @@ namespace mace { namespace rpc {
      *
      */
     template<typename Connection>
-    struct function_filter : default_filter {
+    struct function_filter {
       function_filter( Connection& c ):m_con(c){}
 
-      using default_filter::operator();
-      using default_filter::is_filtered;
-
-      template<typename Signature>
-      auto operator()( const boost::function<Signature>& v ) -> decltype( ((Connection*)0)->add_method(v)) {
-        return m_con.add_method( v );
-      }
+      /**
+       *  Given input T convert and assign to output v.
+       */
+      template<typename T>
+      void operator()( const T& r, T& v )const  { v = r; }
       
       template<typename Signature, typename R>
       void operator()( const R& r, boost::function<Signature>& v ) {
@@ -57,8 +72,61 @@ namespace mace { namespace rpc {
       
       template<typename Signature>
       const bool is_filtered(const boost::function<Signature>*)const { return true; }
+
+
+      /**
+       *  @return true if filtered for a particular type.
+       */
+      template<typename T>
+      const bool is_filtered(const T*)const { return false; }
+
+      /**
+       *  Pack filter, given input type return output type.
+       */
+      template<typename T>
+      inline const T& operator()( const T& v )const { return v; }
+
+      template<typename T>
+      inline T operator()( T&& v )const { 
+        return ffilter<T,Connection>( std::forward<T>(v), m_con ); 
+      }
+
       private:
         Connection& m_con;
+    };
+
+    template<>
+    struct function_filter<void>  {
+      /**
+       *  Given input T convert and assign to output v.
+       */
+      template<typename T>
+      void operator()( const T& r, T& v )const  { v = r; }
+
+      template<typename Signature, typename R>
+      void operator()( const R& r, boost::function<Signature>& v ) {
+        v = boost::function<Signature>();
+      }
+      
+      template<typename Signature>
+      const bool is_filtered(const boost::function<Signature>*)const { return true; }
+
+      /**
+       *  @return true if filtered for a particular type.
+       */
+      template<typename T>
+      const bool is_filtered(const T*)const { return false; }
+
+      /**
+       *  Pack filter, given input type return output type.
+       */
+      template<typename T>
+      inline const T& operator()( const T& v )const { return v; }
+
+      template<typename T>
+      inline T operator()( T&& v )const { 
+        return ffilter<T,void>( std::forward<T>(v) ); 
+      }
     };
 
 } } // namespace boost::rpc

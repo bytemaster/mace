@@ -1,6 +1,8 @@
 #ifndef _MACE_REFLECT_TYPEINFO_HPP
 #define _MACE_REFLECT_TYPEINFO_HPP
+#include <mace/void.hpp>
 namespace mace { namespace reflect {
+using mace::void_t;
 
 /**
  *  @brief provides compile time access to name of a type.

@@ -9,7 +9,7 @@
   #include <boost/fusion/container/generation/make_vector.hpp>
   #include <boost/fusion/functional/generation/make_fused_function_object.hpp>
   #include <boost/fusion/functional/generation/make_unfused.hpp>
-  #include <mace/stub/void.hpp>
+  #include <mace/void.hpp>
   #include <mace/stub/vtable.hpp>
 
   namespace mace { namespace rpc { 
@@ -109,7 +109,7 @@
 
 template<typename ConnectionType, typename R, typename Class BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
 struct client_member<R(Class::*)(PARAM_TYPES)const,ConnectionType> : public client_member_base<ConnectionType> {
-  typedef typename mace::stub::adapt_void<R>::result_type    result_type;
+  typedef typename mace::adapt_void<R>::result_type    result_type;
   typedef mace::cmt::future<result_type>                        future_type;
   typedef client_member                                          self_type;
   typedef boost::fusion::vector<PARAM_TYPES>                     fused_params;
@@ -140,7 +140,7 @@ struct client_member<R(Class::*)(PARAM_TYPES)const,ConnectionType> : public clie
 
 template<typename ConnectionType, typename R, typename Class  BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
 struct client_member<R(Class::*)(PARAM_TYPES),ConnectionType>  : public client_member_base<ConnectionType> {
-  typedef typename mace::stub::adapt_void<R>::result_type   result_type;
+  typedef typename mace::adapt_void<R>::result_type   result_type;
   typedef mace::cmt::future<result_type>                       future_type;
   typedef client_member                                         self_type;
   typedef boost::fusion::vector<PARAM_TYPES>                    fused_params;
