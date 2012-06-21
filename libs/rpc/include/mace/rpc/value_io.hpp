@@ -499,13 +499,15 @@ namespace mace { namespace rpc {
 
   template<typename T> 
   void pack( mace::rpc::value& jsv, const T& v )  {
-    function_filter<void> f;
+    //function_filter<void> f;
+    default_filter f;
     pack( f, jsv, v );
   }
 
   template<typename T> 
   void unpack( const mace::rpc::value& jsv, T& v ) {
-    function_filter<void> f;
+    //function_filter<void> f;
+    default_filter f;
     unpack( f, jsv, v );
   }
   template<typename T> 

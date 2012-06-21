@@ -9,6 +9,7 @@
 #include <mace/rpc/json/io.hpp>
 #include <mace/cmt/thread.hpp>
 #include <mace/stub/ptr.hpp>
+#include <sstream>
 
 namespace mace { namespace rpc { namespace json {
 
@@ -68,7 +69,9 @@ class cli {
          void operator()( const char* name ) const {
               typedef typename boost::function_types::result_type<MemberPtr>::type member_ref;
               typedef typename boost::remove_reference<member_ref>::type member;
-              m_api.push_back( std::string(name) + "    signature: " + std::string(mace::reflect::get_typename<typename member::signature>() ));
+              std::stringstream ss; 
+              ss<<std::left<<std::setw(30)<<name<<"     "<<mace::reflect::get_typename<typename member::signature>();
+              m_api.push_back( ss.str() );
 
               m_cli.methods[name] = cli_functor<typename member::fused_params,member_ref>(m_vtbl.*m);
           /*

@@ -14,6 +14,9 @@ namespace mace { namespace rpc { namespace json {
   template<typename T, typename Stream, typename Filter>
   void to_json( const mace::rpc::value&, Stream& os, Filter& f );
 
+  template<typename Stream, typename Filter>
+  void to_json( const void_t&, Stream& os, Filter& f ) { os<<"null"; }
+
   template<typename T, typename Stream, typename Filter>
   void to_json( const std::vector<T>& v, Stream& os, Filter& f );
 
@@ -183,9 +186,10 @@ namespace mace { namespace rpc { namespace json {
   template<typename IsReflected=boost::false_type>
   struct if_reflected {
     template<typename T,typename Filter, typename Stream>
-    static inline void to_json( Filter& f,Stream& s, const T& v ) { 
+    static inline void to_json( const T& v, Stream& os, Filter& f ) { 
       // Use boost serialization or die!
       elog( "Unknown type %1%", mace::reflect::get_typename<T>() );
+      assert( !"This should never be called" );
     }
   };
   template<>
