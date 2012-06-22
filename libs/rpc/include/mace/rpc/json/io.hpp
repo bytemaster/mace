@@ -132,6 +132,12 @@ namespace mace { namespace rpc { namespace json {
 
     template<typename T, typename Filter>
     static T unpack( Filter& f, std::vector<char>&& d );
+
+    template<typename T>
+    static T unpack( std::vector<char>&& d ) {
+      function_filter<void> f;
+      return unpack<T>( f, std::move(d) );
+    }
   };
   template<typename T>
   std::string to_string( const T& v ) {

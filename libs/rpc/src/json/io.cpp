@@ -415,7 +415,8 @@ char* read_key_val( object& obj, bool sc, char* in, char* end, mace::rpc::json::
     name = mace::rpc::json::read_value( name, end, name_end );
     if( sc ) { // if we expect a ,
       if( *name != ',' ) { // but didn't get one
-        wlog( "expected ',' but got %1%", name ); // warn and accept name
+        if( *name != '}' )
+            wlog( "expected ',' or '}' but got %1%", name ); // warn and accept name
       } else { // we got the exepcted , read the expected name 
         name = mace::rpc::json::read_value( name_end, end, name_end );
       }
@@ -616,8 +617,16 @@ std::string pretty_print( std::vector<char>&& v, uint8_t indent ) {
             escape = true;
           ss<<v[i];
           break;
+        case ':':
+          if( !quote ) {
+            ss<<": ";
+          } else {
+            ss<<':';
+          }
+          break;
         case '"':
           if( first ) {
+             ss<<'\n';
              for( int i = 0; i < level*indent; ++i ) ss<<' ';
              first = false;
           }
@@ -632,7 +641,6 @@ std::string pretty_print( std::vector<char>&& v, uint8_t indent ) {
           ss<<v[i];
           if( !quote ) {
             ++level;
-            ss<<'\n';
             first = true;
           }else {
             escape = false;
@@ -640,13 +648,14 @@ std::string pretty_print( std::vector<char>&& v, uint8_t indent ) {
           break;
         case '}':
         case ']':
-          if( v[i-1] == ']' ||
-              v[i-1] == '}' ) {
-              ss<<'\n';
-          }
           if( !quote ) {
+            if( v[i-1] != '[' && v[i-1] != '{' ) {
+              ss<<'\n';
+            }
             --level;
-            for( int i = 0; i < level*indent; ++i ) ss<<' ';
+            if( !first ) {
+              for( int i = 0; i < level*indent; ++i ) ss<<' ';
+            }
             ss<<v[i];
             break;
           } else {
@@ -655,7 +664,7 @@ std::string pretty_print( std::vector<char>&& v, uint8_t indent ) {
           }
         case ',':
           if( !quote ) {
-            ss<<",\n";
+            ss<<',';
             first = true;
           } else {
             escape = false;
@@ -664,6 +673,7 @@ std::string pretty_print( std::vector<char>&& v, uint8_t indent ) {
           break;
         default:
           if( first ) {
+             ss<<'\n';
              for( int i = 0; i < level*indent; ++i ) ss<<' ';
              first = false;
           }

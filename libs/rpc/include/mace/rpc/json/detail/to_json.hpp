@@ -79,21 +79,38 @@ namespace mace { namespace rpc { namespace json {
   //! [Define a visitor]
   template<typename T,typename Stream, typename Filter>
   struct to_json_visitor {
-      to_json_visitor( const T& v, Stream& _os, Filter& f ):val(v),os(_os),i(0),filt(f){}
+      to_json_visitor( const T& v, Stream& _os, Filter& f ):val(v),os(_os),i(0),filt(f),c(false){}
 
       template<typename MemberPtr, MemberPtr m>
       void operator()( const char* name )const {
         if( i == 0 ) os << '{';    
-        os<<'"'<<name<<"\":";
-        to_json( filt(val.*m), os, filt);
-        if( i != mace::reflect::reflector<T>::total_member_count-1 ) os << ',';
+        optional_helper( filt(val.*m), name );
         if( i == mace::reflect::reflector<T>::total_member_count-1 ) os << '}';
         ++i;
       }
+
+      template<typename O>
+      void optional_helper( const O& v, const char* name )const {
+        if( c ) os <<',';
+        os<<'"'<<name<<"\":";
+        to_json( v, os, filt);
+        c = true;
+      }
+      template<typename O>
+      void optional_helper( const boost::optional<O>& v, const char* name )const {
+        if( !!v ) {
+          if( c ) os <<',';
+          c = true;
+          os<<'"'<<name<<"\":";
+          to_json( filt(*v), os, filt);
+        }
+      }
+
       const T& val;
       Stream& os;
       mutable int i;
       Filter& filt;
+      mutable bool c;
   };
   //! [Define a visitor]
   
