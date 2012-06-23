@@ -11,7 +11,7 @@ namespace mace { namespace rpc { namespace json {
   void to_json( const T&, Stream& os, Filter& f );
 
   //! [Define base cases]
-  template<typename T, typename Stream, typename Filter>
+  template<typename Stream, typename Filter>
   void to_json( const mace::rpc::value&, Stream& os, Filter& f );
 
   template<typename Stream, typename Filter>
@@ -199,13 +199,27 @@ namespace mace { namespace rpc { namespace json {
     }
     os << '}';
   }
+  template<typename IsReflected=boost::false_type>
+  struct if_enum {
+    template<typename T,typename Filter, typename Stream>
+    static inline void to_json( const T& v, Stream& os, Filter& f ) {
+      mace::reflect::reflector<T>::visit( to_json_visitor<T,Stream,Filter>( v, os, f ) );
+    }
+  };
+  template<>
+  struct if_enum<boost::true_type> {
+    template<typename T,typename Filter, typename Stream>
+    static inline void to_json( const T& v, Stream& os, Filter& f ) {
+      mace::rpc::json::detail::to_json( std::string(mace::reflect::reflector<T>::to_string( v ) ), os, f );
+    }
+  };
 
   template<typename IsReflected=boost::false_type>
   struct if_reflected {
     template<typename T,typename Filter, typename Stream>
     static inline void to_json( const T& v, Stream& os, Filter& f ) { 
+      v.did_not_implement_reflect_macro();
       // Use boost serialization or die!
-      elog( "Unknown type %1%", mace::reflect::get_typename<T>() );
       assert( !"This should never be called" );
     }
   };
@@ -213,7 +227,8 @@ namespace mace { namespace rpc { namespace json {
   struct if_reflected<boost::true_type> {
     template<typename T,typename Filter, typename Stream>
     static inline void to_json( const T& v, Stream& os, Filter& f ) {
-      mace::reflect::reflector<T>::visit( to_json_visitor<T,Stream,Filter>( v, os, f ) );
+      if_enum<typename mace::reflect::reflector<T>::is_enum>::to_json(v,os,f);
+   //   mace::reflect::reflector<T>::visit( to_json_visitor<T,Stream,Filter>( v, os, f ) );
     }
   };
 

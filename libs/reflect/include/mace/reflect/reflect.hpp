@@ -29,7 +29,7 @@
 #include <stdint.h>
 #include <boost/fusion/container/vector.hpp>
 #include <boost/function_types/result_type.hpp>
-
+#include <mace/reflect/error.hpp>
 
 #include <mace/void.hpp>
 #include <mace/reflect/typeinfo.hpp>
@@ -54,25 +54,38 @@ struct reflector{
     typedef T type;
     typedef boost::fusion::vector<> base_class_types;
     typedef boost::false_type is_defined;
+    typedef boost::false_type is_enum; 
 
     /**
      *  @tparam Visitor a function object of the form:
-     *
+     *    
      *    @code
      *     struct functor {  
      *        template<typename MemberPtr, MemberPtr m>
      *        void operator()( const char* name )const;
      *     };
      *    @endcode
+     *
+     *  If T is an enum then the functor has the following form:
+     *    @code
+     *     struct functor {  
+     *        template<int Value>
+     *        void operator()( const char* name )const;
+     *     };
+     *    @endcode
      *  
      *  @param v a functor that will be called for each member on T
      *
+     *  @note - this method is not defined for non-reflected types.
      */
+    #ifdef DOXYGEN
     template<typename Visitor>
-    static inline void visit( const Visitor& v ){}; 
+    static inline void visit( const Visitor& v ); 
+    #endif // DOXYGEN
 };
 
 } } // namespace mace::reflect
+
 
 #ifndef DOXYGEN
 
@@ -109,6 +122,42 @@ void mace::reflect::reflector<TYPE>::visit( const Visitor& v ) { \
 
 #endif // DOXYGEN
 
+
+#define MACE_REFLECT_VISIT_ENUM( r, visitor, elem ) \
+  visitor.TEMPLATE operator()<elem>(BOOST_PP_STRINGIZE(elem));
+#define MACE_REFLECT_ENUM_TO_STRING( r, visitor, elem ) \
+  case elem: return BOOST_PP_STRINGIZE(elem);
+
+#define MACE_REFLECT_ENUM_FROM_STRING( r, visitor, elem ) \
+  if( strcmp( s, BOOST_PP_STRINGIZE(elem)  ) == 0 ) return elem;
+
+#define MACE_REFLECT_ENUM( ENUM, FIELDS ) \
+MACE_REFLECT_TYPEINFO(ENUM) \
+namespace mace { namespace reflect { \
+template<> struct reflector<ENUM> { \
+    typedef boost::true_type is_defined; \
+    typedef boost::true_type is_enum; \
+    typedef boost::fusion::vector<> base_class_types; \
+    template<typename Visitor> \
+    static inline void visit( const Visitor& v ) { \
+        BOOST_PP_SEQ_FOR_EACH( MACE_REFLECT_VISIT_ENUM, v, FIELDS ) \
+    }\
+    static const char* to_string(int64_t i) { \
+      switch( ENUM(i) ) { \
+        BOOST_PP_SEQ_FOR_EACH( MACE_REFLECT_ENUM_TO_STRING, v, FIELDS ) \
+        default: \
+        MACE_REFLECT_THROW( mace::reflect::unknown_field(), "%1% not in enum '%2%'", %i %BOOST_PP_STRINGIZE(ENUM) ); \
+      }\
+    } \
+    static ENUM from_string( const char* s ) { \
+        BOOST_PP_SEQ_FOR_EACH( MACE_REFLECT_ENUM_FROM_STRING, v, FIELDS ) \
+        MACE_REFLECT_THROW( mace::reflect::unknown_field(), "%1% in enum %2%", %s %BOOST_PP_STRINGIZE(ENUM) ); \
+    } \
+};  \
+} }
+
+
+
 /**
  *  @def MACE_REFLECT_DERIVED(TYPE,INHERITS,MEMBERS)
  *
@@ -123,7 +172,8 @@ MACE_REFLECT_TYPEINFO(TYPE) \
 namespace mace { namespace reflect { \
 template<> struct reflector<TYPE> {\
     typedef TYPE type; \
-    typedef boost::true_type is_defined; \
+    typedef boost::true_type  is_defined; \
+    typedef boost::false_type is_enum;  \
     enum  member_count_enum {  \
       local_member_count = BOOST_PP_SEQ_SIZE(MEMBERS), \
       total_member_count = local_member_count BOOST_PP_SEQ_FOR_EACH( MACE_REFLECT_BASE_MEMBER_COUNT, +, INHERITS )\

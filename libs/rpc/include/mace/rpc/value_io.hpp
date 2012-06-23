@@ -232,10 +232,44 @@ namespace mace { namespace rpc {
     };
 
     template<typename IsReflected=boost::false_type>
+    struct if_enum {
+      template<typename T,typename Filter>
+      static inline void pack( Filter& f, mace::rpc::value& jsv, const T& v ) { 
+         jsv = mace::rpc::object();
+         detail::pack_object_visitor<T,Filter> pov(f,f(v),jsv);
+         mace::reflect::reflector<T>::visit(pov);
+      }
+      template<typename T,typename Filter>
+      static inline void unpack( Filter& f, const mace::rpc::value& jsv, T& v ) { 
+         detail::unpack_object_visitor<T,Filter> pov(f,v,jsv );
+         mace::reflect::reflector<T>::visit(pov);
+      }
+    };
+
+    template<>
+    struct if_enum<boost::true_type> {
+      template<typename T,typename Filter>
+      static inline void pack( Filter& f, mace::rpc::value& jsv, const T& v ) { 
+         mace::rpc::pack( f, jsv, mace::reflect::reflector<T>::to_string(v) );
+      }
+      template<typename T,typename Filter>
+      static inline void unpack( Filter& f, const mace::rpc::value& jsv, T& v ) { 
+         if( strcmp( jsv.type(), "string" ) == 0 ) {
+            v = mace::reflect::reflector<T>::from_string( value_cast<std::string>(jsv).c_str() );
+         } else {
+            // throw if invalid int, by attempting to convert to string
+            mace::reflect::reflector<T>::to_string( v = value_cast<int64_t>(jsv) );
+         }
+      }
+    };
+
+
+    template<typename IsReflected=boost::false_type>
     struct if_reflected {
       template<typename T,typename Filter>
       static inline void pack( Filter& f,mace::rpc::value& s, const T& v ) { 
-        wlog( "warning, ignoring unknown type" );
+       // wlog( "warning, ignoring unknown type" );
+        v.did_not_implement_reflect_macro();
        // std::stringstream ss; ss << v;
        // mace::rpc::pack(f,s,f(mace::rpc::base64_encode((unsigned char const*)ss.str().c_str(),ss.str().size())));
       }
@@ -252,14 +286,11 @@ namespace mace { namespace rpc {
     struct if_reflected<boost::true_type> {
       template<typename T,typename Filter>
       static inline void pack( Filter& f, mace::rpc::value& jsv, const T& v ) { 
-         jsv = mace::rpc::object();
-         detail::pack_object_visitor<T,Filter> pov(f,f(v),jsv);
-         mace::reflect::reflector<T>::visit(pov);
+         if_enum<typename mace::reflect::reflector<T>::is_enum>::pack( f,jsv,v );
       }
       template<typename T,typename Filter>
       static inline void unpack( Filter& f, const mace::rpc::value& jsv, T& v ) { 
-         detail::unpack_object_visitor<T,Filter> pov(f,v,jsv );
-         mace::reflect::reflector<T>::visit(pov);
+         if_enum<typename mace::reflect::reflector<T>::is_enum>::unpack( f,jsv,v );
       }
     };
 
