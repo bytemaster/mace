@@ -12,11 +12,19 @@ struct test_s {
   std::string a;
   int         b;
   double      c;
+
+  bool operator == ( const test_s& s )const {
+    return s.a == a && s.b == b && s.c == c;
+  }
 };
 struct test_sub {
   test_sub():d("ddd"){}
   std::string d;
   test_s      sub;
+
+  bool operator == ( const test_sub& s )const {
+    return s.sub == sub && d == s.d;
+  }
 };
 
 MACE_REFLECT( test_s, (a)(b)(c) )
@@ -131,3 +139,33 @@ BOOST_AUTO_TEST_CASE( value_new_index ) {
   v["area"] = 5.5;
   BOOST_REQUIRE( value_cast<double>(v["area"]) == 5.5 );
 }
+
+BOOST_AUTO_TEST_CASE( parse_test ) {
+  test_sub ts;
+  ts.sub.a = "__AA";
+  std::string j = mace::rpc::json::to_string(ts);
+  BOOST_REQUIRE( ts == mace::rpc::json::from_string<test_sub>(j) );
+}
+BOOST_AUTO_TEST_CASE( parse_pretty_test ) {
+  test_sub ts;
+  ts.sub.a = "__AA";
+  ts.sub.b = 5;;
+  ts.sub.c = 6;;
+  ts.d = "7";
+  std::string j = mace::rpc::json::to_pretty_string(ts);
+  std::cout<<j<<std::endl;
+  auto f = mace::rpc::json::from_string<test_sub>(j);
+  BOOST_REQUIRE( ts == f );
+  std::string j2 = mace::rpc::json::to_pretty_string(f);
+  BOOST_REQUIRE( j2 == j );
+}
+BOOST_AUTO_TEST_CASE( parse_bug ) {
+  std::string j = "{\"uuid\":\"1340315652715724000nanosecondssinceJan1,1970\",\"name\":\"test\",\"description\":\"\""
+                  ",\"components\":{\"root.areacalc\":{\"uuid\":\"10234\",\"type\":\"area\",\"path\":\"\"}},\"structs\":{}}";
+  mace::rpc::json::error_collector ec;    
+  value v = json::to_value( std::vector<char>( j.begin(),j.end()), ec );
+  auto o = json::to_string(v);
+  slog( "%1%\n%2%", o, j );
+  BOOST_REQUIRE( o == j );
+}
+

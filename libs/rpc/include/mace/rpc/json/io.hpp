@@ -144,6 +144,11 @@ namespace mace { namespace rpc { namespace json {
     auto i = io::pack(v);
     return std::string(&i.front(),i.size());
   }
+  template<typename T>
+  T from_string( const std::string& s ) {
+    std::vector<char> v(s.begin(),s.end());
+    return io::unpack<T>(std::move(v));
+  }
   std::string pretty_print( std::vector<char>&& json, uint8_t indent = 2 );
 
   /**

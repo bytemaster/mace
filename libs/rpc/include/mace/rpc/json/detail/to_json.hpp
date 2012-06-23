@@ -250,7 +250,7 @@ namespace mace { namespace rpc { namespace json {
     virtual void operator()( const uint64_t& v    ){ os << v; }
     virtual void operator()( const float& v       ){ os << v; }
     virtual void operator()( const double& v      ){ os << v; }
-    virtual void operator()( const bool& v        ){ os << v ? "true" : "false"; }
+    virtual void operator()( const bool& v        ){ os << (v ? "true" : "false"); }
     virtual void operator()( const std::string& v ){ os << '"' << escape_string(v) <<'"'; }
     virtual void operator()( const object& o ){
       os << '{';

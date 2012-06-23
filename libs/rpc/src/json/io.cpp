@@ -413,6 +413,8 @@ char* read_key_val( object& obj, bool sc, char* in, char* end, mace::rpc::json::
   do {
     // read first char
     name = mace::rpc::json::read_value( name, end, name_end );
+    if( name == name_end )
+      return name;
     if( sc ) { // if we expect a ,
       if( *name != ',' ) { // but didn't get one
         if( *name != '}' )

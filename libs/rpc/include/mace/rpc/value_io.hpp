@@ -488,7 +488,7 @@ namespace mace { namespace rpc {
       val.clear();
       auto e = jsv.end();
       for( auto i = jsv.begin(); i != e; ++i ) {
-          apply_unpack_filter( f, jsv, val[i->key] );
+          apply_unpack_filter( f, i->val, val[i->key] );
       }
   }
   template<typename T, typename Filter> 
