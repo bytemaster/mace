@@ -119,13 +119,13 @@ struct client_member<R(Class::*)(PARAM_TYPES)const,ConnectionType> : public clie
   typedef typename boost::remove_pointer<result_type(*)(PARAM_TYPES)>::type   signature;
 
   inline future_type operator()( PARAM_ARGS )const {
-    return (*this)( boost::fusion::make_vector(PARAM_NAMES) );
+    return call_fused( boost::fusion::make_vector(PARAM_NAMES) );
   }
-  inline future_type operator() ( const fused_params& fp )const {
+  inline future_type call_fused( const fused_params& fp )const {
     BOOST_ASSERT(this->m_con);
-    return this->m_con->template call_fused<result_type,fused_params>( std::string(this->m_method_id), fp );
+    return this->m_con->template call_fused<result_type,fused_params>( this->m_method_id, fp );
   }
-  inline future_type operator() ( fused_params&& fp )const {
+  inline future_type call_fused( fused_params&& fp )const {
     BOOST_ASSERT(this->m_con);
     return this->m_con->template call_fused<result_type,fused_params>( std::string(this->m_method_id), std::move(fp) );
   }
@@ -152,14 +152,14 @@ struct client_member<R(Class::*)(PARAM_TYPES),ConnectionType>  : public client_m
   typedef typename boost::remove_pointer<result_type(*)(PARAM_TYPES)>::type signature;
 
   inline future_type operator()( PARAM_ARGS ) {
-    return (*this)( boost::fusion::make_vector(PARAM_NAMES) );
+    return call_fused( boost::fusion::make_vector(PARAM_NAMES) );
   }
-  inline future_type operator() ( const fused_params& fp ) {
+  inline future_type call_fused( const fused_params& fp ) {
     BOOST_ASSERT(this->m_con);
     return this->m_con->template call_fused<result_type,fused_params>( this->m_method_id, fp );
   }
 
-  inline future_type operator() ( fused_params&& fp ) {
+  inline future_type call_fused( fused_params&& fp ) {
     BOOST_ASSERT(this->m_con);
     return this->m_con->template call_fused<result_type,fused_params>( std::string(this->m_method_id), std::move(fp) );
   }

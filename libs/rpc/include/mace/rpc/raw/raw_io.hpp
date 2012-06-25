@@ -222,6 +222,11 @@ namespace mace { namespace rpc { namespace raw {
          void operator() ( const T& v )const {
             mace::rpc::raw::pack(f,s,f(v));
          }
+         template<typename T>
+         void operator() ( const boost::function<T>& v )const {
+            auto a = f(v);
+            mace::rpc::raw::pack(f,s,a);
+         }
       };
 
       template<typename Filter, typename Stream>
@@ -254,6 +259,7 @@ namespace mace { namespace rpc { namespace raw {
       struct if_reflected {
         template<typename T,typename Filter, typename Stream>
         static inline void pack( Filter& f,Stream& s, const T& v ) { 
+          v.did_not_implement_reflect_macro();
           //BOOST_STATIC_ASSERT_MSG( false, "Unknown type, not reflected" );
           elog( "Unknown type %1%", mace::reflect::get_typename<T>() );
           // TODO: Boost Serialize??

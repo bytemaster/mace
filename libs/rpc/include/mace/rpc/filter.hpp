@@ -1,6 +1,8 @@
 #ifndef _MACE_RPC_FILTER_HPP_
 #define _MACE_RPC_FILTER_HPP_
 #include <boost/function.hpp>
+#include <mace/void.hpp>
+#include <boost/fusion/container/vector.hpp>
 namespace mace { namespace rpc {
 
     /**
@@ -31,22 +33,6 @@ namespace mace { namespace rpc {
       inline T operator()( T&& v )const { return v; }
     };
 
-    template<typename T, typename Connection>
-    struct ffilter {
-      inline T operator()( T&& v, Connection& )const { return v; }
-    };
-    template<typename Signature, typename Connection>
-    struct ffilter<boost::function<Signature>,Connection> {
-      auto operator()( const boost::function<Signature>& v, Connection& m_con ) -> decltype( ((Connection*)0)->add_method(v)) {
-        return m_con.add_method( v );
-      }
-    };
-    template<typename Signature>
-    struct ffilter<boost::function<Signature>,void> {
-      auto operator()( const boost::function<Signature>& v) -> std::string {
-        return "";
-      }
-    };
 
     /**
      *  @tparam Connection must implement the following expressions:
@@ -65,14 +51,15 @@ namespace mace { namespace rpc {
       template<typename T>
       void operator()( const T& r, T& v )const  { v = r; }
       
-      template<typename Signature, typename R>
-      void operator()( const R& r, boost::function<Signature>& v ) {
+      template<typename Signature>
+      void operator()( const std::string& r, boost::function<Signature>& v ) {
         v = m_con.template create_callback<Signature>(r);
       }
       
       template<typename Signature>
-      const bool is_filtered(const boost::function<Signature>*)const { return true; }
-
+      const bool is_filtered(boost::function<Signature>*)const { return true; }
+      template<typename Signature>
+      const bool is_filtered(std::function<Signature>*)const { return true; }
 
       /**
        *  @return true if filtered for a particular type.
@@ -82,13 +69,17 @@ namespace mace { namespace rpc {
 
       /**
        *  Pack filter, given input type return output type.
+       *   @todo only 'copy' rvalues, hopefully a smart optimizer will avoid a copy
+       *         with this implementation, but we make it more explicit that we don't 
+       *         want to copy const T& v to the return value....
        */
       template<typename T>
-      inline const T& operator()( const T& v )const { return v; }
-
+      inline auto operator()( const T& v )const -> T {
+        return v; 
+      }
       template<typename T>
-      inline T operator()( T&& v )const { 
-        return ffilter<T,Connection>( std::forward<T>(v), m_con ); 
+      inline auto operator()( const boost::function<T>& v )const -> std::string {
+        return  m_con.add_method(v);
       }
 
       private:
@@ -102,14 +93,15 @@ namespace mace { namespace rpc {
        */
       template<typename T>
       void operator()( const T& r, T& v )const  { v = r; }
-
-      template<typename Signature, typename R>
-      void operator()( const R& r, boost::function<Signature>& v ) {
-        v = boost::function<Signature>();
+      
+      template<typename Signature>
+      void operator()( const std::string& r, boost::function<Signature>& v ) {
       }
       
       template<typename Signature>
-      const bool is_filtered(const boost::function<Signature>*)const { return true; }
+      const bool is_filtered(boost::function<Signature>*)const { return true; }
+      template<typename Signature>
+      const bool is_filtered(std::function<Signature>*)const { return true; }
 
       /**
        *  @return true if filtered for a particular type.
@@ -119,13 +111,18 @@ namespace mace { namespace rpc {
 
       /**
        *  Pack filter, given input type return output type.
+       *   
+       *   @todo only 'copy' rvalues, hopefully a smart optimizer will avoid a copy
+       *         with this implementation, but we make it more explicit that we don't 
+       *         want to copy const T& v to the return value....
        */
       template<typename T>
-      inline const T& operator()( const T& v )const { return v; }
-
+      inline auto operator()( const T& v )const -> T {
+        return v; 
+      }
       template<typename T>
-      inline T operator()( T&& v )const { 
-        return ffilter<T,void>( std::forward<T>(v) ); 
+      inline auto operator()( const boost::function<T>& v )const -> mace::void_t {
+        return mace::void_t();
       }
     };
 

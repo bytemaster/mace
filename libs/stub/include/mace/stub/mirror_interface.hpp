@@ -163,7 +163,7 @@ struct mirror_member<R(Class::*)(PARAM_TYPES)const> {
   result_type operator()( PARAM_ARGS )const {
     return m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
   }
-  result_type operator() ( const fused_params& fp )const {
+  result_type call_fused( const fused_params& fp )const {
     return m_delegate( fp );
   }
   mirror_member& operator=( const mirror_member& d )  {
@@ -204,7 +204,7 @@ struct mirror_member<R(Class::*)(PARAM_TYPES)>
   result_type operator()( PARAM_ARGS ) {
     return m_delegate( boost::fusion::make_vector(PARAM_NAMES) );
   }
-  result_type operator() ( const fused_params& fp ) {
+  result_type call_fused( const fused_params& fp ) {
     return m_delegate( fp );
   }
   template<typename T>

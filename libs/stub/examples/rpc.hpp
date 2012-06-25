@@ -169,7 +169,7 @@ class rpc_server {
 
                 std::ostringstream os;
                 boost::archive::binary_oarchive oa(os);
-                typename boost::remove_reference<Functor>::type::result_type r = m_func(paramv);
+                typename boost::remove_reference<Functor>::type::result_type r = m_func.call_fused(paramv);
                 oa << r;
                 return os.str();
            }

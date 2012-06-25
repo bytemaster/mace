@@ -44,4 +44,40 @@ namespace mace { namespace rpc {
         my->send( message( std::move(meth), std::move(param) ) );
   }
 
+namespace detail {
+  void connection_base::break_promises() {
+    auto itr = results.begin();
+    while( itr != results.end() ) {
+      itr->second->handle_error( message::broken_promise, datavec() );
+      ++itr;
+    }
+    results.clear();
+  }
+
+  void connection_base::handle( message&& m ) {
+    if( m.meth.size() ) {
+      auto itr = methods.find( m.meth );
+      if( itr != methods.end() ) {
+         send( itr->second( m ) );
+      } else {
+         handle_error( message::unknown_method, m.meth ); 
+      }
+    } else if( m.id ) {
+      auto itr = results.find( *m.id );
+      if( itr != results.end() ) {
+        if( !m.err ) {
+          itr->second->handle_value( std::move( m.data ) );
+        } else {
+          itr->second->handle_error( m.err, std::move(m.data) );
+        }
+        results.erase(itr);
+      } else {
+         handle_error( message::invalid_response, "Unexpected response id "+ boost::lexical_cast<std::string>(*m.id)  ); 
+      }
+    } else {
+      handle_error( message::invalid_response, "no method or request id" );
+    }
+  }
+} // namespace detail
+
 } } // namepace mace::rpc

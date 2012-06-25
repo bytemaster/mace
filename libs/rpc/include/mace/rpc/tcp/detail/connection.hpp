@@ -6,6 +6,7 @@
 #include <mace/rpc/raw/message.hpp>
 #include <mace/rpc/raw/raw_io.hpp>
 #include <mace/rpc/error.hpp>
+#include <mace/cmt/bind.hpp>
 
 #include <mace/cmt/asio/tcp/socket.hpp>
 #include <mace/cmt/thread.hpp>
@@ -51,7 +52,9 @@ namespace mace { namespace rpc { namespace tcp { namespace detail {
       void read_loop( ) {
         try {
           while ( true ) {
-            handle( read_message() );
+            //auto m = read_message();
+            mace::cmt::async( mace::cmt::bind( [this]( message&& m ) { handle( std::move(m) ); } , read_message() ) );
+            //handle( read_message() );
           }
         } catch ( ... ) {
           elog( "connection closed: %1%", 

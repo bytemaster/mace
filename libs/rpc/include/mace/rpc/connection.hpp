@@ -8,6 +8,9 @@
 #include <mace/stub/ptr.hpp>
 #include <boost/fusion/support/deduce.hpp>
 #include <boost/fusion/support/deduce_sequence.hpp>
+#include <boost/fusion/include/make_fused.hpp>
+#include <boost/function_types/result_type.hpp>
+#include <boost/function_types/parameter_types.hpp>
 
 #include <boost/signals.hpp>
 
@@ -54,7 +57,7 @@ namespace mace { namespace rpc {
 
       template<typename R, typename ParamSeq>
       cmt::future<R> call_fused( const std::string& id, ParamSeq&& params ) {
-        return call_fused( std::string(id), std::move(params) );
+        return call_fused<R>( std::string(id), std::forward<ParamSeq>(params) );
       }
       template<typename ParamSeq>
       void notice_fused( const std::string& id, ParamSeq&& params ) {
@@ -63,7 +66,7 @@ namespace mace { namespace rpc {
 
       template<typename R, typename ParamSeq>
       cmt::future<R> call_fused( std::string&& id, ParamSeq&& params ) {
-        BOOST_STATIC_ASSERT( boost::fusion::traits::is_sequence<ParamSeq>::value );
+        BOOST_STATIC_ASSERT( boost::fusion::traits::is_sequence<typename std::decay<ParamSeq>::type>::value );
         // TODO: filter params for non-const references and add them as additional 'return values'
         //       then pass the extra references to the pending_result impl.
         //       References must remain valid until pr->prom->wait() returns.
@@ -75,7 +78,7 @@ namespace mace { namespace rpc {
 
       template<typename ParamSeq>
       void notice_fused( std::string&& id, ParamSeq&& params ) {
-        BOOST_STATIC_ASSERT( boost::fusion::traits::is_sequence<ParamSeq>::value );
+        BOOST_STATIC_ASSERT( boost::fusion::traits::is_sequence<typename std::decay<ParamSeq>::type>::value );
         function_filter<connection> f(*this);
         raw_call( std::move(id), IODelegate::pack(f, params), detail::pending_result::ptr() );
       }
@@ -86,8 +89,15 @@ namespace mace { namespace rpc {
        */
       template<typename Signature>
       std::string add_method( const boost::function<Signature>& m ) {
+        typedef typename boost::function_types::parameter_types<Signature>::type  mpl_param_types;
+        typedef typename boost::fusion::result_of::as_vector<mpl_param_types>::type param_types;
+
         // TODO:  convert m into a rpc::method and add it.
-        return std::string();
+        std::string mid = create_method_id();
+        typedef decltype( boost::fusion::make_fused( m ) ) fused_func;
+        //add_method( mid, rpc_recv_functor<param_types,boost::function<Signature> >( m, *this ) );
+        add_method( mid, rpc_recv_functor<param_types,fused_func >( boost::fusion::make_fused(m), *this ) );
+        return  mid;
       }
 
       /**
@@ -95,7 +105,13 @@ namespace mace { namespace rpc {
        */
       template<typename Signature>
       boost::function<Signature> create_callback( const std::string& name ) {
-        return boost::function<Signature>();  
+        typedef typename boost::function_types::parameter_types<Signature>::type  mpl_param_types;
+        typedef typename boost::fusion::result_of::as_vector<mpl_param_types>::type param_types;
+        typedef typename boost::function_types::result_type<Signature>::type  R;
+
+        return boost::fusion::make_unfused( boost::bind<R>(
+           [=]( const param_types& p ) { return this->call_fused<R>(name,p); },
+            _1) );
       }
 
       /**
@@ -150,7 +166,9 @@ namespace mace { namespace rpc {
             typedef typename boost::function_types::result_type<MemberPtr>::type MemberRef;
             typedef typename boost::remove_reference<MemberRef>::type Member;
             typedef typename boost::fusion::traits::deduce_sequence<typename Member::fused_params>::type param_type;
-            m_con.add_method( std::string(name), method(rpc_recv_functor<param_type, Member&>( (*m_aptr).*m, m_con )) );
+            typedef decltype( boost::bind( &Member::call_fused, (*m_aptr).*m, _1 ) ) functor;
+           // m_con.add_method( std::string(name), method(rpc_recv_functor<param_type, Member&>( (*m_aptr).*m, m_con )) );
+            m_con.add_method( std::string(name), method(rpc_recv_functor<param_type, functor>( boost::bind( &Member::call_fused, (*m_aptr).*m,_1) , m_con )) );
         }
         connection&                       m_con;
         mace::stub::ptr<InterfaceType>&   m_aptr;

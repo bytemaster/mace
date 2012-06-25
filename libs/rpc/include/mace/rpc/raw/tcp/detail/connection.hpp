@@ -23,8 +23,6 @@ namespace mace { namespace rpc { namespace raw { namespace tcp {  namespace deta
       virtual rpc::message read_message() {
         raw::message rm;
         raw::unpack( *m_sock, rm );
-        slog( "unpacked id: %1%  method: %2%  error: %3%  datalen: %4%", rm.id.value, rm.method, rm.error_code.value, rm.data.size() );
-
         return static_cast<rpc::message>(rm);
       }
   };

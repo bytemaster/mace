@@ -168,7 +168,7 @@ namespace mace { namespace rpc { namespace json {
      
      template<typename T>
      void operator() ( const T& v )const {
-        to_json(v,os,f);
+        to_json(f(v),os,f);
         ++i;
         if( i < N ) os << ',';
      }

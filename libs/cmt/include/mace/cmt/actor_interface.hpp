@@ -76,10 +76,11 @@
 
               template<typename MemberPtr, MemberPtr m> 
               void operator()( const char* name )const {
-                slog( "%1% set delegate", name );
                 typedef typename boost::function_types::result_type<MemberPtr>::type member_ref;
                 typedef typename boost::remove_reference<member_ref>::type member;
-                (vtbl.*m) = boost::bind( boost::ref( m_self.* member::template get_member_ptr<T>()), _1 );
+                auto memptr = member::template get_member_ptr<T>();
+                typedef typename std::remove_reference<decltype(m_self.*memptr)>::type mem_type;
+                (vtbl.*m) = boost::bind( &mem_type::call_fused, &(m_self.*memptr), _1 );
                 (vtbl.*m).set_actor(a);
               }
             private:
@@ -202,9 +203,9 @@ struct actor_member<R(Class::*)(PARAM_TYPES)const> : public detail::actor_member
   typedef typename boost::remove_pointer<result_type(*)(PARAM_TYPES)>::type   signature;
 
   future_type operator()( PARAM_ARGS )const {
-    return (*this)( boost::fusion::make_vector(PARAM_NAMES) );
+    return call_fused( boost::fusion::make_vector(PARAM_NAMES) );
   }
-  future_type operator() ( const fused_params& fp )const {
+  future_type call_fused( const fused_params& fp )const {
     if( this->m_actor && &mace::cmt::thread::current() != m_actor->m_thread ) {
       return this->m_actor->m_thread->async<R>( boost::bind(std::ref(m_delegate),fp) );
     }
@@ -247,9 +248,9 @@ struct actor_member<R(Class::*)(PARAM_TYPES)> : public detail::actor_member_base
   typedef typename boost::remove_pointer<result_type(*)(PARAM_TYPES)>::type signature;
 
   future_type operator()( PARAM_ARGS ) {
-    return (*this)( boost::fusion::make_vector(PARAM_NAMES) );
+    return call_fused( boost::fusion::make_vector(PARAM_NAMES) );
   }
-  future_type operator() ( const fused_params& fp ) {
+  future_type call_fused( const fused_params& fp ) {
     if( this->m_actor && &mace::cmt::thread::current() != this->m_actor->m_thread ) {
       return this->m_actor->m_thread->async( boost::bind(m_delegate,fp) );
     }
