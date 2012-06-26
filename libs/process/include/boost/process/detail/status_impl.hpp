@@ -50,6 +50,7 @@ typedef HANDLE phandle;
 
 struct operation
 {
+    virtual ~operation(){}
     virtual void operator()(int exit_code)
     {
 #if defined(BOOST_MSVC)

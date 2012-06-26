@@ -13,7 +13,7 @@ SET( CMAKE_DEBUG_POSTFIX _debug )
 SET( BUILD_SHARED_LIBS NO )
 
 SET(Boost_USE_STATIC_LIBS ON)
-FIND_PACKAGE(Boost COMPONENTS test thread date_time system filesystem program_options signals serialization chrono) 
+FIND_PACKAGE(Boost COMPONENTS test thread date_time system filesystem program_options signals serialization chrono unit_test_framework ) 
 
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
@@ -24,6 +24,8 @@ INCLUDE( SetupTargetMacros )
 option( ENABLE_EXAMPLES "Build Examples" ON )
 option( ENABLE_TESTS "Build Tests" ON )
 option( ENABLE_ARM "Build for ARM CPU" OFF )
+
+include_directories(/usr/local/include)
 
 #ADD_DEFINITIONS( -DBOOST_CONTEXT_UCTX )
 #ADD_DEFINITIONS( -D_XOPEN_SOURCE )
