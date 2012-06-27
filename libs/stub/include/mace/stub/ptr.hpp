@@ -32,7 +32,7 @@ namespace mace { namespace stub {
       ptr( const ptr& m ) 
       :m_ptr( m.m_ptr ),m_vtable( m.m_vtable){}
 
-      operator bool()const  { return m_vtable; }
+      operator bool()const  { return !!m_vtable; }
       bool operator!()const { return !m_vtable; }
 
       template<typename T>
@@ -60,6 +60,11 @@ namespace mace { namespace stub {
 
       const vtable_type* operator->()const { return m_vtable.get(); } 
       vtable_type*       operator->()      { return m_vtable.get(); } 
+
+      ptr& operator=( const ptr& p ) {
+        m_ptr = p.m_ptr;
+        m_vtable = p.m_vtable;
+      }
        
     protected:
       std::shared_ptr<boost::any>     m_ptr;
