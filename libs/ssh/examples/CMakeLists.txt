@@ -1,0 +1,15 @@
+SET( libraries 
+    mace_cmt
+    mace_ssh
+    boost_context 
+    ${pthread_library}
+    ${rt_library}
+    ${Boost_THREAD_LIBRARY} 
+    ${Boost_CHRONO_LIBRARY} 
+    ${Boost_ASIO_LIBRARY} 
+    ${Boost_SYSTEM_LIBRARY} 
+    ${Boost_SIGNALS_LIBRARY})
+
+add_executable( ssh_ls  ssh_ls.cpp  )
+target_link_libraries( ssh_ls ${libraries} )
+

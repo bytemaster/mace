@@ -82,8 +82,7 @@ namespace asio {
         typedef boost::asio::ip::tcp::endpoint endpoint;
         typedef boost::asio::ip::tcp::resolver::iterator resolver_iterator;
         typedef boost::asio::ip::tcp::resolver resolver;
-        /// @brief asynchronously resolve all tcp::endpoints for hostname:port
-        cmt::future<std::vector<endpoint> > resolve( const std::string& hostname, const std::string& port );
+        std::vector<endpoint> resolve( const std::string& hostname, const std::string& port );
 
         /// @brief wraps boost::asio::async_accept
         template<typename SocketType, typename AcceptorType>
@@ -105,8 +104,8 @@ namespace asio {
         typedef boost::asio::ip::udp::endpoint endpoint;
         typedef boost::asio::ip::udp::resolver::iterator resolver_iterator;
         typedef boost::asio::ip::udp::resolver resolver;
-        /// @brief asynchronously resolve all udp::endpoints for hostname:port
-        cmt::future<std::vector<endpoint> > resolve( resolver& r, const std::string& hostname, const std::string& port );
+        /// @brief resolve all udp::endpoints for hostname:port
+        std::vector<endpoint> resolve( resolver& r, const std::string& hostname, const std::string& port );
     }
 
 

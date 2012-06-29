@@ -11,6 +11,9 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
    *
    *  Read buffer grabs what ever is available from ASIO when it
    *  is empty.  This makes small synchronous reads much more effecient.
+   *
+   *  This class also provides an input iterator that is useful for
+   *  parsing input from the stream.
    */
   class socket  : public boost::asio::ip::tcp::socket {
     public:
@@ -19,6 +22,7 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
       socket();
       ~socket();
 
+      mace::cmt::future<boost::system::error_code> connect( const std::string& host, uint16_t p );
       mace::cmt::future<boost::system::error_code> connect( const boost::asio::ip::tcp::endpoint& ep );
 
       /**

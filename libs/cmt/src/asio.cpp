@@ -50,21 +50,21 @@ namespace mace { namespace cmt { namespace asio {
     }
 
     namespace tcp {
-        cmt::future<std::vector<endpoint> > resolve( const std::string& hostname, const std::string& port) {
+        std::vector<endpoint> resolve( const std::string& hostname, const std::string& port) {
             resolver res( mace::cmt::asio::default_io_service() );
             promise<std::vector<endpoint> >::ptr p( new promise<std::vector<endpoint> >() );
             res.async_resolve( resolver::query(hostname,port), 
                              boost::bind( detail::resolve_handler<endpoint,resolver_iterator>, p, _1, _2 ) );
-            return p;
+            return p->wait();;
         }
     }
     namespace udp {
-        cmt::future<std::vector<endpoint> > resolve( resolver& r, const std::string& hostname, const std::string& port) {
+        std::vector<endpoint> resolve( resolver& r, const std::string& hostname, const std::string& port) {
                 resolver res( mace::cmt::asio::default_io_service() );
                 promise<std::vector<endpoint> >::ptr p( new promise<std::vector<endpoint> >() );
                 res.async_resolve( resolver::query(hostname,port), 
                                     boost::bind( detail::resolve_handler<endpoint,resolver_iterator>, p, _1, _2 ) );
-                return p;
+                return p->wait();
         }
     }
 

@@ -107,11 +107,10 @@ class retainable_ptr
                 u.cnt->retain();
             return u;
         }
-        retainable_ptr& reset()  {
-            if( !cnt ) 
-                return *this; 
-            cnt->release();
-            cnt = 0; 
+        retainable_ptr& reset( T* v = 0 )  {
+            if( cnt ) cnt->release();
+            cnt = v; 
+            if( cnt ) cnt->retain();
             return *this; 
         }
 
