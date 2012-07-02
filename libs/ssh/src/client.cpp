@@ -4,7 +4,10 @@
 #include <mace/cmt/asio.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include "client_detail.hpp"
+#include <boost/interprocess/file_mapping.hpp>
+#include <boost/interprocess/mapped_region.hpp>
 
 namespace mace { namespace ssh {
   namespace detail { 
@@ -180,6 +183,7 @@ namespace mace { namespace ssh {
   }
 
   client::~client() {
+    try { close(); } catch( ... ) {}
     delete my;
   }
 
@@ -268,14 +272,7 @@ namespace mace { namespace ssh {
        my->authenticate();
        
     } catch ( ... ) {
-      // maintain invariants 
-      if( my->m_session ) {
-       libssh2_session_disconnect(my->m_session, "Shutdown session due to exception.");
-       libssh2_session_free(my->m_session);
-       my->m_session = 0;
-      }   
-      // free the socket
-      my->m_sock.reset(0);
+      close();
       throw;
     }
   }
@@ -284,6 +281,115 @@ namespace mace { namespace ssh {
     process::ptr cpp(new process(*this,cmd));
     //my->processes.push_back(ccp);
     return cpp;
+  }
+
+  /**
+   *  Handles uploading file to remote host via scp.  The file will be memory mapped and then
+   *  copied. As the copy progresses, the progress callback will be called.  To cancel the upload
+   *  the progress callback should return 'false'.  
+   *
+   *  @param progress - called with progress updates as the file is uploaded.
+   *  
+   *  @pre local_path exists
+   *  @pre remote_path all directories in the remote path exist.
+   */
+  void  client::scp_send( const std::string& local_path, const std::string& remote_path, 
+                     boost::function<bool(size_t,size_t)> progress  ) {
+    using namespace boost::filesystem;
+    if( !exists(local_path) ) {
+      MACE_SSH_THROW( "Source file '%1%' does not exist", %local_path );
+    }
+    if( is_directory( local_path ) ) {
+      MACE_SSH_THROW( "Source path '%1%' is a directory, expected a file.", %local_path );
+    }
+
+    using namespace boost::interprocess;
+    // memory map the file
+    file_mapping fmap( local_path.c_str(), read_only );
+    size_t       fsize = file_size(local_path);
+
+    mapped_region mr( fmap, boost::interprocess::read_only, 0, fsize );
+
+    LIBSSH2_CHANNEL*                      chan = 0;
+    time_t now;
+    memset( &now, 0, sizeof(now) );
+    // TODO: preserve creation / modification date
+    chan = libssh2_scp_send64( my->m_session, remote_path.c_str(), 0700, fsize, now, now );
+    while( chan == 0 ) {
+      char* msg;
+      int ec = libssh2_session_last_error( my->m_session, &msg, 0, 0 );
+      if( ec == LIBSSH2_ERROR_EAGAIN ) {
+        my->wait_on_socket();
+        chan = libssh2_scp_send64( my->m_session, local_path.c_str(), 0700, fsize, now, now );
+      } else {
+          MACE_SSH_THROW( "scp failed %1% - %2%", %ec %msg );
+      }
+    }
+    try {
+      uint64_t   wrote = 0;
+      char* pos = reinterpret_cast<char*>(mr.get_address());
+      while( progress( wrote, fsize ) && wrote < fsize ) {
+          int r = libssh2_channel_write( chan, pos, fsize - wrote );
+          if( r < 0 ) {
+            if( r == LIBSSH2_ERROR_EAGAIN ) {
+              my->wait_on_socket();
+              continue;
+            } else {
+              char* msg = 0;
+              int ec = libssh2_session_last_error( my->m_session, &msg, 0, 0 );
+              MACE_SSH_THROW( "scp failed %1% - %2%", %ec %msg );
+            }
+          }
+          wrote += r;
+          pos   += r;
+      } 
+    } catch ( ... ) {
+      // clean up chan
+      int ec = libssh2_channel_free(chan );  
+      while( ec == LIBSSH2_ERROR_EAGAIN ) {
+        my->wait_on_socket();
+        ec = libssh2_channel_free( chan );  
+      }
+      throw;
+    }
+    int ec = libssh2_channel_free( chan );  
+    while( ec == LIBSSH2_ERROR_EAGAIN ) {
+      my->wait_on_socket();
+      ec = libssh2_channel_free( chan );  
+    }
+  }
+
+  /**
+   *  @post all session and socket objects closed and freed.
+   */
+  void client::close() {
+    if( my->m_session ) {
+       try {
+         int ec = libssh2_session_disconnect(my->m_session, "exit cleanly" );
+         while( ec == LIBSSH2_ERROR_EAGAIN ) {
+            my->wait_on_socket();
+            ec = libssh2_session_disconnect(my->m_session, "exit cleanly" );
+         }
+         ec = libssh2_session_free(my->m_session);
+         while( ec == LIBSSH2_ERROR_EAGAIN ) {
+            my->wait_on_socket();
+            ec = libssh2_session_free(my->m_session );
+         }
+         my->m_session = 0;
+       } catch ( ... ){}
+       try {
+         if( my->m_sock ) {
+           my->m_sock->close();
+           my->m_sock.reset(0);
+         }
+       } catch ( ... ){}
+       try {
+        if( my->read_prom ) my->read_prom->wait();
+       } catch ( ... ){}
+       try {
+        if( my->write_prom ) my->write_prom->wait();
+       } catch ( ... ){}
+    }
   }
 
 

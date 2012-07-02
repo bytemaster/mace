@@ -72,19 +72,8 @@ namespace mace { namespace ssh {
        {
         BOOST_ASSERT( c.my->m_session );
 
-        chan = libssh2_channel_open_session(c.my->m_session);
-        if( !chan ) {
-           char* msg;
-           int ec = libssh2_session_last_error( c.my->m_session, &msg, 0, 0 );
-           while( !chan && ec == LIBSSH2_ERROR_EAGAIN ) {
-              c.my->wait_on_socket();
-              chan = libssh2_channel_open_session(c.my->m_session);
-              ec   = libssh2_session_last_error( c.my->m_session, &msg, 0, 0 );
-           }
-           if( !chan ) {
-              MACE_SSH_THROW( "libssh2_channel_open_session failed: %1% - %2%", %ec %msg  );
-           }
-        }
+        chan = c.my->open_channel(); 
+
         std::shared_ptr<mace::ssh::client> sshsc(sshc);
         BOOST_ASSERT( sshsc );
 
@@ -199,8 +188,7 @@ namespace mace { namespace ssh {
              } else {
                char* msg;
                rc   = libssh2_session_last_error( sshsc->my->m_session, &msg, 0, 0 );
-               MACE_SSH_THROW( "read failed: %1% - %2%", %rc %msg  );
-               return buf-data;
+               MACE_SSH_THROW( "read failed: %1% - %2%", %rc %msg  ); return buf-data;
              }
            }
        } while( rc >= 0 && buflen);
@@ -257,7 +245,22 @@ namespace mace { namespace ssh {
   process::process( client& c, const std::string& cmd )
   :my( new detail::process_d( c, cmd ) ){}
 
-  process::~process() { delete my; }
+  process::~process() { 
+    try {
+        std::shared_ptr<mace::ssh::client> sshsc(my->sshc);
+        if( sshsc ) {
+          if( my->chan ) {
+              int ec = libssh2_channel_free( my->chan );  
+              while ( ec == LIBSSH2_ERROR_EAGAIN ) {
+                if( sshsc ) 
+                  sshsc->my->wait_on_socket();
+                ec = libssh2_channel_free( my->chan );  
+              }
+          }
+        }
+    } catch ( ... ) { }
+    delete my; 
+  }
 
   /**
    *  This method will block until the remote channel is closed before

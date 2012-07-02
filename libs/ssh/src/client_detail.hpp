@@ -9,8 +9,6 @@
 
 namespace mace { namespace ssh {
   namespace detail { 
-
-
     /**
      *  Internal Implementation of client.
      */
@@ -133,6 +131,26 @@ namespace mace { namespace ssh {
 
             printf("Done. Sending keyboard-interactive responses to server now.\n");
         }
+
+
+        LIBSSH2_CHANNEL*   open_channel() {
+            LIBSSH2_CHANNEL*                      chan = 0;
+            chan = libssh2_channel_open_session(m_session);
+            if( !chan ) {
+               char* msg;
+               int ec = libssh2_session_last_error( m_session, &msg, 0, 0 );
+               while( !chan && ec == LIBSSH2_ERROR_EAGAIN ) {
+                  wait_on_socket();
+                  chan = libssh2_channel_open_session(m_session);
+                  ec   = libssh2_session_last_error( m_session, &msg, 0, 0 );
+               }
+               if( !chan ) {
+                  MACE_SSH_THROW( "libssh2_channel_open_session failed: %1% - %2%", %ec %msg  );
+               }
+            }
+            return chan;
+        }
+
 
 
         mace::ssh::key                 host_key;
