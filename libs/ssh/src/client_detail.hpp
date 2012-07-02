@@ -1,5 +1,6 @@
 #ifndef _MACE_SSH_CLIENT_DETAIL_HPP_
 #define _MACE_SSH_CLIENT_DETAIL_HPP_
+#include <mace/cmt/future.hpp>
 #include <mace/ssh/client.hpp>
 #include <mace/cmt/asio/tcp/socket.hpp>
 #include <boost/bind.hpp>
@@ -28,17 +29,18 @@ namespace mace { namespace ssh {
         mace::cmt::promise<boost::system::error_code>::ptr write_prom;
 
         /**
-         *  Call libssh function, check for EAGAIN, if EAGAIN
-         *  then we must ask ASIO to notify us when the socket
-         *  is ready and then yield until then.
+         *  @pre libssh2_session_block_directions is set to either INBOUND or OUTBOUND or both. 
+         *  @post socket has data available for either INBOUND or OUTBOUND according to the
+         *        specified block direction.
+         *  @throw boost::system::system_error if an error occurs on the socket while waiting.
          */
-        template<typename Functor, typename CompareResult>
-        CompareResult wait_on_read( Functor&& f, CompareResult test, const char* message = "read" ) {
-          using namespace std::placeholders;
-          auto rtn = f();
-          while( rtn == test ) {
-            // are we already waiting for data?
-            if( !read_prom ) {
+        void wait_on_socket() {
+          auto dir = libssh2_session_block_directions(m_session);
+          BOOST_ASSERT( dir & (LIBSSH2_SESSION_BLOCK_INBOUND | LIBSSH2_SESSION_BLOCK_OUTBOUND ) );
+
+          mace::cmt::future<boost::system::error_code> rprom, wprom;
+          if( dir & LIBSSH2_SESSION_BLOCK_INBOUND ) {
+            if(!read_prom) {
                read_prom.reset( new mace::cmt::promise<boost::system::error_code>() );
                auto s = self.shared_from_this();
                m_sock->async_read_some( boost::asio::null_buffers(),
@@ -46,78 +48,109 @@ namespace mace { namespace ssh {
                                           s->my->read_prom->set_value(e);
                                         } );
             }
-            // save the promise(so it doesn't go out of scope
-            auto prom = read_prom;
-
-            // wait for the result, if an error occured throw
-            if( auto e = prom->wait() ) {
-               BOOST_THROW_EXCEPTION( boost::system::system_error( e ) );    
+            rprom = mace::cmt::future<boost::system::error_code>(read_prom);
+          }
+          
+          if( dir & LIBSSH2_SESSION_BLOCK_OUTBOUND ) {
+             if( !write_prom ) {
+                write_prom.reset( new mace::cmt::promise<boost::system::error_code>() );
+                auto s = self.shared_from_this();
+                m_sock->async_write_some( boost::asio::null_buffers(),
+                                         [s,this]( const boost::system::error_code& e, size_t  ) {
+                                           s->my->write_prom->set_value(e);
+                                         } );
             }
-
-            // anyone else who comes along must spawn a new wait promise
-            read_prom.reset();
-            rtn = f();
+            rprom = mace::cmt::future<boost::system::error_code>(write_prom);
           }
-          if( rtn < 0 ) {
-            char* msg;
-                  libssh2_session_last_error( m_session, &msg, 0, 0 );
-                  elog( "%1%",msg);
-            MACE_SSH_THROW( "%1% failed with %2%: %3%", %message %rtn %msg );
+          boost::system::error_code ec;
+          if( rprom.valid() && wprom.valid() ) {
+            /// TODO: implement wait on any in mace::cmt
+            wlog( "Attempt to wait in either direction currently waits for both directions" );
+            if( rprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(rprom.wait() ) ); }
+            if( wprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
+            /*
+              int p = mace::cmt::wait_any( rprom, wprom );
+              switch( p ) {
+                case 0:
+                  if( rprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
+                case 1:
+                  if( wprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
+              }
+              BOOST_ASSERT( p == 0 || p == 1 );
+              return;
+            */
+          } else if( rprom.valid() ) {
+              if( rprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(rprom.wait() ) ); }
+              read_prom.reset(0);
+          } else if( wprom.valid() ) {
+              if( wprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
+              write_prom.reset(0);
           }
-          return rtn;
-        }
-        /**
-         *  Call libssh function, check for EAGAIN, if EAGAIN
-         *  then we must ask ASIO to notify us when the socket
-         *  is ready and then yield until then.
-         */
-        template<typename Functor>
-        int wait_on_write( Functor&& f, const char* message = "write" ) {
-          using namespace std::placeholders;
-          int rtn = f();
-          while( rtn == LIBSSH2_ERROR_EAGAIN ) {
-            // are we already waiting for write?
-            if( !write_prom ) {
-               write_prom.reset( new mace::cmt::promise<boost::system::error_code>() );
-               auto s = self.shared_from_this();
-               m_sock->async_write_some( boost::asio::null_buffers(),
-                                        [s,this]( const boost::system::error_code& e, size_t  ) {
-                                          s->my->write_prom->set_value(e);
-                                        } );
-            }
-            // save the promise(so it doesn't go out of scope
-            auto prom = write_prom;
-
-            // wait for the result, if an error occured throw
-            if( auto e = prom->wait() ) {
-               BOOST_THROW_EXCEPTION( boost::system::system_error( e ) );    
-            }
-
-            // anyone else who comes along must spawn a new wait promise
-            write_prom.reset(0);
-            rtn = f();
-          }
-          if( rtn < 0 ) {
-            MACE_SSH_THROW( "%1% failed with %2%", %message %f );
-          }
-          return rtn;
         }
 
+        static void kbd_callback(const char *name, int name_len, 
+                     const char *instruction, int instruction_len, int num_prompts,
+                     const LIBSSH2_USERAUTH_KBDINT_PROMPT *prompts,
+                     LIBSSH2_USERAUTH_KBDINT_RESPONSE *responses,
+                     void **abstract)
+        {
+            int i;
+            size_t n;
+            char buf[1024];
+            (void)abstract;
+
+            printf("Performing keyboard-interactive authentication.\n");
+
+            printf("Authentication name: '");
+            fwrite(name, 1, name_len, stdout);
+            printf("'\n");
+
+            printf("Authentication instruction: '");
+            fwrite(instruction, 1, instruction_len, stdout);
+            printf("'\n");
+
+            printf("Number of prompts: %d\n\n", num_prompts);
+
+            for (i = 0; i < num_prompts; i++) {
+                printf("Prompt %d from server: '", i);
+                fwrite(prompts[i].text, 1, prompts[i].length, stdout);
+                printf("'\n");
+
+                printf("Please type response: ");
+                fgets(buf, sizeof(buf), stdin);
+                n = strlen(buf);
+                while (n > 0 && strchr("\r\n", buf[n - 1]))
+                  n--;
+                buf[n] = 0;
+
+                responses[i].text = strdup(buf);
+                responses[i].length = n;
+
+                printf("Response %d from user is '", i);
+                fwrite(responses[i].text, 1, responses[i].length, stdout);
+                printf("'\n\n");
+            }
+
+            printf("Done. Sending keyboard-interactive responses to server now.\n");
+        }
 
 
-        mace::ssh::key host_key;
-        std::string    uname;
-        std::string    upass;
-        std::string    pubkey;
-        std::string    privkey;
-        std::string    hostname;
-        uint16_t       port;
-        bool           session_connected;
+        mace::ssh::key                 host_key;
+        boost::asio::ip::tcp::endpoint endpt;
+        std::string                    uname;
+        std::string                    upass;
+        std::string                    pubkey;
+        std::string                    privkey;
+        std::string                    passphrase;
+        std::string                    hostname;
+        uint16_t                       port;
+        bool                           session_connected;
 
         bool validate_remote_host();
-        bool try_auth();
+        void authenticate();
         bool try_pass();
         bool try_pub_key();
+        bool try_keyboard();
   };
 } } } // mace::ssh::detail
 #endif // _MACE_SSH_CLIENT_DETAIL_HPP_

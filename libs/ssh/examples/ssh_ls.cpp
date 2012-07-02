@@ -9,18 +9,16 @@ int main( int argc, char** argv ) {
   try {
       auto sshc = mace::ssh::client::create();
       sshc->connect( "dlarimer", "zap.local");//10.211.55.2" );
-      auto ls   = sshc->exec( "ls" );
+      auto ls   = sshc->exec( "cat" );
+      ls->in_stream()<<"Hello World\n";
+      ls->in_stream().flush();
+      ls->in_stream().close();
 
       // print out anything that is sent our way
-   /*
-      int r = 0;
-      while( r >= 0 ) {
-        char out[1024];
-        int r = ls->read_some( out, sizeof(out) );
-        std::cout.write( out, r );
-      }
-      */
-
+   
+      std::string str((std::istreambuf_iterator<char>(ls->out_stream())),
+                    std::istreambuf_iterator<char>());
+      std::cout<<"stdout: "<<str<<std::endl;
       std::cout<<"\nresult: "<<ls->result()<<std::endl;
   } catch ( ... ) {
     elog( "%1%", boost::current_exception_diagnostic_information() );
