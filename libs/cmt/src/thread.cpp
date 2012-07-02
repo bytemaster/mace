@@ -426,7 +426,8 @@ namespace mace { namespace cmt {
       if( !my->current ) { 
         my->current = new cmt::context(&cmt::thread::current()); 
       }
-
+      
+      slog( "                                 %1% blocking on %2%", my->current, p.get() );
       my->current->add_blocking_promise(p.get(),true);
 
       // if not max timeout, added to sleep pqueue
@@ -437,11 +438,16 @@ namespace mace { namespace cmt {
                           my->sleep_pqueue.end(), 
                           sleep_priority_less()   );
       }
-      //slog( "blocking %1%", my->current );
-      my->add_to_blocked( my->current );
-      my->start_next_fiber();
-      //slog( "resuming %1%", my->current );
 
+      elog( "blocking %1%", my->current );
+      my->add_to_blocked( my->current );
+
+
+
+      my->start_next_fiber();
+      slog( "resuming %1%", my->current );
+
+      slog( "                                 %1% unblocking blocking on %2%", my->current, p.get() );
       my->current->remove_blocking_promise(p.get());
 
       my->check_fiber_exceptions();
@@ -510,22 +516,23 @@ namespace mace { namespace cmt {
     }
 
     void thread::notify( const promise_base::ptr& p ) {
-      slog( "notify task complete %1%", p.get() );
       BOOST_ASSERT(p->ready());
       if( &current() != this )  {
-        //slog( "post notify to %1% from %2%", name(), current().name() );
+        slog( "post notify to %1% from %2%", name(), current().name() );
         this->async( boost::bind( &thread::notify, this, p ) );
         return;
       }
+      slog( "                                    notify task complete %1%", p.get() );
       // TODO: store a list of blocked contexts with the promise 
       //  to accelerate the lookup.... unless it introduces contention...
       
       // iterate over all blocked contexts
+
       cmt::context* cur_blocked  = my->blocked;
       cmt::context* prev_blocked = 0;
       while( cur_blocked ) {
         // if the blocked context is waiting on this promise 
-        slog( "try unblock %1%", p.get() );
+        slog( "try unblock ctx %1% from prom %2%", cur_blocked, p.get() );
         if( cur_blocked->try_unblock( p.get() )  ) {
           slog( "unblock!" );
           // remove it from the blocked list.
@@ -540,16 +547,17 @@ namespace mace { namespace cmt {
               break;
             }
           }
-
+          auto cur = cur_blocked;
           if( prev_blocked ) {  
               prev_blocked->next_blocked = cur_blocked->next_blocked; 
+              cur_blocked =  prev_blocked->next_blocked;
           } else { 
               my->blocked = cur_blocked->next_blocked; 
+              cur_blocked = my->blocked;
           }
-          cur_blocked->next_blocked = 0;
-          //slog( "ready push front %1%", cur_blocked );
-          my->ready_push_front( cur_blocked );
-          cur_blocked =  cur_blocked->next_blocked;
+          cur->next_blocked = 0;
+          slog( "ready push front %1%", cur );
+          my->ready_push_front( cur );
         } else { // goto the next blocked task
           slog( "unable to unblock %1%", p.get() );
           prev_blocked  = cur_blocked;

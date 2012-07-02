@@ -39,9 +39,9 @@ namespace mace { namespace cmt {
       friend class context;
       friend class thread_private;
 
-      task*           m_task;
-      abstract_thread*      m_blocked_thread;
-      microseconds        m_timeout;  
+      task*             m_task;
+      abstract_thread*  m_blocked_thread;
+      microseconds      m_timeout;  
   };
 
   struct void_t {};

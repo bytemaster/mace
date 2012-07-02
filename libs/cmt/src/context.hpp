@@ -82,10 +82,16 @@ namespace mace { namespace cmt {
      *  @todo check list
      */
     bool try_unblock( promise_base* p ) {
+      slog( "%1%", p );
+      if( blocking_prom.size() == 0 )  {
+        wlog("why is this?" );
+        return true;
+     }
       bool req = false;
       for( uint32_t i = 0; i < blocking_prom.size(); ++i ) {
         if( blocking_prom[i].prom == p ) {
            blocking_prom[i].required = false;
+           return true;
         }
         req = req || blocking_prom[i].required;
       }
