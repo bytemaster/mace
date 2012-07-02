@@ -50,7 +50,7 @@ namespace mace { namespace ssh {
 
     struct process_d {
       std::string                           command;
-      std::weak_ptr<mace::ssh::client>      sshc;
+      std::shared_ptr<mace::ssh::client>    sshc;
       mace::cmt::promise<int>::ptr          result;
       LIBSSH2_CHANNEL*                      chan;
 
@@ -74,47 +74,39 @@ namespace mace { namespace ssh {
 
         chan = c.my->open_channel(); 
 
-        std::shared_ptr<mace::ssh::client> sshsc(sshc);
-        BOOST_ASSERT( sshsc );
-
         int ec = libssh2_channel_exec( chan, cmd.c_str() );
         while( ec == LIBSSH2_ERROR_EAGAIN ) {
-          sshsc->my->wait_on_socket();
+          sshc->my->wait_on_socket();
           ec = libssh2_channel_exec( chan, cmd.c_str() );
         }
 
         if( ec ) {
            char* msg = 0;
-           ec   = libssh2_session_last_error( sshsc->my->m_session, &msg, 0, 0 );
+           ec   = libssh2_session_last_error( sshc->my->m_session, &msg, 0, 0 );
            MACE_SSH_THROW( "libssh2_channel_exec failed: %1% - %2%", %ec %msg  );
         }
       }
 
       void send_eof() {
-        std::shared_ptr<mace::ssh::client> sshsc(sshc);
-        BOOST_ASSERT( sshsc );
 
         int ec = libssh2_channel_send_eof( chan );
         while( ec == LIBSSH2_ERROR_EAGAIN ) {
-          sshsc->my->wait_on_socket();
+          sshc->my->wait_on_socket();
           ec = libssh2_channel_send_eof( chan );
         }
         if( ec ) {
         }
       }
       bool flush(int stream_id) {
-        std::shared_ptr<mace::ssh::client> sshsc(sshc);
-        BOOST_ASSERT( sshsc );
 
         int ec = libssh2_channel_flush_ex( chan, stream_id );
         while( ec == LIBSSH2_ERROR_EAGAIN ) {
-          sshsc->my->wait_on_socket();
+          sshc->my->wait_on_socket();
           ec = libssh2_channel_flush_ex( chan, stream_id );
         }
         if( ec ) {
           char* msg = 0;
-          std::shared_ptr<mace::ssh::client> sshsc(sshc);
-          ec = libssh2_session_last_error( sshsc->my->m_session, &msg, 0, 0 );
+          ec = libssh2_session_last_error( sshc->my->m_session, &msg, 0, 0 );
           MACE_SSH_THROW( "flush failed: %1% - %2%", %ec %msg  );
         }
         return true;
@@ -136,21 +128,19 @@ namespace mace { namespace ssh {
                 return -1; // eof
               }
            } else {
-             std::shared_ptr<mace::ssh::client> sshsc(sshc);
-             BOOST_ASSERT( sshsc );
   
              if( rc == LIBSSH2_ERROR_EAGAIN ) {
                if( 0 < (buf-data) ) {
                  return buf-data;
                }
                else  {
-                 sshsc->my->wait_on_socket();
+                 sshc->my->wait_on_socket();
                  rc = 0;
                  continue;
                }
              } else {
                char* msg;
-               rc   = libssh2_session_last_error( sshsc->my->m_session, &msg, 0, 0 );
+               rc   = libssh2_session_last_error( sshc->my->m_session, &msg, 0, 0 );
                MACE_SSH_THROW( "write failed: %1% - %2%", %rc %msg  );
                return buf-data;
              }
@@ -173,21 +163,18 @@ namespace mace { namespace ssh {
                 return -1; // eof
               }
            } else {
-             std::shared_ptr<mace::ssh::client> sshsc(sshc);
-             BOOST_ASSERT( sshsc );
-  
              if( rc == LIBSSH2_ERROR_EAGAIN ) {
                if( 0 < (buf-data) ) {
                  return buf-data;
                }
                else  {
-                 sshsc->my->wait_on_socket();
+                 sshc->my->wait_on_socket();
                  rc = 0;
                  continue;
                }
              } else {
                char* msg;
-               rc   = libssh2_session_last_error( sshsc->my->m_session, &msg, 0, 0 );
+               rc   = libssh2_session_last_error( sshc->my->m_session, &msg, 0, 0 );
                MACE_SSH_THROW( "read failed: %1% - %2%", %rc %msg  ); return buf-data;
              }
            }
@@ -247,17 +234,13 @@ namespace mace { namespace ssh {
 
   process::~process() { 
     try {
-        std::shared_ptr<mace::ssh::client> sshsc(my->sshc);
-        if( sshsc ) {
-          if( my->chan ) {
-              int ec = libssh2_channel_free( my->chan );  
-              while ( ec == LIBSSH2_ERROR_EAGAIN ) {
-                if( sshsc ) 
-                  sshsc->my->wait_on_socket();
-                ec = libssh2_channel_free( my->chan );  
-              }
+      if( my->chan ) {
+          int ec = libssh2_channel_free( my->chan );  
+          while ( ec == LIBSSH2_ERROR_EAGAIN ) {
+              my->sshc->my->wait_on_socket();
+            ec = libssh2_channel_free( my->chan );  
           }
-        }
+      }
     } catch ( ... ) { }
     delete my; 
   }
@@ -269,20 +252,16 @@ namespace mace { namespace ssh {
    *  @pre client has not been freed.
    */
   int process::result() {
-    std::shared_ptr<mace::ssh::client> sshc(my->sshc);
-    BOOST_ASSERT( sshc );
-
     char* msg = 0;
     int ec = libssh2_channel_wait_closed( my->chan );
     while( ec == LIBSSH2_ERROR_EAGAIN ) {
-      sshc->my->wait_on_socket();
+      my->sshc->my->wait_on_socket();
       ec = libssh2_channel_wait_closed( my->chan );
     }
-    ec   = libssh2_session_last_error( sshc->my->m_session, &msg, 0, 0 );
+    ec   = libssh2_session_last_error( my->sshc->my->m_session, &msg, 0, 0 );
     if( !ec ) {
       MACE_SSH_THROW( "Error waiting on socket to close: %1% - %2%", %ec %msg );
     }
-
     return libssh2_channel_get_exit_status( my->chan );
   }
 

@@ -7,6 +7,7 @@
 #include <boost/bind.hpp>
 #include <mace/ssh/error.hpp>
 #include <libssh2.h>
+#include <mace/cmt/mutex.hpp>
 
 namespace mace { namespace ssh {
   namespace detail { 
@@ -24,8 +25,10 @@ namespace mace { namespace ssh {
         LIBSSH2_SESSION*            m_session;
         LIBSSH2_KNOWNHOSTS*         m_knownhosts;
 
-        mace::cmt::promise<boost::system::error_code>::ptr read_prom;
-        mace::cmt::promise<boost::system::error_code>::ptr write_prom;
+        typedef mace::cmt::promise<boost::system::error_code>::ptr rw_prom;
+        rw_prom read_prom;
+        rw_prom write_prom;
+        
 
         /**
          *  @pre libssh2_session_block_directions is set to either INBOUND or OUTBOUND or both. 
@@ -35,9 +38,10 @@ namespace mace { namespace ssh {
          */
         void wait_on_socket() {
           auto dir = libssh2_session_block_directions(m_session);
+          if( !dir ) return;
           BOOST_ASSERT( dir & (LIBSSH2_SESSION_BLOCK_INBOUND | LIBSSH2_SESSION_BLOCK_OUTBOUND ) );
 
-          mace::cmt::future<boost::system::error_code> rprom, wprom;
+          rw_prom rprom, wprom;
           if( dir & LIBSSH2_SESSION_BLOCK_INBOUND ) {
             if(!read_prom) {
                read_prom.reset( new mace::cmt::promise<boost::system::error_code>() );
@@ -45,8 +49,10 @@ namespace mace { namespace ssh {
                                         [=]( const boost::system::error_code& e, size_t  ) {
                                           read_prom->set_value(e);
                                         } );
+            } else {
+              elog( "already waiting on read %1%", read_prom.get() );
             }
-            rprom = mace::cmt::future<boost::system::error_code>(read_prom);
+            rprom = read_prom;
           }
           
           if( dir & LIBSSH2_SESSION_BLOCK_OUTBOUND ) {
@@ -56,40 +62,44 @@ namespace mace { namespace ssh {
                                          [=]( const boost::system::error_code& e, size_t  ) {
                                             write_prom->set_value(e);
                                          } );
+            } else {
+              elog( "already waiting on write" );
             }
-            wprom = mace::cmt::future<boost::system::error_code>(write_prom);
+            wprom = write_prom;
           }
+
+
           boost::system::error_code ec;
-          if( rprom.valid() && wprom.valid() ) {
+          if( rprom && wprom ) {
             wlog( "Attempt to wait in either direction currently waits for both directions" );
-            wlog( "rprom %1%   wprom %2%", read_prom.get(), write_prom.get() );
-            int r = mace::cmt::wait_any( wprom, rprom );
+            //wlog( "rprom %1%   wprom %2%", rprom.get(), write_prom.get() );
+             wlog( "wait on read %1% or write %2% ", rprom.get(), wprom.get() );
+            typedef mace::cmt::future<boost::system::error_code> fprom;
+            fprom fw(wprom);
+            fprom fr(rprom);
+            int r = mace::cmt::wait_any( fw, fr );
             wlog( "wait returned %1%", r );
             switch( r ) {
               case 0:
+                wlog( "WRITE READY %1%", wprom.get() );
+                BOOST_ASSERT( wprom.get() == write_prom.get() );
                 write_prom.reset(0);
                 break;
               case 1:
+                wlog( "READ READY %1%", rprom.get() );
+                BOOST_ASSERT( rprom.get() == read_prom.get() );
                 read_prom.reset(0);
                 break;
             }
-            //if( wprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
-            /*
-              int p = mace::cmt::wait_any( rprom, wprom );
-              switch( p ) {
-                case 0:
-                  if( rprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
-                case 1:
-                  if( wprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
-              }
-              BOOST_ASSERT( p == 0 || p == 1 );
-              return;
-            */
-          } else if( rprom.valid() ) {
-              if( rprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(rprom.wait() ) ); }
+          } else if( rprom ) {
+              wlog( "wait on read %1%", rprom.get() );
+              if( rprom->wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(rprom->wait() ) ); }
+              wlog( "READ READY %1%", rprom.get() );
               read_prom.reset(0);
-          } else if( wprom.valid() ) {
-              if( wprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
+          } else if( wprom ) {
+              wlog( "wait on write %1%", wprom.get() );
+              if( wprom->wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom->wait() ) ); }
+              wlog( "WRITE READY %1%", wprom.get() );
               write_prom.reset(0);
           }
         }
@@ -161,7 +171,7 @@ namespace mace { namespace ssh {
 
 
 
-        mace::ssh::key                 host_key;
+        //mace::ssh::key                 host_key;
         boost::asio::ip::tcp::endpoint endpt;
         std::string                    uname;
         std::string                    upass;

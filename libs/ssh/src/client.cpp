@@ -295,6 +295,7 @@ namespace mace { namespace ssh {
    */
   void  client::scp_send( const std::string& local_path, const std::string& remote_path, 
                      boost::function<bool(size_t,size_t)> progress  ) {
+    slog( "scp send %1%", local_path );
     using namespace boost::filesystem;
     if( !exists(local_path) ) {
       MACE_SSH_THROW( "Source file '%1%' does not exist", %local_path );
@@ -319,7 +320,9 @@ namespace mace { namespace ssh {
       char* msg;
       int ec = libssh2_session_last_error( my->m_session, &msg, 0, 0 );
       if( ec == LIBSSH2_ERROR_EAGAIN ) {
+        slog( "create chan wait on socket %1%", local_path );
         my->wait_on_socket();
+        slog( "done create chan wait on socket %1%", local_path );
         chan = libssh2_scp_send64( my->m_session, local_path.c_str(), 0700, fsize, now, now );
       } else {
           MACE_SSH_THROW( "scp failed %1% - %2%", %ec %msg );
@@ -330,9 +333,12 @@ namespace mace { namespace ssh {
       char* pos = reinterpret_cast<char*>(mr.get_address());
       while( progress( wrote, fsize ) && wrote < fsize ) {
           int r = libssh2_channel_write( chan, pos, fsize - wrote );
+          slog( "scp send %1% r %2%", local_path, r );
           if( r < 0 ) {
             if( r == LIBSSH2_ERROR_EAGAIN ) {
+              slog( "wait on socket %1%", local_path );
               my->wait_on_socket();
+              slog( "done wait socket %1%", local_path );
               continue;
             } else {
               char* msg = 0;
@@ -384,10 +390,10 @@ namespace mace { namespace ssh {
          }
        } catch ( ... ){}
        try {
-        if( my->read_prom ) my->read_prom->wait();
+        //if( my->read_prom ) my->read_prom->wait();
        } catch ( ... ){}
        try {
-        if( my->write_prom ) my->write_prom->wait();
+        //if( my->write_prom ) my->write_prom->wait();
        } catch ( ... ){}
     }
   }

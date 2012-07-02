@@ -1,7 +1,10 @@
 #include <mace/ssh/client.hpp>
+#include <mace/cmt/log/log.hpp>
+#include <mace/cmt/thread.hpp>
+#include <boost/bind.hpp>
 
-bool progress( size_t sent, size_t total ) {
-  slog( "Sent %1% of %2%", sent, total ); 
+bool progress( const std::string& file, size_t sent, size_t total ) {
+//  slog( "%3% sent %1% of %2%", sent, total, file ); 
   return true;
 }
 
@@ -10,10 +13,10 @@ bool progress( size_t sent, size_t total ) {
  *  result without 'blocking'.
  */
 int main( int argc, char** argv ) {
-  
+  mace::cmt::thread::current().set_name("main");  
   try {
       auto sshc = mace::ssh::client::create();
-      sshc->connect( "dlarimer", "zap.local");//10.211.55.2" );
+      sshc->connect( "test", "localhost");//10.211.55.2" );
       auto ls   = sshc->exec( "cat" );
       ls->in_stream()<<"Hello World\n";
       ls->in_stream().flush();
@@ -26,7 +29,12 @@ int main( int argc, char** argv ) {
       std::cout<<"stdout: "<<str<<std::endl;
       std::cout<<"\nresult: "<<ls->result()<<std::endl;
 
-      sshc->scp_send( "libmace_ssh_debug.a", "/Users/dlarimer/test.a", progress );
+      auto f = mace::cmt::async([=](){ return sshc->scp_send( "libmace_ssh.a", "test.a", boost::bind(progress,"test.a",_1,_2) );});
+      auto f2 = mace::cmt::async([=](){ return sshc->scp_send( "libmace_ssh_debug.a", "test.b", boost::bind(progress,"test.b",_1,_2) );});
+      elog( "wait for first" );
+      f.wait();
+      elog( "wait for second" );
+      f2.wait();
   } catch ( ... ) {
     elog( "%1%", boost::current_exception_diagnostic_information() );
   }
