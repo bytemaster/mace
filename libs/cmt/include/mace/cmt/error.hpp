@@ -23,6 +23,10 @@ namespace mace { namespace cmt {
             const char*  what()const throw() { return "timeout waiting for future"; }
             virtual void rethrow()const      { BOOST_THROW_EXCEPTION(*this); }
         };
+        struct wait_any_error : public virtual future_exception {
+            const char*  what()const throw() { return "none of the futures were ready"; }
+            virtual void rethrow()const      { BOOST_THROW_EXCEPTION(*this); }
+        };
         struct broken_promise : public virtual future_exception {
             const char*  what()const throw() { return "broken promise - operation timeout"; }
             virtual void rethrow()const      { BOOST_THROW_EXCEPTION(*this); }

@@ -10,6 +10,7 @@
 #include <boost/thread/condition_variable.hpp>
 
 namespace mace { namespace cmt {
+  class thread;
   using boost::chrono::microseconds;
   using boost::chrono::system_clock;
   boost::system_time to_system_time( const boost::chrono::system_clock::time_point& t );
@@ -35,6 +36,7 @@ namespace mace { namespace cmt {
 
     private:
       friend class thread;
+      friend class context;
       friend class thread_private;
 
       task*           m_task;
@@ -200,6 +202,7 @@ namespace mace { namespace cmt {
 
 
     private:
+      friend class mace::cmt::thread;
       mutable promise_ptr m_prom;
   };
 

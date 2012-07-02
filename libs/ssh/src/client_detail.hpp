@@ -1,6 +1,7 @@
 #ifndef _MACE_SSH_CLIENT_DETAIL_HPP_
 #define _MACE_SSH_CLIENT_DETAIL_HPP_
 #include <mace/cmt/future.hpp>
+#include <mace/cmt/thread.hpp>
 #include <mace/ssh/client.hpp>
 #include <mace/cmt/asio/tcp/socket.hpp>
 #include <boost/bind.hpp>
@@ -49,28 +50,30 @@ namespace mace { namespace ssh {
           }
           
           if( dir & LIBSSH2_SESSION_BLOCK_OUTBOUND ) {
-              // if both, use the same promise with 2 potential setters!
-             if( dir & LIBSSH2_SESSION_BLOCK_INBOUND ) {
-                write_prom = read_prom;
+            if( !write_prom ) {
+                write_prom.reset( new mace::cmt::promise<boost::system::error_code>() );
                 m_sock->async_write_some( boost::asio::null_buffers(),
-                                           [=]( const boost::system::error_code& e, size_t  ) {
-                                              write_prom->set_value(e);
-                                           } );
-             } else {
-               if( !write_prom ) {
-                  write_prom.reset( new mace::cmt::promise<boost::system::error_code>() );
-                  m_sock->async_write_some( boost::asio::null_buffers(),
-                                           [=]( const boost::system::error_code& e, size_t  ) {
-                                              write_prom->set_value(e);
-                                           } );
-              }
+                                         [=]( const boost::system::error_code& e, size_t  ) {
+                                            write_prom->set_value(e);
+                                         } );
             }
             wprom = mace::cmt::future<boost::system::error_code>(write_prom);
           }
           boost::system::error_code ec;
           if( rprom.valid() && wprom.valid() ) {
-            //wlog( "Attempt to wait in either direction currently waits for both directions" );
-            if( wprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
+            wlog( "Attempt to wait in either direction currently waits for both directions" );
+            wlog( "rprom %1%   wprom %2%", read_prom.get(), write_prom.get() );
+            int r = mace::cmt::wait_any( wprom, rprom );
+            wlog( "wait returned %1%", r );
+            switch( r ) {
+              case 0:
+                write_prom.reset(0);
+                break;
+              case 1:
+                read_prom.reset(0);
+                break;
+            }
+            //if( wprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
             /*
               int p = mace::cmt::wait_any( rprom, wprom );
               switch( p ) {

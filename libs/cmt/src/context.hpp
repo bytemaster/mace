@@ -23,7 +23,6 @@ namespace mace { namespace cmt {
     context( void (*sf)(intptr_t), bc::stack_allocator& alloc, cmt::thread* t )
     : caller_context(0),
       stack_alloc(&alloc),
-      prom(0), 
       next_blocked(0), 
       next(0), 
       ctx_thread(t),
@@ -40,7 +39,6 @@ namespace mace { namespace cmt {
     context( cmt::thread* t)
     :caller_context(0),
      stack_alloc(0),
-     prom(0),
      next_blocked(0), 
      next(0), 
      ctx_thread(t),
@@ -54,6 +52,14 @@ namespace mace { namespace cmt {
   //      slog("deallocate stack" );
       }
     }
+
+    struct blocked_promise {
+      blocked_promise( promise_base* p=0, bool r=true )
+      :prom(p),required(r){}
+
+      promise_base* prom;
+      bool          required;
+    };
     
     /**
      *  @todo Have a list of promises so that we can wait for
@@ -62,7 +68,13 @@ namespace mace { namespace cmt {
      *     will allow it to be one of many that could 'unblock'
      */
     void add_blocking_promise( promise_base* p, bool req = true ) {
-      prom = p;
+      for( auto i = blocking_prom.begin(); i != blocking_prom.end(); ++i ) {
+        if( i->prom == p ) {
+          i->required = req;
+          return;
+        }
+      }
+      blocking_prom.push_back( blocked_promise(p,req) );
     }
     /**
      *  If all of the required promises and any optional promises then
@@ -70,30 +82,56 @@ namespace mace { namespace cmt {
      *  @todo check list
      */
     bool try_unblock( promise_base* p ) {
-      return p == prom;
+      bool req = false;
+      for( uint32_t i = 0; i < blocking_prom.size(); ++i ) {
+        if( blocking_prom[i].prom == p ) {
+           blocking_prom[i].required = false;
+        }
+        req = req || blocking_prom[i].required;
+      }
+      return !req;
     }
 
     void remove_blocking_promise( promise_base* p ) {
-      prom = 0;
+      for( auto i = blocking_prom.begin(); i != blocking_prom.end(); ++i ) {
+        if( i->prom == p ) {
+          blocking_prom.erase(i);
+          return;
+        }
+      }
+    }
+
+    void timeout_blocking_promises() {
+      for( auto i = blocking_prom.begin(); i != blocking_prom.end(); ++i ) {
+        i->prom->set_exception( boost::copy_exception( error::future_wait_timeout() ) );
+      }
+    }
+    template<typename Exception>
+    void except_blocking_promises( const Exception& e ) {
+      for( auto i = blocking_prom.begin(); i != blocking_prom.end(); ++i ) {
+        i->prom->set_exception( boost::copy_exception( e ) );
+      }
     }
     void clear_blocking_promises() {
-      prom = 0;
+      blocking_prom.clear();
     }
 
     bool is_complete()const { return complete; }
 
 
-    bc::fcontext_t            my_context;
-    cmt::context*             caller_context;
-    bc::stack_allocator*      stack_alloc;
-    priority                  prio;
-    promise_base*             prom; 
-    system_clock::time_point  resume_time;
-    cmt::context*             next_blocked;
-    cmt::context*             next;
-    cmt::thread*              ctx_thread;
-    bool                      canceled;
-    bool                      complete;
+
+    bc::fcontext_t               my_context;
+    cmt::context*                caller_context;
+    bc::stack_allocator*         stack_alloc;
+    priority                     prio;
+    //promise_base*              prom; 
+    std::vector<blocked_promise> blocking_prom;
+    system_clock::time_point     resume_time;
+    cmt::context*                next_blocked;
+    cmt::context*                next;
+    cmt::thread*                 ctx_thread;
+    bool                         canceled;
+    bool                         complete;
   };
 
 } }

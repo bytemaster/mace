@@ -328,8 +328,8 @@ namespace mace { namespace cmt {
             std::pop_heap(sleep_pqueue.begin(), sleep_pqueue.end(), sleep_priority_less() );
             sleep_pqueue.pop_back();
 
-            if( c->prom ) {
-                c->prom->set_exception( boost::copy_exception( error::future_wait_timeout() ) );
+            if( c->blocking_prom.size() ) {
+                c->timeout_blocking_promises();
             }
             else { ready_push_back( c ); }
         }
@@ -446,6 +446,55 @@ namespace mace { namespace cmt {
 
       my->check_fiber_exceptions();
     }
+
+    int thread::wait_any( const std::vector<promise_base::ptr>& p, const system_clock::time_point& timeout ) {
+       slog( "wait any %1%", p.size() );
+       for( uint32_t i = 0; i < p.size(); ++i ) {
+         if( p[i]->ready() ) return i;
+       }
+
+       if( timeout < system_clock::now() ) 
+           BOOST_THROW_EXCEPTION( cmt::error::future_wait_timeout() );
+       
+       if( !my->current ) { 
+         my->current = new cmt::context(&cmt::thread::current()); 
+       }
+     
+       for( uint32_t i = 0; i < p.size(); ++i ) {
+           slog( "adding blocking promises %1%", p[i].get() );
+           my->current->add_blocking_promise(p[i].get(),false);
+       };
+
+     
+       // if not max timeout, added to sleep pqueue
+       if( timeout != system_clock::time_point::max() ) {
+           my->current->resume_time = timeout;
+           my->sleep_pqueue.push_back(my->current);
+           std::push_heap( my->sleep_pqueue.begin(),
+                           my->sleep_pqueue.end(), 
+                           sleep_priority_less()   );
+       }
+       slog( "blocking %1%", my->current );
+       my->add_to_blocked( my->current );
+       my->start_next_fiber();
+       slog( "resuming %1%", my->current );
+
+       std::for_each( p.begin(),p.end(), [&]( const promise_base::ptr& prom) {
+           slog( "remove blocking promises %1%", prom.get() );
+           my->current->remove_blocking_promise(prom.get());
+       });
+     
+       my->check_fiber_exceptions();
+
+       for( uint32_t i = 0; i < p.size(); ++i ) {
+         if( p[i]->ready() ) return i;
+       }
+       BOOST_THROW_EXCEPTION( mace::cmt::error::wait_any_error() );
+       return -1;
+    }
+
+
+
     void thread::wait( const promise_base::ptr& p, const boost::chrono::microseconds& timeout_us ) {
       if( timeout_us == microseconds::max() ) 
         wait( p, system_clock::time_point::max() ); 
@@ -453,8 +502,15 @@ namespace mace { namespace cmt {
         wait( p, system_clock::now() + timeout_us );
     }
 
+    int thread::wait_any( const std::vector<promise_base::ptr>& p, const boost::chrono::microseconds& timeout_us ) {
+      if( timeout_us == microseconds::max() ) 
+        return wait_any( p, system_clock::time_point::max() ); 
+      else 
+        return wait_any( p, system_clock::now() + timeout_us );
+    }
+
     void thread::notify( const promise_base::ptr& p ) {
-     // slog( "notify task complete" );
+      slog( "notify task complete %1%", p.get() );
       BOOST_ASSERT(p->ready());
       if( &current() != this )  {
         //slog( "post notify to %1% from %2%", name(), current().name() );
@@ -469,10 +525,22 @@ namespace mace { namespace cmt {
       cmt::context* prev_blocked = 0;
       while( cur_blocked ) {
         // if the blocked context is waiting on this promise 
-        // TODO: what if multiple things are blocked sleeping on this promise??
+        slog( "try unblock %1%", p.get() );
         if( cur_blocked->try_unblock( p.get() )  ) {
-          //slog( "unblock!" );
+          slog( "unblock!" );
           // remove it from the blocked list.
+
+          // remove this context from the sleep queue...
+          for( uint32_t i = 0; i < my->sleep_pqueue.size(); ++i ) {
+            if( my->sleep_pqueue[i] == cur_blocked ) {
+              my->sleep_pqueue[i]->blocking_prom.clear();
+              my->sleep_pqueue[i] = my->sleep_pqueue.back();
+              my->sleep_pqueue.pop_back();
+              std::make_heap( my->sleep_pqueue.begin(),my->sleep_pqueue.end(), sleep_priority_less() );
+              break;
+            }
+          }
+
           if( prev_blocked ) {  
               prev_blocked->next_blocked = cur_blocked->next_blocked; 
           } else { 
@@ -483,21 +551,13 @@ namespace mace { namespace cmt {
           my->ready_push_front( cur_blocked );
           cur_blocked =  cur_blocked->next_blocked;
         } else { // goto the next blocked task
+          slog( "unable to unblock %1%", p.get() );
           prev_blocked  = cur_blocked;
           cur_blocked   = cur_blocked->next_blocked;
         }
       }
 
 
-      for( uint32_t i = 0; i < my->sleep_pqueue.size(); ++i ) {
-        if( my->sleep_pqueue[i]->prom == p.get() ) {
-          my->sleep_pqueue[i]->prom = 0;
-          my->sleep_pqueue[i] = my->sleep_pqueue.back();
-          my->sleep_pqueue.pop_back();
-          std::make_heap( my->sleep_pqueue.begin(),my->sleep_pqueue.end(), sleep_priority_less() );
-          break;
-        }
-      }
     }
 
     /**
@@ -602,7 +662,8 @@ namespace mace { namespace cmt {
         while( cur ) {
             cmt::context* n = cur->next;
             // this will move the context into the ready list.
-            cur->prom->set_exception( boost::copy_exception( error::thread_quit() ) );
+            //cur->prom->set_exception( boost::copy_exception( error::thread_quit() ) );
+            cur->except_blocking_promises( error::thread_quit() );
             cur = n;
         }
         BOOST_ASSERT( my->blocked == 0 );
@@ -685,9 +746,10 @@ namespace mace { namespace cmt {
       boost::unique_lock<cmt::spin_lock> lock( active_context_lock );
       canceled = true;
       if( active_context ) {
-        if( active_context->prom ) {
-          // set exception and return
-          active_context->prom->cancel();
+        if( active_context->blocking_prom.size() ) {
+          for( uint32_t i = 0; i < active_context->blocking_prom.size(); ++i ) {
+            active_context->blocking_prom[i].prom->cancel();
+          }
         }
         active_context->canceled = true;
         active_context = 0;

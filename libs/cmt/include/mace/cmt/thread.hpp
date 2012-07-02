@@ -164,6 +164,10 @@ namespace cmt {
     priority current_priority()const;
     ~thread();
 
+
+   template<typename T1, typename T2>
+   static int wait_any( mace::cmt::future<T1>& f1, mace::cmt::future<T2>& f2, const microseconds& timeout_us = microseconds::max() );
+
     private:
       void set_boost_thread( boost::thread* t );
       friend class thread_private;
@@ -182,6 +186,9 @@ namespace cmt {
 
       void wait( const promise_base::ptr& p, const microseconds& timeout_us );
       void wait( const promise_base::ptr& p, const system_clock::time_point& timeout );
+
+      int wait_any( const std::vector<promise_base::ptr>& p, const microseconds& timeout_us );
+      int wait_any( const std::vector<promise_base::ptr>& p, const system_clock::time_point& timeout );
       void notify( const promise_base::ptr& p );
 
       cmt::context* current_context()const;
@@ -195,6 +202,23 @@ namespace cmt {
       void async_task( const task::ptr& t );
       class thread_private* my;
    };
+
+   /**
+    * Wait until either f1 or f2 is ready.
+    *
+    * @return 0 if f1 is ready, 1 if f2 is ready or throw on error.
+    */
+   template<typename T1, typename T2>
+   int wait_any( mace::cmt::future<T1>& f1, mace::cmt::future<T2>& f2, const microseconds& timeout_us = microseconds::max() ) {
+     return mace::cmt::thread::wait_any(f1,f2);
+   }
+   template<typename T1, typename T2>
+   int thread::wait_any( mace::cmt::future<T1>& f1, mace::cmt::future<T2>& f2, const microseconds& timeout_us ) {
+     std::vector<promise_base::ptr> p(2);
+     p[0] = f1.m_prom;
+     p[1] = f2.m_prom;
+     return cmt::thread::current().wait_any(p,timeout_us);
+   }
 
    template<typename Functor>
    auto async( Functor&& f, priority prio=priority()) -> cmt::future<decltype(f())> {
