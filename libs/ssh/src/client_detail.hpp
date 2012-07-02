@@ -42,8 +42,8 @@ namespace mace { namespace ssh {
                read_prom.reset( new mace::cmt::promise<boost::system::error_code>() );
                auto s = self.shared_from_this();
                m_sock->async_read_some( boost::asio::null_buffers(),
-                                        [s,this]( const boost::system::error_code& e, size_t  ) {
-                                          s->my->read_prom->set_value(e);
+                                        [=]( const boost::system::error_code& e, size_t  ) {
+                                          read_prom->set_value(e);
                                         } );
             }
             rprom = mace::cmt::future<boost::system::error_code>(read_prom);
@@ -54,18 +54,20 @@ namespace mace { namespace ssh {
                 write_prom.reset( new mace::cmt::promise<boost::system::error_code>() );
                 auto s = self.shared_from_this();
                 m_sock->async_write_some( boost::asio::null_buffers(),
-                                         [s,this]( const boost::system::error_code& e, size_t  ) {
-                                           s->my->write_prom->set_value(e);
+                                         [=]( const boost::system::error_code& e, size_t  ) {
+                                            write_prom->set_value(e);
                                          } );
             }
-            rprom = mace::cmt::future<boost::system::error_code>(write_prom);
+            wprom = mace::cmt::future<boost::system::error_code>(write_prom);
           }
           boost::system::error_code ec;
           if( rprom.valid() && wprom.valid() ) {
             /// TODO: implement wait on any in mace::cmt
             wlog( "Attempt to wait in either direction currently waits for both directions" );
-            if( rprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(rprom.wait() ) ); }
+            slog( "... wait for write..." );
             if( wprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom.wait() ) ); }
+            slog( "... wait for read..." );
+            if( rprom.wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(rprom.wait() ) ); }
             /*
               int p = mace::cmt::wait_any( rprom, wprom );
               switch( p ) {
