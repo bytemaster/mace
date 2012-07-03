@@ -28,6 +28,7 @@ namespace mace { namespace ssh {
         typedef mace::cmt::promise<boost::system::error_code>::ptr rw_prom;
         rw_prom read_prom;
         rw_prom write_prom;
+        mace::cmt::mutex scp_send_mutex;
         
 
         /**
@@ -37,71 +38,78 @@ namespace mace { namespace ssh {
          *  @throw boost::system::system_error if an error occurs on the socket while waiting.
          */
         void wait_on_socket() {
+        //  mace::cmt::thread::current().debug("wait_on_socket");
           auto dir = libssh2_session_block_directions(m_session);
           if( !dir ) return;
           BOOST_ASSERT( dir & (LIBSSH2_SESSION_BLOCK_INBOUND | LIBSSH2_SESSION_BLOCK_OUTBOUND ) );
 
           rw_prom rprom, wprom;
           if( dir & LIBSSH2_SESSION_BLOCK_INBOUND ) {
-            if(!read_prom) {
-               read_prom.reset( new mace::cmt::promise<boost::system::error_code>() );
+            rprom = read_prom;
+            if(!read_prom.get()) {
+          //     elog( "   this %2%            NEW READ PROM      %1%           ", read_prom.get(), this );
+               read_prom.reset( new mace::cmt::promise<boost::system::error_code>("read_prom") );
+           //    wlog( " new read prom %1%   this %2%", read_prom.get(), this );
+               rprom = read_prom;
                m_sock->async_read_some( boost::asio::null_buffers(),
                                         [=]( const boost::system::error_code& e, size_t  ) {
-                                          read_prom->set_value(e);
+                                          this->read_prom->set_value(e);
+                                          this->read_prom.reset(0);
                                         } );
             } else {
-              elog( "already waiting on read %1%", read_prom.get() );
+       //       elog( "already waiting on read %1%", read_prom.get() );
             }
-            rprom = read_prom;
           }
           
           if( dir & LIBSSH2_SESSION_BLOCK_OUTBOUND ) {
+            wprom = write_prom;
             if( !write_prom ) {
-                write_prom.reset( new mace::cmt::promise<boost::system::error_code>() );
+                write_prom.reset( new mace::cmt::promise<boost::system::error_code>("write_prom") );
+                wprom = write_prom;
                 m_sock->async_write_some( boost::asio::null_buffers(),
                                          [=]( const boost::system::error_code& e, size_t  ) {
-                                            write_prom->set_value(e);
+                                            this->write_prom->set_value(e);
+                                            this->write_prom.reset(0);
                                          } );
             } else {
-              elog( "already waiting on write" );
+        //      elog( "already waiting on write" );
             }
-            wprom = write_prom;
           }
 
 
           boost::system::error_code ec;
-          if( rprom && wprom ) {
-            wlog( "Attempt to wait in either direction currently waits for both directions" );
+          if( rprom.get() && wprom.get() ) {
+       //     elog( "************* Attempt to wait in either direction currently waits for both directions ****** " );
             //wlog( "rprom %1%   wprom %2%", rprom.get(), write_prom.get() );
-             wlog( "wait on read %1% or write %2% ", rprom.get(), wprom.get() );
+        //     wlog( "wait on read %1% or write %2% ", rprom.get(), wprom.get() );
             typedef mace::cmt::future<boost::system::error_code> fprom;
             fprom fw(wprom);
             fprom fr(rprom);
             int r = mace::cmt::wait_any( fw, fr );
-            wlog( "wait returned %1%", r );
+           // wlog( "wait returned %1%", r );
             switch( r ) {
               case 0:
-                wlog( "WRITE READY %1%", wprom.get() );
+            //    wlog( "WRITE READY %1%", wprom.get() );
                 BOOST_ASSERT( wprom.get() == write_prom.get() );
-                write_prom.reset(0);
                 break;
               case 1:
-                wlog( "READ READY %1%", rprom.get() );
+             //   wlog( "READ READY %1%", rprom.get() );
                 BOOST_ASSERT( rprom.get() == read_prom.get() );
-                read_prom.reset(0);
                 break;
             }
           } else if( rprom ) {
-              wlog( "wait on read %1%", rprom.get() );
-              if( rprom->wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(rprom->wait() ) ); }
-              wlog( "READ READY %1%", rprom.get() );
-              read_prom.reset(0);
+             // wlog( "wait on read %1%", rprom.get() );
+             // mace::cmt::thread::current().debug("wait on read");
+              if( rprom->wait() ) { 
+                BOOST_THROW_EXCEPTION( boost::system::system_error(rprom->wait() ) ); 
+              }
+             // wlog( "READ READY %1%", rprom.get() );
           } else if( wprom ) {
-              wlog( "wait on write %1%", wprom.get() );
+             // wlog( "wait on write %1%", wprom.get() );
               if( wprom->wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom->wait() ) ); }
-              wlog( "WRITE READY %1%", wprom.get() );
-              write_prom.reset(0);
+             // wlog( "WRITE READY %1%", wprom.get() );
           }
+      //    mace::cmt::thread::current().debug("end wait_on_socket");
         }
 
         static void kbd_callback(const char *name, int name_len, 

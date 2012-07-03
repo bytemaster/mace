@@ -295,7 +295,17 @@ namespace mace { namespace ssh {
    */
   void  client::scp_send( const std::string& local_path, const std::string& remote_path, 
                      boost::function<bool(size_t,size_t)> progress  ) {
-    slog( "scp send %1%", local_path );
+
+    /**
+     *  Tests have shown that if one scp is 'blocked' by a need to read (presumably to 
+     *  ack recv for the trx window), and then a second transfer begins that the first
+     *  transfer will never be acked.   Placing this mutex limits the transfer of
+     *  one file at a time via SCP which is just as well because there is a fixed
+     *  amount of bandwidth.  
+     */
+    boost::unique_lock<mace::cmt::mutex> lock(my->scp_send_mutex);
+
+
     using namespace boost::filesystem;
     if( !exists(local_path) ) {
       MACE_SSH_THROW( "Source file '%1%' does not exist", %local_path );
@@ -320,9 +330,7 @@ namespace mace { namespace ssh {
       char* msg;
       int ec = libssh2_session_last_error( my->m_session, &msg, 0, 0 );
       if( ec == LIBSSH2_ERROR_EAGAIN ) {
-        slog( "create chan wait on socket %1%", local_path );
         my->wait_on_socket();
-        slog( "done create chan wait on socket %1%", local_path );
         chan = libssh2_scp_send64( my->m_session, local_path.c_str(), 0700, fsize, now, now );
       } else {
           MACE_SSH_THROW( "scp failed %1% - %2%", %ec %msg );
@@ -333,18 +341,14 @@ namespace mace { namespace ssh {
       char* pos = reinterpret_cast<char*>(mr.get_address());
       while( progress( wrote, fsize ) && wrote < fsize ) {
           int r = libssh2_channel_write( chan, pos, fsize - wrote );
-          slog( "scp send %1% r %2%", local_path, r );
+          while( r == LIBSSH2_ERROR_EAGAIN ) {
+            my->wait_on_socket();
+            r = libssh2_channel_write( chan, pos, fsize - wrote );
+          }
           if( r < 0 ) {
-            if( r == LIBSSH2_ERROR_EAGAIN ) {
-              slog( "wait on socket %1%", local_path );
-              my->wait_on_socket();
-              slog( "done wait socket %1%", local_path );
-              continue;
-            } else {
-              char* msg = 0;
-              int ec = libssh2_session_last_error( my->m_session, &msg, 0, 0 );
-              MACE_SSH_THROW( "scp failed %1% - %2%", %ec %msg );
-            }
+             char* msg = 0;
+             int ec = libssh2_session_last_error( my->m_session, &msg, 0, 0 );
+             MACE_SSH_THROW( "scp failed %1% - %2%", %ec %msg );
           }
           wrote += r;
           pos   += r;
