@@ -59,6 +59,17 @@ namespace cmt {
     void    set_name( const char* n );
 
     /**
+     *  @brief print debug info about the state of every context / promise.
+     *
+     *  This method is helpful to figure out where your program is 'hung' by listing
+     *  every async operation (context) and what it is blocked on (future).  
+     *
+     *  @note debug info is more useful if you provide a description for your
+     *  async tasks and promises.
+     */
+    void    debug( const std::string& d );
+
+    /**
      *  Creates a new thread with the given name.
      *
      *  @todo this method currently blocks the calling thread while a new
@@ -108,6 +119,28 @@ namespace cmt {
     }
 
     /**
+     *  Calls function <code>f</code> in this thread and returns a future<T> that can
+     *  be used to wait on the result.  
+     *
+     *  @see debug
+     *
+     *  @param f the operation to perform
+     *  @param desc a description that shows up in debug messages.
+     *  @param prio the priority relative to other tasks
+     *  @param n a debut name to associate with this task.
+     */
+    template<typename Functor>
+    auto async( Functor&& f, const char* desc, priority prio = priority()) -> future<decltype(f())> {
+       typedef decltype(f()) Result;
+       typename promise<Result>::ptr p(new promise<Result>(desc));
+       task::ptr tsk( new rtask<Functor,Result>( std::forward<Functor>(f),p,std::max(current_priority(),prio)) );
+       tsk->set_desc(desc);
+       p->set_task(tsk);
+       async_task(tsk);
+       return p;
+    }
+
+    /**
      *  Performs <code>f()</code> asynchronously at the specified time
      *  without returning a future.  This is slightly more effecient as there is no 
      *  need to allocate a promise object.
@@ -124,6 +157,13 @@ namespace cmt {
       task::ptr tsk( new vtask<Functor>(std::forward<Functor>(f),when,std::max(current_priority(),prio)) );
       async_task(tsk);
     }
+    template<typename Functor>
+    void post( Functor&& f, const system_clock::time_point& when, const char* desc = "",
+                        priority prio = priority()) {
+      task::ptr tsk( new vtask<Functor>(std::forward<Functor>(f),when,std::max(current_priority(),prio)) );
+      tsk->set_desc(desc);
+      async_task(tsk);
+    }
 
     /**
      *  Calls function <code>f</code> in this thread. Returns immediately.
@@ -134,6 +174,18 @@ namespace cmt {
     template<typename Functor>
     void post( Functor&& f, priority p = priority() ) {
       task::ptr tsk( new vtask<Functor>(std::forward<Functor>(f),std::max(current_priority(),p)) );
+      async_task(tsk);
+    }
+    /**
+     *  Calls function <code>f</code> in this thread. Returns immediately.
+     *
+     *  @param p - the priority of a task.
+     *  @param t - the task to be run.
+     */
+    template<typename Functor>
+    void post( Functor&& f, const char* desc, priority p = priority() ) {
+      task::ptr tsk( new vtask<Functor>(std::forward<Functor>(f),std::max(current_priority(),p)) );
+      tsk->set_desc( desc );
       async_task(tsk);
     }
     
@@ -224,7 +276,12 @@ namespace cmt {
    auto async( Functor&& f, priority prio=priority()) -> cmt::future<decltype(f())> {
     return cmt::thread::current().async(std::forward<Functor>(f),(std::max)(current_priority(),prio));
    }
+   template<typename Functor>
+   auto async( Functor&& f, const char* desc, priority prio=priority()) -> cmt::future<decltype(f())> {
+    return cmt::thread::current().async(std::forward<Functor>(f),desc,(std::max)(current_priority(),prio));
+   }
    void async( const boost::function<void()>& t, priority prio=priority() ); 
+   void async( const boost::function<void()>& t, const char* desc, priority prio=priority() ); 
 
    /**
   *   @brief Same as <code>cmt::current().exec()</code>

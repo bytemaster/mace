@@ -44,7 +44,7 @@ namespace asio {
      */
     template<typename AsyncReadStream, typename MutableBufferSequence>
     cmt::future<size_t> read( AsyncReadStream& s, const MutableBufferSequence& buf ) {
-        promise<size_t>::ptr p(new promise<size_t>());
+        promise<size_t>::ptr p(new promise<size_t>("mace::cmt::asio::read"));
         boost::asio::async_read( s, buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
         return p;
     }
@@ -53,7 +53,7 @@ namespace asio {
      */
     template<typename AsyncReadStream, typename MutableBufferSequence>
     cmt::future<size_t> read_some( AsyncReadStream& s, const MutableBufferSequence& buf ) {
-        promise<size_t>::ptr p(new promise<size_t>());
+        promise<size_t>::ptr p(new promise<size_t>("mace::cmt::asio::read_some"));
         s.async_read_some( buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
         return p;
     }
@@ -63,7 +63,7 @@ namespace asio {
      */
     template<typename AsyncReadStream, typename MutableBufferSequence>
     cmt::future<size_t> write( AsyncReadStream& s, const MutableBufferSequence& buf ) {
-        promise<size_t>::ptr p(new promise<size_t>());
+        promise<size_t>::ptr p(new promise<size_t>("mace::cmt::asio::write"));
         boost::asio::async_write( s, buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
         return p;
     }
@@ -73,7 +73,7 @@ namespace asio {
      */
     template<typename AsyncReadStream, typename MutableBufferSequence>
     cmt::future<size_t> write_some( AsyncReadStream& s, const MutableBufferSequence& buf ) {
-        promise<size_t>::ptr p(new promise<size_t>());
+        promise<size_t>::ptr p(new promise<size_t>("mace::cmt::asio::write_some"));
         s.async_write_some(  buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
         return p;
     }
@@ -87,7 +87,7 @@ namespace asio {
         /// @brief wraps boost::asio::async_accept
         template<typename SocketType, typename AcceptorType>
         cmt::future<boost::system::error_code> accept( AcceptorType& acc, SocketType& sock ) {
-            promise<boost::system::error_code>::ptr p( new promise<boost::system::error_code>() );
+            promise<boost::system::error_code>::ptr p( new promise<boost::system::error_code>("mace::cmt::asio::tcp::accept") );
             acc.async_accept( sock, boost::bind( mace::cmt::asio::detail::error_handler, p, _1 ) );
             return p;
         }
@@ -95,7 +95,7 @@ namespace asio {
         /// @brief wraps boost::asio::socket::async_connect
         template<typename AsyncSocket, typename EndpointType>
         cmt::future<boost::system::error_code> connect( AsyncSocket& sock, const EndpointType& ep ) {
-            promise<boost::system::error_code>::ptr p(new promise<boost::system::error_code>());
+            promise<boost::system::error_code>::ptr p(new promise<boost::system::error_code>("mace::cmt::asio::tcp::connect"));
             sock.async_connect( ep, boost::bind( mace::cmt::asio::detail::error_handler, p, _1 ) );
             return p;
         }

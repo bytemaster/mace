@@ -27,7 +27,8 @@ namespace mace { namespace cmt {
       next(0), 
       ctx_thread(t),
       canceled(false),
-      complete(false)
+      complete(false),
+      cur_task(0)
     {
       my_context.fc_stack.base = alloc.allocate( bc::minimum_stacksize() );
    //   slog( "new stack %1% bytes at %2%", bc::minimum_stacksize(), my_context.fc_stack.base );
@@ -43,7 +44,8 @@ namespace mace { namespace cmt {
      next(0), 
      ctx_thread(t),
      canceled(false),
-     complete(false)
+     complete(false),
+     cur_task(0)
     {}
 
     ~context() {
@@ -82,9 +84,7 @@ namespace mace { namespace cmt {
      *  @todo check list
      */
     bool try_unblock( promise_base* p ) {
-      slog( "%1%", p );
       if( blocking_prom.size() == 0 )  {
-        wlog("why is this?" );
         return true;
      }
       bool req = false;
@@ -138,6 +138,7 @@ namespace mace { namespace cmt {
     cmt::thread*                 ctx_thread;
     bool                         canceled;
     bool                         complete;
+    cmt::task*                   cur_task;
   };
 
 } }

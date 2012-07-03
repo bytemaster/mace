@@ -20,10 +20,13 @@ namespace mace { namespace cmt {
   class promise_base :  public retainable {
     public:
       typedef retainable_ptr<promise_base> ptr;
-      promise_base():m_task(0),m_blocked_thread(0),m_timeout(microseconds::max()){}
+      promise_base(const char* desc=""):m_desc(desc),m_task(0),m_blocked_thread(0),m_timeout(microseconds::max()){}
       virtual ~promise_base(){}
 
+      const char* get_desc()const { return m_desc; }
+
       void     set_task( task* t );
+      task*    get_task()const { return m_task; }
       void     cancel();
       virtual bool ready()const = 0;
     protected:
@@ -39,6 +42,7 @@ namespace mace { namespace cmt {
       friend class context;
       friend class thread_private;
 
+      const char*       m_desc;
       task*             m_task;
       abstract_thread*  m_blocked_thread;
       microseconds      m_timeout;  
@@ -58,7 +62,7 @@ namespace mace { namespace cmt {
       typedef retainable_ptr<promise> ptr;
       static ptr make() { return ptr(new promise()); }
 
-      promise(){}
+      promise(const char* desc=""):promise_base(desc){}
       promise( const T& v ):m_value(v){}
 
       bool error()const { return m_error; }
@@ -147,7 +151,9 @@ namespace mace { namespace cmt {
 
 
   template<>
-  class promise<void> : public promise<void_t> {};
+  class promise<void> : public promise<void_t> { 
+    public: promise( const char* desc = "" ):promise<void_t>(desc){} 
+  };
 
 
   /**

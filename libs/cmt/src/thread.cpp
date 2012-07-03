@@ -77,6 +77,48 @@ namespace mace { namespace cmt {
 
            system_clock::time_point  check_for_timeouts();
 
+
+           void debug( const std::string& s ) {
+              std::cerr<<"--------------------- "<<s<<" - "<<current;
+              if( current && current->cur_task ) std::cerr<<'('<<current->cur_task->get_desc()<<')';
+              std::cerr<<" ---------------------------\n";
+              std::cerr<<"  Ready\n";
+              cmt::context* c = ready_head;
+              while( c ) {
+                std::cerr<<"    "<<c;
+                if( c->cur_task ) std::cerr<<'('<<c->cur_task->get_desc()<<')'; 
+                cmt::context* p = c->caller_context;
+                while( p ) {
+                  std::cerr<<"  ->  "<<p;
+                  p = p->caller_context;
+                }
+                std::cerr<<"\n";
+                c = c->next;
+              }
+              std::cerr<<"  Blocked\n";
+              c = blocked;
+              while( c ) {
+                std::cerr<<"   ctx: "<< c; 
+                if( c->cur_task ) std::cerr<<'('<<c->cur_task->get_desc()<<')'; 
+                std::cerr << " blocked on prom: ";
+                for( uint32_t i = 0; i < c->blocking_prom.size(); ++i ) {
+                  std::cerr<<c->blocking_prom[i].prom<<'('<<c->blocking_prom[i].prom->get_desc()<<')';
+                  if( i + 1 < c->blocking_prom.size() ) { 
+                    std::cerr<<",";
+                  }
+                }
+
+                cmt::context* p = c->caller_context;
+                while( p ) {
+                  std::cerr<<"  ->  "<<p;
+                  p = p->caller_context;
+                }
+                std::cerr<<"\n";
+                c = c->next_blocked;
+              }
+              std::cerr<<"-------------------------------------------------\n";
+           }
+
             // insert at from of blocked linked list
            inline void add_to_blocked( cmt::context* c ) {
               c->next_blocked = blocked;
@@ -252,7 +294,9 @@ namespace mace { namespace cmt {
                 task* next = dequeue();
                 if( next ) {
                     next->set_active_context( current );
+                    current->cur_task = next;
                     next->run();
+                    current->cur_task = 0;
                     next->set_active_context(0);
                     delete next;
                     return true;
@@ -412,9 +456,7 @@ namespace mace { namespace cmt {
     }
 
     void thread::usleep( uint64_t timeout_us ) {
-      //slog( "usleep %1%", timeout_us );
       BOOST_ASSERT( &current() == this );
-      //BOOST_ASSERT(my->current);
       sleep_until( system_clock::now() + microseconds(timeout_us) );
     }
 
@@ -427,7 +469,7 @@ namespace mace { namespace cmt {
         my->current = new cmt::context(&cmt::thread::current()); 
       }
       
-      slog( "                                 %1% blocking on %2%", my->current, p.get() );
+      //slog( "                                 %1% blocking on %2%", my->current, p.get() );
       my->current->add_blocking_promise(p.get(),true);
 
       // if not max timeout, added to sleep pqueue
@@ -439,15 +481,15 @@ namespace mace { namespace cmt {
                           sleep_priority_less()   );
       }
 
-      elog( "blocking %1%", my->current );
+    //  elog( "blocking %1%", my->current );
       my->add_to_blocked( my->current );
-
+   //   my->debug("swtiching fibers..." );
 
 
       my->start_next_fiber();
-      slog( "resuming %1%", my->current );
+     // slog( "resuming %1%", my->current );
 
-      slog( "                                 %1% unblocking blocking on %2%", my->current, p.get() );
+      //slog( "                                 %1% unblocking blocking on %2%", my->current, p.get() );
       my->current->remove_blocking_promise(p.get());
 
       my->check_fiber_exceptions();
@@ -518,23 +560,24 @@ namespace mace { namespace cmt {
     void thread::notify( const promise_base::ptr& p ) {
       BOOST_ASSERT(p->ready());
       if( &current() != this )  {
-        slog( "post notify to %1% from %2%", name(), current().name() );
         this->async( boost::bind( &thread::notify, this, p ) );
         return;
       }
-      slog( "                                    notify task complete %1%", p.get() );
+      //slog( "                                    notify task complete %1%", p.get() );
+      //debug( "begin notify" );
       // TODO: store a list of blocked contexts with the promise 
       //  to accelerate the lookup.... unless it introduces contention...
       
       // iterate over all blocked contexts
 
+
       cmt::context* cur_blocked  = my->blocked;
       cmt::context* prev_blocked = 0;
       while( cur_blocked ) {
         // if the blocked context is waiting on this promise 
-        slog( "try unblock ctx %1% from prom %2%", cur_blocked, p.get() );
+       // slog( "try unblock ctx %1% from prom %2%", cur_blocked, p.get() );
         if( cur_blocked->try_unblock( p.get() )  ) {
-          slog( "unblock!" );
+          //slog( "unblock!" );
           // remove it from the blocked list.
 
           // remove this context from the sleep queue...
@@ -556,14 +599,13 @@ namespace mace { namespace cmt {
               cur_blocked = my->blocked;
           }
           cur->next_blocked = 0;
-          slog( "ready push front %1%", cur );
           my->ready_push_front( cur );
         } else { // goto the next blocked task
-          slog( "unable to unblock %1%", p.get() );
           prev_blocked  = cur_blocked;
           cur_blocked   = cur_blocked->next_blocked;
         }
       }
+      //debug( "end notify" );
 
 
     }
@@ -658,9 +700,7 @@ namespace mace { namespace cmt {
         if( &current() != this ) {
             async( boost::bind( &thread::quit, this ) ).wait();
             if( my->boost_thread ) {
-              //slog("%2% joining thread... %1%", this->name(), current().name() );
               my->boost_thread->join();
-              //wlog( "%2% joined thread %1% !!!", name(), current().name() );
             }
             return;
         }
@@ -740,6 +780,7 @@ namespace mace { namespace cmt {
     }
     void        thread::set_name( const char* n ) { my->name = n;    }
     const char* thread_name() { return thread::current().name(); }
+    void        thread::debug( const std::string& d ) { my->debug(d); }
 
 
     /**

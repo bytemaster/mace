@@ -53,6 +53,9 @@ namespace mace { namespace cmt {
       /// implemented in thread.cpp
       void cancel();
 
+      void set_desc( const char*  d ) { desc=d; }
+      const char* get_desc()const { return desc; }
+
     protected:
       void set_active_context( cmt::context* c ) {
         boost::unique_lock<cmt::spin_lock> lock( active_context_lock );
@@ -69,6 +72,7 @@ namespace mace { namespace cmt {
       task*                    next;
       cmt::context*            active_context;
       mace::cmt::spin_lock     active_context_lock;
+      const char*              desc;
   };
 
   template<typename Functor, typename R = void>
