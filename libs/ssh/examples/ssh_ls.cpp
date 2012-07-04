@@ -19,6 +19,14 @@ int main( int argc, char** argv ) {
 
       auto sshc = mace::ssh::client::create();
       sshc->connect( "dlarimer", "localhost");//10.211.55.2" );
+
+      auto stat = sshc->stat("test_dir/subdir");
+      wlog( "size: %1%", stat.size );
+      //auto does_not_exist = sshc->stat("test_dir/subdir/sd");
+      sshc->mkdir("test_dir/subdir");
+      sshc->mkdir("test_dir/subdir");
+      sshc->mkdir("test.a");
+
       auto ls   = sshc->exec( "cat" );
       ls->in_stream()<<"Hello World\n";
       ls->in_stream().flush();

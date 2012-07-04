@@ -173,6 +173,19 @@ namespace mace { namespace ssh {
 
   } // namespace detail
 
+  file_attrib::file_attrib()
+  :size(0),uid(0),gid(0),permissions(0),atime(0),mtime(0)
+  { }
+  bool file_attrib::is_directory() {
+    return  LIBSSH2_SFTP_S_ISDIR(permissions);
+  }
+  bool file_attrib::is_file() {
+    return LIBSSH2_SFTP_S_ISREG(permissions);
+  }
+  bool file_attrib::exists() {
+    return permissions;
+  }
+
   client::ptr client::create() {
     client::ptr c = client::ptr(new client());
     return c;
@@ -369,11 +382,55 @@ namespace mace { namespace ssh {
     }
   }
 
+  file_attrib client::stat( const std::string& remote_path ) {
+     my->init_sftp();
+     LIBSSH2_SFTP_ATTRIBUTES att;
+     int ec = libssh2_sftp_stat( my->m_sftp, remote_path.c_str(), &att );
+     while( ec == LIBSSH2_ERROR_EAGAIN ) {
+        my->wait_on_socket();
+        ec = libssh2_sftp_stat( my->m_sftp, remote_path.c_str(), &att );
+     }
+     if( ec ) {
+        return file_attrib();
+     }
+     file_attrib    ft;
+     ft.size        = att.filesize;
+     ft.permissions = att.permissions;
+     return ft;
+  }
+
+  void client::mkdir( const std::string& rdir, int mode ) {
+    auto s = stat(rdir);
+    if( s.is_directory() ) return;
+    else if( s.exists() ) {
+      MACE_SSH_THROW( "Non directory exists at path %1%", %rdir );
+    }
+
+    int rc = libssh2_sftp_mkdir(my->m_sftp, rdir.c_str(), mode );
+    while( rc == LIBSSH2_ERROR_EAGAIN ) {
+      my->wait_on_socket();
+      rc = libssh2_sftp_mkdir(my->m_sftp, rdir.c_str(), mode );
+    }
+    if( 0 != rc ) {
+       rc = libssh2_sftp_last_error(my->m_sftp);
+       MACE_SSH_THROW( "mkdir error %1%", %rc );
+    }
+  }
+
   /**
    *  @post all session and socket objects closed and freed.
    */
   void client::close() {
     if( my->m_session ) {
+      
+       if( my->m_sftp ) {
+         int ec = libssh2_sftp_shutdown(my->m_sftp);
+         while( ec == LIBSSH2_ERROR_EAGAIN ) {
+            my->wait_on_socket();
+            ec = libssh2_sftp_shutdown(my->m_sftp);
+         } 
+         my->m_sftp = 0;
+       }
        try {
          int ec = libssh2_session_disconnect(my->m_session, "exit cleanly" );
          while( ec == LIBSSH2_ERROR_EAGAIN ) {

@@ -7,6 +7,7 @@
 #include <boost/bind.hpp>
 #include <mace/ssh/error.hpp>
 #include <libssh2.h>
+#include <libssh2_sftp.h>
 #include <mace/cmt/mutex.hpp>
 
 namespace mace { namespace ssh {
@@ -17,13 +18,14 @@ namespace mace { namespace ssh {
     struct client_d {
         client& self;
         client_d( client& c )
-        :self(c), m_session(0),m_knownhosts(0)
+        :self(c), m_session(0),m_knownhosts(0),m_sftp(0)
         { }
 
         std::unique_ptr<boost::asio::ip::tcp::socket> m_sock;
 
         LIBSSH2_SESSION*            m_session;
         LIBSSH2_KNOWNHOSTS*         m_knownhosts;
+        LIBSSH2_SFTP*               m_sftp;
 
         typedef mace::cmt::promise<boost::system::error_code>::ptr rw_prom;
         rw_prom read_prom;
@@ -195,6 +197,22 @@ namespace mace { namespace ssh {
         bool try_pass();
         bool try_pub_key();
         bool try_keyboard();
+
+        void init_sftp() {
+          if( !m_sftp ) {
+             m_sftp = libssh2_sftp_init(m_session);
+             while( !m_sftp ) {
+                char* msg = 0;
+                int   ec = libssh2_session_last_error(m_session,&msg,NULL,0);
+                if( ec == LIBSSH2_ERROR_EAGAIN ) {
+                  wait_on_socket();
+                  m_sftp = libssh2_sftp_init(m_session);
+                } else {
+                  MACE_SSH_THROW( "init sftp error %1%: %2%", %ec %msg );
+                }
+             }
+          }
+        }
   };
 } } } // mace::ssh::detail
 #endif // _MACE_SSH_CLIENT_DETAIL_HPP_

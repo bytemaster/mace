@@ -28,15 +28,33 @@ namespace mace { namespace ssh {
     } // namespace detail
   class client;
 
+  /**
+   *  Enables communication with a process executed via 
+   *  client::exec().  
+   *
+   *  Process can only be created by mace::ssh::client.
+   */
   class process : public std::enable_shared_from_this<process> {
     public:
       typedef std::shared_ptr<process> ptr;
 
       ~process();
 
+      /**
+       *  Blocks until the result code of the process has been returned.
+       */
       int result();
+      /**
+       *  @brief returns a stream that writes to the procss' stdin
+       */
       boost::iostreams::stream<detail::process_sink>& in_stream();
+      /**
+       *  @brief returns a stream that reads from the process' stdout
+       */
       std::istream& out_stream();
+      /**
+       *  @brief returns a stream that reads from the process' stderr
+       */
       std::istream& err_stream();
     private:
       friend class client;
