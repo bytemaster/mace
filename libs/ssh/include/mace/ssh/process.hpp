@@ -58,7 +58,7 @@ namespace mace { namespace ssh {
       std::istream& err_stream();
     private:
       friend class client;
-      process( client& c, const std::string& cmd );
+      process( client& c, const std::string& cmd, bool req_pty );
       detail::process_d* my;
   };
 } }

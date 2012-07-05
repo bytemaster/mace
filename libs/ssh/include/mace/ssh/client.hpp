@@ -64,8 +64,11 @@ namespace mace { namespace ssh {
 
       /**
        *  @brief execute command on remote machine
+       *  @param req_pty - whether or not to request a PTY when executing this process, this is necessary 
+       *          for interactive (non-buffered) IO with the remote process
+       *
        */
-      process::ptr exec( const std::string& cmd );
+      process::ptr exec( const std::string& cmd, bool req_pty = false );
 
       /**
        *  @brief upload a file to remote host

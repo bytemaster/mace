@@ -167,7 +167,7 @@ namespace mace { namespace ssh {
         }
 
 
-        LIBSSH2_CHANNEL*   open_channel() {
+        LIBSSH2_CHANNEL*   open_channel( bool req_pty ) {
             LIBSSH2_CHANNEL*                      chan = 0;
             chan = libssh2_channel_open_session(m_session);
             if( !chan ) {
@@ -182,6 +182,20 @@ namespace mace { namespace ssh {
                   MACE_SSH_THROW( "libssh2_channel_open_session failed: %1% - %2%", %ec %msg  );
                }
             }
+            if( req_pty ) {
+                //int ec = libssh2_channel_request_pty(chan,"vanilla");
+                int ec = libssh2_channel_request_pty(chan,"vt100");
+                while( ec == LIBSSH2_ERROR_EAGAIN ) {
+                   wait_on_socket();
+                   ec = libssh2_channel_request_pty(chan,"vt100");
+                }
+                if( 0 != ec ) {
+                   char* msg;
+                   ec = libssh2_session_last_error( m_session, &msg, 0, 0 );
+                   MACE_SSH_THROW( "libssh2_channel_req_pty failed: %1% - %2%", %ec %msg  );
+                }
+            }
+
             return chan;
         }
 

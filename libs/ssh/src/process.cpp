@@ -64,7 +64,7 @@ namespace mace { namespace ssh {
       /**
        *  @pre c is connected and has a valid session
        */
-      process_d( mace::ssh::client& c, const std::string& cmd )
+      process_d( mace::ssh::client& c, const std::string& cmd, bool req_pty )
       :sshc(c.shared_from_this()),
        std_out(process_source(*this,0)),
        std_err(process_source(*this,1)),
@@ -72,12 +72,13 @@ namespace mace { namespace ssh {
        {
         BOOST_ASSERT( c.my->m_session );
 
-        chan = c.my->open_channel(); 
+        chan = c.my->open_channel(req_pty); 
 
-        int ec = libssh2_channel_exec( chan, cmd.c_str() );
+        //int ec = libssh2_channel_exec( chan, cmd.c_str() );
+        int ec = libssh2_channel_shell( chan );//, cmd.c_str() );
         while( ec == LIBSSH2_ERROR_EAGAIN ) {
           sshc->my->wait_on_socket();
-          ec = libssh2_channel_exec( chan, cmd.c_str() );
+          ec = libssh2_channel_shell( chan);//, cmd.c_str() );
         }
 
         if( ec ) {
@@ -98,7 +99,7 @@ namespace mace { namespace ssh {
         }
       }
       bool flush(int stream_id) {
-
+        slog( "flush! %1%", stream_id );
         int ec = libssh2_channel_flush_ex( chan, stream_id );
         while( ec == LIBSSH2_ERROR_EAGAIN ) {
           sshc->my->wait_on_socket();
@@ -230,8 +231,8 @@ namespace mace { namespace ssh {
   } // namespace detail
 
 
-  process::process( client& c, const std::string& cmd )
-  :my( new detail::process_d( c, cmd ) ){}
+  process::process( client& c, const std::string& cmd, bool req_pty )
+  :my( new detail::process_d( c, cmd, req_pty ) ){}
 
   process::~process() { 
     try {

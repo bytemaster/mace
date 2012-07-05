@@ -7,6 +7,7 @@ include_directories( ../context/include )
 include_directories( ../atomic/include )
 include_directories( ../void/include )
 include_directories( ../process/include )
+include_directories( ../ssh/include )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 #include_directories( ../network/include )
 

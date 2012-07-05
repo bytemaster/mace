@@ -1,6 +1,7 @@
 SET( libraries 
     mace_rpc
     boost_context 
+    mace_ssh
     ${pthread_library}
     ${Boost_THREAD_LIBRARY} 
     ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} 
@@ -16,3 +17,5 @@ add_executable( runner runner.cpp )
 target_link_libraries( runner ${libraries} )
 add_executable( pipe_test pipe_test.cpp )
 target_link_libraries( pipe_test ${libraries} )
+add_executable( ssh_test ssh_test.cpp )
+target_link_libraries( ssh_test ${libraries} )

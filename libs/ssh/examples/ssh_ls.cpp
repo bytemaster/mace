@@ -20,6 +20,21 @@ int main( int argc, char** argv ) {
       auto sshc = mace::ssh::client::create();
       sshc->connect( "dlarimer", "rapture", "localhost");//10.211.55.2" );
 
+      auto ls   = sshc->exec( "/Users/dlarimer/projects/mace/libs/ssh/examples/test", true );
+      ls->in_stream()<<"ls\n";
+      ls->in_stream().flush();
+   //   ls->in_stream().close();
+
+      //std::string str((std::istreambuf_iterator<char>(ls->out_stream())),
+      //              std::istreambuf_iterator<char>());
+      std::string t;
+      while( ls->out_stream() ) {
+      ls->out_stream() >> t;
+      std::cout<<"stdout: "<<t<<std::endl;
+      }
+      std::cout<<"\nresult: "<<ls->result()<<std::endl;
+      return 0;
+
       auto stat = sshc->stat("test_dir/subdir");
       wlog( "size: %1%", stat.size );
       //auto does_not_exist = sshc->stat("test_dir/subdir/sd");
@@ -27,17 +42,9 @@ int main( int argc, char** argv ) {
       sshc->mkdir("test_dir/subdir");
       sshc->mkdir("test.a");
 
-      auto ls   = sshc->exec( "cat" );
-      ls->in_stream()<<"Hello World\n";
-      ls->in_stream().flush();
-      ls->in_stream().close();
 
       // print out anything that is sent our way
    
-      std::string str((std::istreambuf_iterator<char>(ls->out_stream())),
-                    std::istreambuf_iterator<char>());
-      std::cout<<"stdout: "<<str<<std::endl;
-      std::cout<<"\nresult: "<<ls->result()<<std::endl;
 
       auto f = mace::cmt::async([=](){ return sshc->scp_send( "libmace_ssh.a", "test.a", boost::bind(progress,"test.a",_1,_2) );}, "test.a");
       auto f2 = mace::cmt::async([=](){ return sshc->scp_send( "libmace_ssh_debug.a", "test.b", boost::bind(progress,"test.b",_1,_2) );}, "test.b");

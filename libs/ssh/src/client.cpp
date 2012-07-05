@@ -312,8 +312,8 @@ namespace mace { namespace ssh {
 
 
 
-  process::ptr client::exec( const std::string& cmd ) {
-    process::ptr cpp(new process(*this,cmd));
+  process::ptr client::exec( const std::string& cmd, bool req_pty ) {
+    process::ptr cpp(new process(*this,cmd,req_pty));
     //my->processes.push_back(ccp);
     return cpp;
   }
