@@ -46,6 +46,7 @@ namespace mace { namespace ssh {
     bool     is_directory();
   };
 
+
   /**
    *  @brief Enables communication over ssh using libssh2.
    *
@@ -59,6 +60,7 @@ namespace mace { namespace ssh {
       static client::ptr create();
 
       void connect( const std::string& user, const std::string& host, uint16_t port = 22);
+      void connect( const std::string& user, const std::string& pass, const std::string& host, uint16_t port = 22);
 
       /**
        *  @brief execute command on remote machine

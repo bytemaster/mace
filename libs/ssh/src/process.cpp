@@ -162,6 +162,7 @@ namespace mace { namespace ssh {
               if( libssh2_channel_eof( chan ) )  {
                 return -1; // eof
               }
+              sshc->my->wait_on_socket();
            } else {
              if( rc == LIBSSH2_ERROR_EAGAIN ) {
                if( 0 < (buf-data) ) {

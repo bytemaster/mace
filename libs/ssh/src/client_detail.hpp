@@ -123,7 +123,7 @@ namespace mace { namespace ssh {
             int i;
             size_t n;
             char buf[1024];
-            (void)abstract;
+            client_d* self = (client_d*)*abstract;
 
             printf("Performing keyboard-interactive authentication.\n");
 
@@ -143,14 +143,20 @@ namespace mace { namespace ssh {
                 printf("'\n");
 
                 printf("Please type response: ");
-                fgets(buf, sizeof(buf), stdin);
-                n = strlen(buf);
-                while (n > 0 && strchr("\r\n", buf[n - 1]))
-                  n--;
-                buf[n] = 0;
 
-                responses[i].text = strdup(buf);
-                responses[i].length = n;
+                if( self->upass.size() == 0 ) {
+                    fgets(buf, sizeof(buf), stdin);
+                    n = strlen(buf);
+                    while (n > 0 && strchr("\r\n", buf[n - 1]))
+                      n--;
+                    buf[n] = 0;
+
+                    responses[i].text = strdup(buf);
+                    responses[i].length = n;
+                } else {
+                    responses[i].text = strdup(self->upass.c_str());
+                    responses[i].length = self->upass.size();
+                }
 
                 printf("Response %d from user is '", i);
                 fwrite(responses[i].text, 1, responses[i].length, stdout);
@@ -179,6 +185,7 @@ namespace mace { namespace ssh {
             return chan;
         }
 
+        void connect();
 
 
         //mace::ssh::key                 host_key;

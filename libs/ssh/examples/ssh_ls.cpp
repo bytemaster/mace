@@ -18,7 +18,7 @@ int main( int argc, char** argv ) {
       mace::cmt::thread::current().debug("main");
 
       auto sshc = mace::ssh::client::create();
-      sshc->connect( "dlarimer", "localhost");//10.211.55.2" );
+      sshc->connect( "dlarimer", "rapture", "localhost");//10.211.55.2" );
 
       auto stat = sshc->stat("test_dir/subdir");
       wlog( "size: %1%", stat.size );

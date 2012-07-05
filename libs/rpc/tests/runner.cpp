@@ -21,5 +21,5 @@ int main( int argc, char** argv ) {
    
    mace::cmt::exec();
 
-   return 0;
+   return -9;
 }

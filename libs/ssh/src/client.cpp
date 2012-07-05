@@ -140,6 +140,7 @@ namespace mace { namespace ssh {
         bool client_d::try_keyboard() {
             BOOST_ASSERT( m_session );
             BOOST_ASSERT( uname.size() );
+
             
             int ec = libssh2_userauth_keyboard_interactive(m_session, uname.c_str(), &client_d::kbd_callback);
             while( ec == LIBSSH2_ERROR_EAGAIN ) {
@@ -168,6 +169,75 @@ namespace mace { namespace ssh {
                                                        passphrase.c_str() );
             }
             return !ec;
+        }
+
+        void client_d::connect() {
+            try {
+               if( libssh2_init(0) < 0  ) {
+                 MACE_SSH_THROW( "Unable to init libssh2" );
+               }
+               
+               slog( "resolve %1%:%2%", hostname, port );
+               std::vector<mace::cmt::asio::tcp::endpoint> eps 
+                 = mace::cmt::asio::tcp::resolve( hostname, boost::lexical_cast<std::string>(port));
+               slog( "resolved %1% options", eps.size() );
+               
+               if( eps.size() == 0 ) {
+                 MACE_SSH_THROW( "Hostname '%1%' didn't resolve to any endpoints", %hostname );
+               }
+               
+               m_sock.reset( new boost::asio::ip::tcp::socket( mace::cmt::asio::default_io_service() ) );
+               
+               for( uint32_t i = 0; i < eps.size(); ++i ) {
+                  boost::system::error_code e = mace::cmt::asio::tcp::connect( *m_sock, eps[i] );
+                  if( !e ) {
+                    slog( "connected to remote endpoint" );
+                    endpt = eps[i];
+                    break;
+                  }
+               }
+
+               slog( "Creating session" );
+
+               m_session = libssh2_session_init(); 
+               *libssh2_session_abstract(m_session) = this;
+
+
+               BOOST_ASSERT( m_session );
+               
+               // use non-blocking calls so that we know when to call wait_on_socket
+               libssh2_session_set_blocking( m_session, 0 );
+               
+               // perform the session handshake, and keep trying while EAGAIN
+               int ec = libssh2_session_handshake( m_session, m_sock->native() );
+               while( ec == LIBSSH2_ERROR_EAGAIN ) {
+                 wait_on_socket();
+                 ec = libssh2_session_handshake( m_session, m_sock->native() );
+               }
+
+               // if there was an error, throw it.
+               if( ec < 0 ) {
+                 char* msg;
+                 libssh2_session_last_error( m_session, &msg, 0, 0 );
+                 MACE_SSH_THROW( "Handshake error: %1% - %2%", %ec %msg );
+               }
+               
+               /* At this point we havn't yet authenticated.  The first thing to do
+                * is check the hostkey's fingerprint against our known hosts Your app
+                * may have it hard coded, may go to a file, may present it to the
+                * user, that's your call
+                *
+                * TODO: validate fingerprint
+                */
+               const char* fingerprint = libssh2_hostkey_hash(m_session, LIBSSH2_HOSTKEY_HASH_SHA1);
+                
+               // try to authenticate, throw on error.
+               authenticate();
+               
+            } catch ( ... ) {
+              self.close();
+              throw;
+            }
         }
 
 
@@ -219,76 +289,28 @@ namespace mace { namespace ssh {
    *  @throw if any of the run-time pre conditions are not met.
    */
   void client::connect( const std::string& user, const std::string& host, uint16_t port ) {
-    try {
        // not connected
        BOOST_ASSERT( !my->m_session );
        
        my->hostname = host;
        my->uname    = user;
        my->port     = port;
-       
-       if( libssh2_init(0) < 0  ) {
-         MACE_SSH_THROW( "Unable to init libssh2" );
-       }
-       
-       slog( "resolve %1%:%2%", my->hostname, port );
-       std::vector<mace::cmt::asio::tcp::endpoint> eps 
-         = mace::cmt::asio::tcp::resolve( my->hostname, boost::lexical_cast<std::string>(port));
-       slog( "resolved %1% options", eps.size() );
-       
-       if( eps.size() == 0 ) {
-         MACE_SSH_THROW( "Hostname '%1%' didn't resolve to any endpoints", %host );
-       }
-       
-       my->m_sock.reset( new boost::asio::ip::tcp::socket( mace::cmt::asio::default_io_service() ) );
-       
-       for( uint32_t i = 0; i < eps.size(); ++i ) {
-          boost::system::error_code e = mace::cmt::asio::tcp::connect( *my->m_sock, eps[i] );
-          if( !e ) {
-            slog( "connected to remote endpoint" );
-            my->endpt = eps[i];
-            break;
-          }
-       }
 
-       slog( "Creating session" );
-       my->m_session = libssh2_session_init(); 
-       BOOST_ASSERT( my->m_session );
-       
-       // use non-blocking calls so that we know when to call my->wait_on_socket
-       libssh2_session_set_blocking( my->m_session, 0 );
-       
-       // perform the session handshake, and keep trying while EAGAIN
-       int ec = libssh2_session_handshake( my->m_session, my->m_sock->native() );
-       while( ec == LIBSSH2_ERROR_EAGAIN ) {
-         my->wait_on_socket();
-         ec = libssh2_session_handshake( my->m_session, my->m_sock->native() );
-       }
+       my->connect();
 
-       // if there was an error, throw it.
-       if( ec < 0 ) {
-         char* msg;
-         libssh2_session_last_error( my->m_session, &msg, 0, 0 );
-         MACE_SSH_THROW( "Handshake error: %1% - %2%", %ec %msg );
-       }
-       
-       /* At this point we havn't yet authenticated.  The first thing to do
-        * is check the hostkey's fingerprint against our known hosts Your app
-        * may have it hard coded, may go to a file, may present it to the
-        * user, that's your call
-        *
-        * TODO: validate fingerprint
-        */
-       const char* fingerprint = libssh2_hostkey_hash(my->m_session, LIBSSH2_HOSTKEY_HASH_SHA1);
-        
-       // try to authenticate, throw on error.
-       my->authenticate();
-       
-    } catch ( ... ) {
-      close();
-      throw;
-    }
   }
+
+  void client::connect( const std::string& user, const std::string& pass, const std::string& host, uint16_t port ) {
+
+       my->hostname = host;
+       my->uname    = user;
+       my->upass    =  pass;
+       my->port     = port;
+
+       my->connect();
+  }
+
+
 
   process::ptr client::exec( const std::string& cmd ) {
     process::ptr cpp(new process(*this,cmd));
