@@ -60,15 +60,30 @@ namespace mace { namespace ssh {
       static client::ptr create();
 
       void connect( const std::string& user, const std::string& host, uint16_t port = 22);
+
+      /**
+       *  Connect via password or keyboard-interactive 
+       */
       void connect( const std::string& user, const std::string& pass, const std::string& host, uint16_t port = 22);
 
       /**
        *  @brief execute command on remote machine
-       *  @param req_pty - whether or not to request a PTY when executing this process, this is necessary 
-       *          for interactive (non-buffered) IO with the remote process
+       *  @param pty_type - whether or not to request a PTY when executing this process, this is necessary 
+       *          for interactive (non-buffered) IO with the remote process, if left empty no pty will be 
+       *          requested
        *
+       *  @note Processes launched in this manner will fully buffer stdin and stdout regardless of whether
+       *     the process calls flush().  If you need unbuffered (streaming, realtime) access to standard
+       *     out then you must launch the process via a shell.
        */
-      process::ptr exec( const std::string& cmd, bool req_pty = false );
+      process::ptr exec( const std::string& cmd, const std::string& pty_type = "" );
+
+      /**
+       *  @brief request an interactive shell
+       *
+       *  @param type  "vt100", "vanilla", "ansi", etc
+       */
+      process::ptr shell( const std::string& pty_type = "vt100" );
 
       /**
        *  @brief upload a file to remote host

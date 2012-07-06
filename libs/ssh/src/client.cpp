@@ -310,11 +310,13 @@ namespace mace { namespace ssh {
        my->connect();
   }
 
+  process::ptr client::exec( const std::string& cmd, const std::string& pty_type ) {
+    process::ptr cpp(new process(*this,cmd,pty_type));
+    return cpp;
+  }
 
-
-  process::ptr client::exec( const std::string& cmd, bool req_pty ) {
-    process::ptr cpp(new process(*this,cmd,req_pty));
-    //my->processes.push_back(ccp);
+  process::ptr client::shell( const std::string& pty_type ) {
+    process::ptr cpp(new process(*this,std::string(),pty_type));
     return cpp;
   }
 

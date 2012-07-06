@@ -64,7 +64,7 @@ namespace mace { namespace ssh {
       /**
        *  @pre c is connected and has a valid session
        */
-      process_d( mace::ssh::client& c, const std::string& cmd, bool req_pty )
+      process_d( mace::ssh::client& c, const std::string& cmd, const std::string&  pty_type )
       :sshc(c.shared_from_this()),
        std_out(process_source(*this,0)),
        std_err(process_source(*this,1)),
@@ -72,21 +72,31 @@ namespace mace { namespace ssh {
        {
         BOOST_ASSERT( c.my->m_session );
 
-        chan = c.my->open_channel(req_pty); 
+        chan = c.my->open_channel(pty_type); 
 
-        //int ec = libssh2_channel_exec( chan, cmd.c_str() );
-        int ec = libssh2_channel_shell( chan );//, cmd.c_str() );
-        while( ec == LIBSSH2_ERROR_EAGAIN ) {
-          sshc->my->wait_on_socket();
-          ec = libssh2_channel_shell( chan);//, cmd.c_str() );
+        int ec = 0;
+        if( cmd.size() == 0 ) {
+           slog( "starting shell" );
+            ec = libssh2_channel_shell(chan );
+            while( ec == LIBSSH2_ERROR_EAGAIN ) {
+              sshc->my->wait_on_socket();
+              ec = libssh2_channel_shell(chan);
+            }
+        } else {
+           slog( "exe cmd %1%", cmd );
+            ec = libssh2_channel_exec( chan, cmd.c_str() );
+            while( ec == LIBSSH2_ERROR_EAGAIN ) {
+              sshc->my->wait_on_socket();
+              ec = libssh2_channel_exec( chan, cmd.c_str() );
+            }
         }
-
         if( ec ) {
            char* msg = 0;
            ec   = libssh2_session_last_error( sshc->my->m_session, &msg, 0, 0 );
            MACE_SSH_THROW( "libssh2_channel_exec failed: %1% - %2%", %ec %msg  );
         }
       }
+
 
       void send_eof() {
 
@@ -192,16 +202,7 @@ namespace mace { namespace ssh {
         char* buf = s;
         std::streamsize buflen = n;
         std::streamsize r = m_process.read_some( buf, buflen, m_chan );
-        while( buflen ) {
-          if( r == -1 ) {
-            if( buf == s ) return -1;
-            return (buf-s);
-          }
-          buf    += r;
-          buflen -= r;
-          r = m_process.read_some( buf, buflen, m_chan );
-        }
-        return n;
+        return r;
     }
 
     /**
@@ -231,8 +232,8 @@ namespace mace { namespace ssh {
   } // namespace detail
 
 
-  process::process( client& c, const std::string& cmd, bool req_pty )
-  :my( new detail::process_d( c, cmd, req_pty ) ){}
+  process::process( client& c, const std::string& cmd, const std::string& pty_type )
+  :my( new detail::process_d( c, cmd, pty_type ) ){}
 
   process::~process() { 
     try {
