@@ -12,7 +12,8 @@ namespace mace { namespace rpc { namespace json { namespace pipe {
         typedef std::shared_ptr<connection> ptr;
 
         connection( std::istream& in, std::ostream& out) 
-        :rpc::pipe::connection<IODelegate>( new mace::rpc::json::pipe::detail::connection(in,out) ) {}
+        :rpc::pipe::connection<IODelegate>( new mace::rpc::json::pipe::detail::connection(*this,in,out) ) {}
+
     };
 
 } } } } // mace::rpc::json::pipe

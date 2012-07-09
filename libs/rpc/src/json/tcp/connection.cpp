@@ -5,13 +5,14 @@
 
 namespace mace { namespace rpc { namespace json { namespace tcp {  namespace detail {
 
-connection::connection(){}
+connection::connection(mace::rpc::connection_base& cb)
+:mace::rpc::tcp::detail::connection(cb){}
 
-connection::connection( const boost::asio::ip::tcp::endpoint& ep )
-:mace::rpc::tcp::detail::connection(ep) {}
+connection::connection(mace::rpc::connection_base& cb, const boost::asio::ip::tcp::endpoint& ep )
+:mace::rpc::tcp::detail::connection(cb,ep) {}
 
-connection::connection( const mace::cmt::asio::tcp::socket::ptr& sock )
-:mace::rpc::tcp::detail::connection(sock) {}
+connection::connection(mace::rpc::connection_base& cb, const mace::cmt::asio::tcp::socket::ptr& sock )
+:mace::rpc::tcp::detail::connection(cb,sock) {}
 
 /**
  *  Convert the generic rpc::message into a json-rpc message

@@ -17,13 +17,15 @@ namespace mace { namespace rpc { namespace tcp { namespace detail {
 
   class connection : public mace::rpc::detail::connection_base {
     public:
-      connection(){}
+      connection( mace::rpc::connection_base& cb)
+      :mace::rpc::detail::connection_base(cb){}
 
-      connection( const boost::asio::ip::tcp::endpoint& ep ) {
+      connection( mace::rpc::connection_base& cb, const boost::asio::ip::tcp::endpoint& ep )
+      :mace::rpc::detail::connection_base(cb) {
         connect( ep );
       }
-      connection( const mace::cmt::asio::tcp::socket::ptr& sock )
-      :m_sock(sock){
+      connection( mace::rpc::connection_base& cb, const mace::cmt::asio::tcp::socket::ptr& sock )
+      :mace::rpc::detail::connection_base(cb), m_sock(sock){
         if( m_sock ) {
           m_read_done = mace::cmt::async( std::bind( &connection::read_loop, this ) );
         }
@@ -62,6 +64,8 @@ namespace mace { namespace rpc { namespace tcp { namespace detail {
         }
         break_promises();
         m_sock.reset();
+
+        self.closed(); // emit signal that connection was closed
       }
       void connect( const boost::asio::ip::tcp::endpoint& ep ) {
         close(); 

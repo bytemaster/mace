@@ -12,8 +12,6 @@
 #include <boost/function_types/result_type.hpp>
 #include <boost/function_types/parameter_types.hpp>
 
-#include <boost/signals.hpp>
-
 namespace mace { namespace rpc { 
 
   /**
@@ -53,7 +51,6 @@ namespace mace { namespace rpc {
       typedef std::shared_ptr<connection> ptr;
       typedef IODelegate io_delegate_type;
 
-      boost::signal<void()> closed;
 
       template<typename R, typename ParamSeq>
       cmt::future<R> call_fused( const std::string& id, ParamSeq&& params ) {

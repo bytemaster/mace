@@ -8,9 +8,9 @@ namespace mace { namespace rpc { namespace json { namespace tcp {  namespace det
 
   class connection : public mace::rpc::tcp::detail::connection  {
     public:
-      connection();
-      connection( const boost::asio::ip::tcp::endpoint& ep );
-      connection( const mace::cmt::asio::tcp::socket::ptr& sock );
+      connection( mace::rpc::connection_base& s );
+      connection( mace::rpc::connection_base& s, const boost::asio::ip::tcp::endpoint& ep );
+      connection( mace::rpc::connection_base& s, const mace::cmt::asio::tcp::socket::ptr& sock );
 
       virtual void         send_message( rpc::message&& m );
       virtual rpc::message read_message();

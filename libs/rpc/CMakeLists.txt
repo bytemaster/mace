@@ -21,6 +21,7 @@ ENDIF()
 SET( libraries  mace_cmt )
 SET( sources 
         src/connection_base.cpp
+        src/pipe/connection.cpp
         src/json/io.cpp
         src/json/tcp/connection.cpp
         src/json/pipe/connection.cpp

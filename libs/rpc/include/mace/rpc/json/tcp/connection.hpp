@@ -12,13 +12,13 @@ namespace mace { namespace rpc { namespace json { namespace tcp {
         typedef std::shared_ptr<connection> ptr;
 
         connection()
-        :rpc::tcp::connection<IODelegate>( new mace::rpc::json::tcp::detail::connection() ) {}
+        :rpc::tcp::connection<IODelegate>( new mace::rpc::json::tcp::detail::connection(*this) ) {}
 
         connection( const boost::asio::ip::tcp::endpoint& ep )
-        :rpc::tcp::connection<IODelegate>( new mace::rpc::json::tcp::detail::connection(ep) ){}
+        :rpc::tcp::connection<IODelegate>( new mace::rpc::json::tcp::detail::connection(*this,ep) ){}
 
         connection( const mace::cmt::asio::tcp::socket::ptr& sock )
-        :rpc::tcp::connection<IODelegate>( new mace::rpc::json::tcp::detail::connection(sock) ) {}
+        :rpc::tcp::connection<IODelegate>( new mace::rpc::json::tcp::detail::connection(*this,sock) ) {}
     };
 
 } } } } // mace::rpc::json::tcp

@@ -4,6 +4,8 @@
 #include <mace/rpc/message.hpp>
 #include <mace/rpc/detail/pending_result.hpp>
 
+#include <boost/signals.hpp>
+
 namespace mace { namespace rpc  {
 
   typedef boost::function<message(message&)> method;
@@ -52,6 +54,10 @@ namespace mace { namespace rpc  {
         return *this;
       }
 
+      /**
+       *  Emited when read loop exits.
+       */
+      boost::signal<void()> closed;
     protected:
       /**
        *  Call method ID with param and use the given result handler if specified.  

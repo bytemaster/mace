@@ -8,13 +8,14 @@ namespace mace { namespace rpc { namespace raw { namespace tcp {  namespace deta
 
   class connection : public mace::rpc::tcp::detail::connection  {
     public:
-      connection(){}
+      connection(mace::rpc::connection_base& s)
+      :mace::rpc::tcp::detail::connection(s){}
 
-      connection( const boost::asio::ip::tcp::endpoint& ep )
-      :mace::rpc::tcp::detail::connection(ep) {}
+      connection( mace::rpc::connection_base& s, const boost::asio::ip::tcp::endpoint& ep )
+      :mace::rpc::tcp::detail::connection(s,ep) {}
 
-      connection( const mace::cmt::asio::tcp::socket::ptr& sock )
-      :mace::rpc::tcp::detail::connection(sock) {}
+      connection( mace::rpc::connection_base& s, const mace::cmt::asio::tcp::socket::ptr& sock )
+      :mace::rpc::tcp::detail::connection(s,sock) {}
 
       virtual void  send_message( rpc::message&& m ) {
         raw::message rm( std::move(m) );

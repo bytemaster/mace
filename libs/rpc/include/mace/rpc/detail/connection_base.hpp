@@ -16,12 +16,14 @@ namespace mace { namespace rpc { namespace detail {
   class connection_base {
     public:
       typedef std::shared_ptr<connection_base> ptr;
+      mace::rpc::connection_base& self;
       method_map  methods;
       pending_map results;
       int32_t     next_method_id;
       int32_t     next_req_id;
 
-      connection_base():next_method_id(0),next_req_id(0){}
+
+      connection_base(mace::rpc::connection_base& mself):self(mself),next_method_id(0),next_req_id(0){}
       virtual ~connection_base(){}
 
       virtual void close() {}

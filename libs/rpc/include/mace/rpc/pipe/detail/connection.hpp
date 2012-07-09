@@ -1,58 +1,43 @@
 #ifndef _MACE_RPC_PIPE_DETAIL_CONNECTION_HPP_
 #define _MACE_RPC_PIPE_DETAIL_CONNECTION_HPP_
-#include <boost/make_shared.hpp>
 #include <mace/rpc/detail/connection_base.hpp>
-#include <mace/rpc/raw/message.hpp>
-#include <mace/rpc/raw/raw_io.hpp>
-#include <mace/rpc/error.hpp>
-#include <mace/cmt/bind.hpp>
-#include <mace/cmt/thread.hpp>
+#include <mace/cmt/future.hpp>
 
-namespace mace { namespace rpc { namespace pipe { namespace detail { 
+namespace mace { 
 
-  namespace raw = mace::rpc::raw;
+  namespace rpc { namespace pipe { namespace detail { 
 
   class connection : public mace::rpc::detail::connection_base {
     public:
-      connection( std::istream& in, std::ostream& out )
-      :m_in(in),m_out(out),m_created_thread(mace::cmt::thread::current()) {
-         m_read_thread = mace::cmt::thread::create("read_loop");
-         m_read_done = m_read_thread->async( [this](){read_loop();} );
-      }
+      connection( mace::rpc::connection_base& cb, std::istream& in, std::ostream& out );
 
-      ~connection() {
-         m_read_thread->quit();
-      }
+      ~connection();
+      void close();
 
       virtual void         send_message( rpc::message&& m ) = 0;
       virtual rpc::message read_message()                   = 0;
 
+      /** 
+       *  @note kept in header for inlining purposes 
+       **/
       void send( message&& m ) {
         send_message( std::move(m) );
       }
-      /**
-       * Occurs in the read_loop thread because reading from
-       * streams is 'blocking'.
-       */
-      void read_loop( ) {
-        try {
-          while ( true ) {
-            //auto m = read_message();
-            m_created_thread.async( mace::cmt::bind( [this]( message&& m ) { handle( std::move(m) ); } , read_message() ) );
-            //handle( read_message() );
-          }
-        } catch ( ... ) {
-          elog( "connection closed: %1%", 
-                boost::current_exception_diagnostic_information() );
-        }
-        break_promises();
-      }
 
-      void handle_error( message::error_type e, const std::string& msg ) {
-        elog( "%1%: %2%", int(e), msg );
-      }
-      mace::cmt::thread*                 m_read_thread;
-      cmt::future<void>                  m_read_done;
+      /**
+       * Read messages until an exception is thrown.
+       *
+       * This method may occur in a different thread for 'blocking' input streams.
+       * 
+       */
+      void read_loop( );
+
+      void handle_error( message::error_type e, const std::string& msg );
+
+
+    protected:
+      mace::cmt::thread*      m_read_thread;
+      cmt::future<void>       m_read_done;
 
       std::istream&           m_in;
       std::ostream&           m_out;
