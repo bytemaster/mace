@@ -127,6 +127,15 @@ namespace mace { namespace cmt {
       }
       cc->next_blocked = m_blist;
       m_blist = cc;
+
+      int cnt = 0;
+      auto i = m_blist;
+      while( i ) {
+        i = i->next_blocked;
+        ++cnt;
+      }
+      wlog( "wait queue len %1%", cnt );
+
     }
 
     try {

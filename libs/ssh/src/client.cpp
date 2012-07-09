@@ -234,6 +234,8 @@ namespace mace { namespace ssh {
                 
                // try to authenticate, throw on error.
                authenticate();
+
+          //     libssh2_trace(m_session, LIBSSH2_TRACE_TRANS);
                
             } catch ( ... ) {
               self.close();

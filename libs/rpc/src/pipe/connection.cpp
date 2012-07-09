@@ -33,6 +33,7 @@ namespace mace { namespace rpc { namespace pipe { namespace detail {
     try {
       while ( true ) {
         m_created_thread.async( mace::cmt::bind( [this]( message&& m ) { handle( std::move(m) ); } , read_message() ) );
+        mace::cmt::yield();
         //handle( read_message() );
       }
     } catch ( const boost::system::system_error& e ) {

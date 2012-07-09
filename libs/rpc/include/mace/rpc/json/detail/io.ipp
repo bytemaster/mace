@@ -48,7 +48,6 @@ namespace mace { namespace rpc { namespace json {
      bool found_dot = false;
      // check for literal vs object, array or string
      switch( *itr ) {
-//       std::cerr<<*itr;
        case '[':
        case '{':
        case '"':
@@ -93,7 +92,6 @@ namespace mace { namespace rpc { namespace json {
      bool done = 0;
      // read until closing ] or " ignoring escaped "
      while( itr != end && !done) {
-//       std::cerr<<*itr;
        if( !in_quote ) {
          switch( *itr ) {
            case '[':

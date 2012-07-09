@@ -74,7 +74,17 @@ namespace mace { namespace ssh {
 
         chan = c.my->open_channel(pty_type); 
 
-        int ec = 0;
+        unsigned int rw_size = 0;
+        int ec = libssh2_channel_receive_window_adjust2(chan, 1024*64, 0, &rw_size );
+
+        while( ec == LIBSSH2_ERROR_EAGAIN ) {
+          sshc->my->wait_on_socket();
+          ec = libssh2_channel_receive_window_adjust2(chan, 1024*64, 0, &rw_size );
+        }
+        elog( "rwindow size %1%", rw_size );
+
+
+        ec = 0;
         ec = libssh2_channel_handle_extended_data2(chan, LIBSSH2_CHANNEL_EXTENDED_DATA_NORMAL );
         while( ec == LIBSSH2_ERROR_EAGAIN ) {
           sshc->my->wait_on_socket();
@@ -116,15 +126,16 @@ namespace mace { namespace ssh {
           }
         }
       }
-      bool flush(int stream_id) {
-        int ec = libssh2_channel_flush_ex( chan, stream_id );
+      bool flush() {
+        int ec = libssh2_channel_flush_ex( chan, LIBSSH2_CHANNEL_FLUSH_EXTENDED_DATA);
         while( ec == LIBSSH2_ERROR_EAGAIN ) {
           sshc->my->wait_on_socket();
-          ec = libssh2_channel_flush_ex( chan, stream_id );
+          ec = libssh2_channel_flush_ex( chan, LIBSSH2_CHANNEL_FLUSH_EXTENDED_DATA );
         }
-        if( ec ) {
+        if( ec < 0 ) {
           char* msg = 0;
-          ec = libssh2_session_last_error( sshc->my->m_session, &msg, 0, 0 );
+          libssh2_session_last_error( sshc->my->m_session, &msg, 0, 0 );
+          elog( "flush failed: %1% - %2%", ec, msg  );
           MACE_SSH_THROW( "flush failed: %1% - %2%", %ec %msg  );
         }
         return true;
@@ -133,6 +144,7 @@ namespace mace { namespace ssh {
 
     int process_d::write_some( const char* data, size_t len, int stream_id ) {
         if( !sshc->my->m_session ) {
+          elog( "SESSION CLOSED" );
           MACE_SSH_THROW( "Session closed\n" );
         }
        int rc;
@@ -146,6 +158,7 @@ namespace mace { namespace ssh {
               return buf-data;
            } else if( rc == 0 ) {
               if( libssh2_channel_eof( chan ) )  {
+                 elog( "return %1%", -1 );
                 return -1; // eof
               }
            } else {
@@ -220,10 +233,20 @@ namespace mace { namespace ssh {
      *  Perform a blocking write
      */
     std::streamsize process_sink::write( const char* s, std::streamsize n ) {
-        return  m_process.write_some( s, n, m_chan );
+        try {
+         return m_process.write_some( s, n, m_chan );
+        } catch ( ... ) {
+          elog( "%1%", boost::current_exception_diagnostic_information() );
+          throw;
+        }
     }
     bool process_sink::flush( ) {
-      return m_process.flush( m_chan );
+      try {
+        return m_process.flush();
+      } catch ( ... ) {
+        elog( "%1%", boost::current_exception_diagnostic_information() );
+        throw;
+      }
     }
 
     void process_sink::close() {

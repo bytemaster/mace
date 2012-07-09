@@ -8,12 +8,15 @@ namespace mace { namespace rpc { namespace json { namespace pipe {  namespace de
 
 connection::connection( mace::rpc::connection_base& s, std::istream& i, std::ostream& o )
 :mace::rpc::pipe::detail::connection(s,i,o)
-{}
+{
+
+}
 
 connection::~connection() {
    try { close(); }
    catch(...) { elog( "%1%", boost::current_exception_diagnostic_information() ); }
 }
+
 /**
  *  Convert the generic rpc::message into a json-rpc message
  */
@@ -47,32 +50,36 @@ void  connection::send_message( rpc::message&& m ) {
         ss<<'}';
     }
     std::string s = ss.str();
+    assert(s.size());
     m_out.write( s.c_str(), s.size() );
-//    std::cerr<<s;
+    
     if( !m.err ) {
       m_out.write( &m.data.front(), m.data.size() );
-//      std::cerr.write(&m.data.front(), m.data.size() );
     }
     m_out.write( "}", 1 );
-//    std::cerr<<'}';
   } else {
     ss<<'}';
     std::string s = ss.str();
-//    std::cerr<<s;
     m_out.write( s.c_str(), s.size() );
   }
   m_out.flush();
+  assert(m_out);
 }
+
+
+
+
+
 rpc::message connection::read_message() {
   std::vector<char> msg;
   {
-//    boost::unique_lock<mace::cmt::mutex> lock(rmutex);
     std::istream_iterator<char> itr(m_in);
     std::istream_iterator<char> end;
     
     msg  = read_value(itr,end);
   }
-//  slog( "%1%", std::string(msg.begin(),msg.end()) );
+//  slog("read: '%1%'",std::string(msg.begin(),msg.end()));
+//  slog( "'%1%'", std::string(msg.begin(),msg.end()) );
   if( !msg.size() )  {
     BOOST_THROW_EXCEPTION( boost::system::system_error( boost::asio::error::eof ) );
     //MACE_RPC_THROW( "EOF Message" );
