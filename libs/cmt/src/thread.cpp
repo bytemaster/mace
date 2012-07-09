@@ -79,6 +79,8 @@ namespace mace { namespace cmt {
 
 
            void debug( const std::string& s ) {
+              boost::unique_lock<boost::mutex> lock(detail::log_mutex());
+
               std::cerr<<"--------------------- "<<s<<" - "<<current;
               if( current && current->cur_task ) std::cerr<<'('<<current->cur_task->get_desc()<<')';
               std::cerr<<" ---------------------------\n";
@@ -496,7 +498,6 @@ namespace mace { namespace cmt {
     }
 
     int thread::wait_any( const std::vector<promise_base::ptr>& p, const system_clock::time_point& timeout ) {
-       slog( "wait any %1%", p.size() );
        for( uint32_t i = 0; i < p.size(); ++i ) {
          if( p[i]->ready() ) return i;
        }
@@ -509,7 +510,6 @@ namespace mace { namespace cmt {
        }
      
        for( uint32_t i = 0; i < p.size(); ++i ) {
-           slog( "adding blocking promises %1%", p[i].get() );
            my->current->add_blocking_promise(p[i].get(),false);
        };
 
@@ -522,13 +522,10 @@ namespace mace { namespace cmt {
                            my->sleep_pqueue.end(), 
                            sleep_priority_less()   );
        }
-       slog( "blocking %1%", my->current );
        my->add_to_blocked( my->current );
        my->start_next_fiber();
-       slog( "resuming %1%", my->current );
 
        std::for_each( p.begin(),p.end(), [&]( const promise_base::ptr& prom) {
-           slog( "remove blocking promises %1%", prom.get() );
            my->current->remove_blocking_promise(prom.get());
        });
      
@@ -697,6 +694,7 @@ namespace mace { namespace cmt {
     }
 
     void thread::quit() {
+        wlog( "quit!" );
         if( &current() != this ) {
             async( boost::bind( &thread::quit, this ) ).wait();
             if( my->boost_thread ) {

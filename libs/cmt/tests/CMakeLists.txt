@@ -8,6 +8,8 @@ SET( libraries
     ${Boost_SYSTEM_LIBRARY} 
     ${Boost_SIGNALS_LIBRARY})
 
+add_executable( cin cin.cpp )
+target_link_libraries( cin ${libraries} )
 add_executable( asio_test asio_test.cpp )
 target_link_libraries( asio_test ${libraries} )
 add_executable( future_test future_test.cpp )

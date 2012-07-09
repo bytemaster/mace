@@ -9,6 +9,14 @@ namespace mace { namespace cmt {
   :m_blist(0){}
 
   mutex::~mutex() {
+    if( m_blist ) {
+      auto c = m_blist;
+      mace::cmt::thread::current().debug("~mutex");
+      while( c )  {
+        elog( "still blocking on context %1% (%2%)", m_blist, (m_blist->cur_task ? m_blist->cur_task->get_desc() : "no current task") ); 
+        c = c->next_blocked;
+      }
+    }
     BOOST_ASSERT( !m_blist && "Attempt to free mutex while others are blocking on lock." );
   }
 
@@ -125,6 +133,7 @@ namespace mace { namespace cmt {
       cmt::thread::current().yield(false);
       BOOST_ASSERT( cc->next_blocked == 0 );
     } catch ( ... ) {
+      wlog( "lock with throw %1% %2%",this, boost::current_exception_diagnostic_information() );
       cleanup( *this, m_blist_lock, m_blist, cc);
       throw;
     }
