@@ -18,9 +18,9 @@ int main( int argc, char** argv ) {
       mace::cmt::thread::current().debug("main");
 
       auto sshc = mace::ssh::client::create();
-      sshc->connect( "dlarimer", "rapture", "localhost");//10.211.55.2" );
+      sshc->connect( argv[1], argv[2], "localhost");
 
-      auto ls   = sshc->exec( "/Users/dlarimer/projects/mace/libs/ssh/examples/test", true );
+      auto ls   = sshc->exec( "/Users/dlarimer/projects/mace/libs/ssh/examples/test", "vt100");
       ls->in_stream()<<"ls\n";
       ls->in_stream().flush();
    //   ls->in_stream().close();

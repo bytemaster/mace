@@ -9,7 +9,7 @@ include_directories( ../void/include )
 include_directories( ../process/include )
 include_directories( ${Boost_INCLUDE_DIR} )
 
-SET( libraries  mace_cmt ssh2 ${Boost_FILESYSTEM_LIBRARY} )
+SET( libraries  mace_cmt /usr/local/lib/libssh2.a crypto z ${Boost_FILESYSTEM_LIBRARY} )
 SET( sources src/client.cpp src/process.cpp )
 
 install( DIRECTORY include/mace/ssh DESTINATION include/mace )

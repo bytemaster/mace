@@ -11,6 +11,7 @@
 
 namespace mace { namespace ssh {
   namespace detail { 
+    static int ssh_init = libssh2_init(0);
   /*
         bool client_d::validate_remote_host() {
           size_t len;
@@ -266,7 +267,7 @@ namespace mace { namespace ssh {
   }
 
   client::~client() {
-    try { close(); } catch( ... ) {}
+    try { close(); } catch( ... ) { elog(""); }
     delete my;
   }
 
@@ -442,17 +443,22 @@ namespace mace { namespace ssh {
   }
 
   /**
+   * 
    *  @post all session and socket objects closed and freed.
+   *  @post my->m_session = NULL
    */
   void client::close() {
     if( my->m_session ) {
-      
        if( my->m_sftp ) {
          int ec = libssh2_sftp_shutdown(my->m_sftp);
-         while( ec == LIBSSH2_ERROR_EAGAIN ) {
-            my->wait_on_socket();
-            ec = libssh2_sftp_shutdown(my->m_sftp);
-         } 
+         try {
+             while( ec == LIBSSH2_ERROR_EAGAIN ) {
+                my->wait_on_socket();
+                ec = libssh2_sftp_shutdown(my->m_sftp);
+             } 
+         }catch(...){
+          elog( "... caught error closing sftp session???" );
+         }
          my->m_sftp = 0;
        }
        try {
@@ -467,20 +473,31 @@ namespace mace { namespace ssh {
             ec = libssh2_session_free(my->m_session );
          }
          my->m_session = 0;
-       } catch ( ... ){}
+       } catch ( ... ){
+          elog( "... caught error freeing session???" );
+          my->m_session = 0;
+       }
        try {
          if( my->m_sock ) {
+           slog( "closing socket" );
            my->m_sock->close();
-           my->m_sock.reset(0);
          }
-       } catch ( ... ){}
+       } catch ( ... ){
+          elog( "... caught error closing socket???" );
+       }
+       my->m_sock.reset(0);
        try {
-        //if( my->read_prom ) my->read_prom->wait();
-       } catch ( ... ){}
+        if( my->read_prom ) my->read_prom->wait();
+       } catch ( ... ){
+        wlog( "caught error waiting on read prom" );
+       }
        try {
-        //if( my->write_prom ) my->write_prom->wait();
-       } catch ( ... ){}
+        if( my->write_prom ) my->write_prom->wait();
+       } catch ( ... ){
+        wlog( "caught error waiting on write prom" );
+       }
     }
+    wlog("my->m_session = %1%", my->m_session );
   }
 
 

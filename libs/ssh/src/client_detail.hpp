@@ -18,8 +18,10 @@ namespace mace { namespace ssh {
     struct client_d {
         client& self;
         client_d( client& c )
-        :self(c), m_session(0),m_knownhosts(0),m_sftp(0)
-        { }
+        :self(c), m_session(0),m_knownhosts(0),m_sftp(0),m_shutdown(0)
+        { 
+          m_thread = &mace::cmt::thread::current(); 
+        }
 
         std::unique_ptr<boost::asio::ip::tcp::socket> m_sock;
 
@@ -31,16 +33,21 @@ namespace mace { namespace ssh {
         rw_prom read_prom;
         rw_prom write_prom;
         mace::cmt::mutex scp_send_mutex;
+        mace::cmt::thread*          m_thread;
+        bool                        m_shutdown;
         
 
         /**
+         *  @pre only one thread can call this method at a time.
          *  @pre libssh2_session_block_directions is set to either INBOUND or OUTBOUND or both. 
          *  @post socket has data available for either INBOUND or OUTBOUND according to the
          *        specified block direction.
          *  @throw boost::system::system_error if an error occurs on the socket while waiting.
          */
         void wait_on_socket() {
-        //  mace::cmt::thread::current().debug("wait_on_socket");
+          BOOST_ASSERT( m_thread == &mace::cmt::thread::current() ); 
+
+    //      mace::cmt::thread::current().debug("wait_on_socket");
           auto dir = libssh2_session_block_directions(m_session);
           if( !dir ) return;
           BOOST_ASSERT( dir & (LIBSSH2_SESSION_BLOCK_INBOUND | LIBSSH2_SESSION_BLOCK_OUTBOUND ) );
@@ -48,7 +55,7 @@ namespace mace { namespace ssh {
           rw_prom rprom, wprom;
           if( dir & LIBSSH2_SESSION_BLOCK_INBOUND ) {
             rprom = read_prom;
-            if(!read_prom.get()) {
+            if(!rprom.get()) {
           //     elog( "   this %2%            NEW READ PROM      %1%           ", read_prom.get(), this );
                read_prom.reset( new mace::cmt::promise<boost::system::error_code>("read_prom") );
            //    wlog( " new read prom %1%   this %2%", read_prom.get(), this );
@@ -59,7 +66,7 @@ namespace mace { namespace ssh {
                                           this->read_prom.reset(0);
                                         } );
             } else {
-       //       elog( "already waiting on read %1%", read_prom.get() );
+      //        elog( "already waiting on read %1%", read_prom.get() );
             }
           }
           
@@ -81,37 +88,33 @@ namespace mace { namespace ssh {
 
           boost::system::error_code ec;
           if( rprom.get() && wprom.get() ) {
-       //     elog( "************* Attempt to wait in either direction currently waits for both directions ****** " );
+           // elog( "************* Attempt to wait in either direction currently waits for both directions ****** " );
             //wlog( "rprom %1%   wprom %2%", rprom.get(), write_prom.get() );
         //     wlog( "wait on read %1% or write %2% ", rprom.get(), wprom.get() );
             typedef mace::cmt::future<boost::system::error_code> fprom;
             fprom fw(wprom);
             fprom fr(rprom);
             int r = mace::cmt::wait_any( fw, fr );
-           // wlog( "wait returned %1%", r );
             switch( r ) {
               case 0:
-            //    wlog( "WRITE READY %1%", wprom.get() );
-                BOOST_ASSERT( wprom.get() == write_prom.get() );
                 break;
               case 1:
-             //   wlog( "READ READY %1%", rprom.get() );
-                BOOST_ASSERT( rprom.get() == read_prom.get() );
                 break;
             }
           } else if( rprom ) {
-             // wlog( "wait on read %1%", rprom.get() );
-             // mace::cmt::thread::current().debug("wait on read");
+           //   wlog( "                                                             wait on read %1%", rprom.get() );
+             // mace::cmt::thread::current().debug("wait on read ");
               if( rprom->wait() ) { 
                 BOOST_THROW_EXCEPTION( boost::system::system_error(rprom->wait() ) ); 
               }
-             // wlog( "READ READY %1%", rprom.get() );
+            //  wlog( "                                                             done wait on read %1%", rprom.get() );
+      //        mace::cmt::thread::current().debug("read ready");
           } else if( wprom ) {
              // wlog( "wait on write %1%", wprom.get() );
               if( wprom->wait() ) { BOOST_THROW_EXCEPTION( boost::system::system_error(wprom->wait() ) ); }
              // wlog( "WRITE READY %1%", wprom.get() );
           }
-      //    mace::cmt::thread::current().debug("end wait_on_socket");
+       //   mace::cmt::thread::current().debug("end wait_on_socket");
         }
 
         static void kbd_callback(const char *name, int name_len, 
@@ -184,7 +187,6 @@ namespace mace { namespace ssh {
             }
 
             if( pty_type.size() ) {
-                wlog( "request pty" );
                 int ec = libssh2_channel_request_pty(chan,pty_type.c_str());
                 while( ec == LIBSSH2_ERROR_EAGAIN ) {
                    wait_on_socket();

@@ -10,6 +10,8 @@ SET( libraries
     ${Boost_SYSTEM_LIBRARY} 
     ${Boost_SIGNALS_LIBRARY})
 
+add_executable( interact  interact.cpp  )
+target_link_libraries( interact ${libraries} )
 add_executable( ssh_ls  ssh_ls.cpp  )
 target_link_libraries( ssh_ls ${libraries} )
 
