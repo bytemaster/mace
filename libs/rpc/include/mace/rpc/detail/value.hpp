@@ -94,6 +94,22 @@ namespace mace { namespace rpc {
 
       T val;
     };
+
+    template<>
+    struct value_holder_impl<void> : value_holder {
+      value_holder_impl(){};
+      typedef void_t T;
+      virtual const char* type()const             { return "void"; }
+      virtual void visit( const_visitor&& v )const{ v(); }
+      virtual void visit( visitor&& v )           { v(); }
+      virtual void clear()                        {  }
+      virtual size_t size()const                  { return 0; }
+
+      virtual value_holder* move_helper( char* c ){ return new(c) value_holder_impl(); }
+      virtual value_holder* copy_helper( char* c )const{ return new(c) value_holder_impl();}
+    };
+
+
     
     template<>
     struct value_holder_impl<std::string> : value_holder {

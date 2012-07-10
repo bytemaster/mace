@@ -68,13 +68,13 @@ int test( ) {
 try {
    mace::cmt::thread::current().set_name("ssh_test_main");
    auto sshc = mace::ssh::client::create();
-   sshc->connect( "dlarimer", argv[1], "localhost");
+   sshc->connect( "dlarimer", "rapture", "localhost");
 
    fs::path run("runner");
    //auto proc = sshc->exec((fs::absolute(run).native()) + " 2> out.txt   | /usr/bin/tee sout.txt ");//, "vt100");
    auto proc = sshc->exec((fs::absolute(run).native()));//, "vt100");
 
-   //mace::cmt::async( std::bind(read_err, proc ), "read_err" );
+   mace::cmt::async( std::bind(read_err, proc ), "read_err" );
 
    auto con = connection::ptr( new connection( proc->out_stream(), proc->in_stream() ) );
    

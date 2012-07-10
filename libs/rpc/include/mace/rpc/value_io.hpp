@@ -8,6 +8,7 @@
 #define _MACE_RPC_VALUE_IO_HPP_
 #include <mace/reflect/reflect.hpp>
 #include <mace/rpc/base64.hpp>
+#include <mace/void.hpp>
 #include <sstream>
 #include <iostream>
 #include <map>
@@ -37,6 +38,8 @@ namespace mace { namespace rpc {
   inline void pack( Filter& f, mace::rpc::value& jsv, mace::rpc::value& v )   { jsv = v; }
   template<typename Filter>
   inline void pack( Filter& f, mace::rpc::value& jsv, mace::rpc::value&& v )  { jsv = std::move(v); }
+  template<typename Filter>
+  inline void pack( Filter& f, mace::rpc::value& jsv, const void_t& v )       { jsv = mace::rpc::value(); }
   template<typename Filter>
   inline void pack( Filter& f, mace::rpc::value& jsv, const bool& v )         { jsv = v; }
   template<typename Filter>
@@ -94,6 +97,12 @@ namespace mace { namespace rpc {
   void unpack( Filter& c, const mace::rpc::value& jsv, T& v ); 
   template<typename Filter>
   void unpack( Filter& c, const mace::rpc::value& jsv, bool& v );
+
+  template<typename Filter>
+  void unpack( Filter& c, const mace::rpc::value& jsv, void_t& v ){ 
+    // TODO: perform sanity check...
+  };
+
   template<typename Filter>
   void unpack( Filter& c, const mace::rpc::value& jsv, float& v );
   template<typename Filter>

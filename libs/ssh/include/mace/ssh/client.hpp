@@ -2,6 +2,7 @@
 #define _MACE_SSH_CLIENT_HPP_
 #include <mace/ssh/process.hpp>
 #include <boost/function.hpp>
+#include <boost/filesystem.hpp>
 
 namespace mace { namespace ssh {
   namespace detail {
@@ -91,12 +92,18 @@ namespace mace { namespace ssh {
        *         The callback takes two parameters, bytes sent and file size.  To continue the 
        *         transfer, the callback should return true.  To cancel the callback should return false.
        */
-      void scp_send( const std::string& local_path, const std::string& remote_path, 
+      void scp_send( const boost::filesystem::path& local_path, const boost::filesystem::path& remote_path, 
                               boost::function<bool(size_t,size_t)> progress = [](size_t,size_t){return true;} );
 
 
-      file_attrib stat( const std::string& remote_path );
-      void mkdir( const std::string& remote_dir, int mode = owner_read|owner_write|owner_exec );
+      file_attrib stat( const boost::filesystem::path& remote_path );
+
+      /**
+       *  @pre all parent directories already exist.
+       *  @pre remote_dir is not exist or is already a directory
+       *  @post remote_dir exists.
+       */
+      void mkdir( const boost::filesystem::path& remote_dir, int mode = owner_read|owner_write|owner_exec );
 
       ~client();
 

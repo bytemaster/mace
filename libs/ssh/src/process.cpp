@@ -74,18 +74,18 @@ namespace mace { namespace ssh {
 
         chan = c.my->open_channel(pty_type); 
 
+        /*
         unsigned int rw_size = 0;
         int ec = libssh2_channel_receive_window_adjust2(chan, 1024*64, 0, &rw_size );
-
         while( ec == LIBSSH2_ERROR_EAGAIN ) {
           sshc->my->wait_on_socket();
           ec = libssh2_channel_receive_window_adjust2(chan, 1024*64, 0, &rw_size );
         }
         elog( "rwindow size %1%", rw_size );
+        */
 
 
-        ec = 0;
-        ec = libssh2_channel_handle_extended_data2(chan, LIBSSH2_CHANNEL_EXTENDED_DATA_NORMAL );
+        int ec = libssh2_channel_handle_extended_data2(chan, LIBSSH2_CHANNEL_EXTENDED_DATA_NORMAL );
         while( ec == LIBSSH2_ERROR_EAGAIN ) {
           sshc->my->wait_on_socket();
           ec = libssh2_channel_handle_extended_data2(chan, LIBSSH2_CHANNEL_EXTENDED_DATA_NORMAL );

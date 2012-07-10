@@ -118,6 +118,24 @@ namespace mace { namespace rpc {
       private:
       object& m_out;
     };
+    template<>
+    struct cast_visitor<void> : const_visitor {
+      virtual void operator()( const int8_t& v      ){ throw std::bad_cast();}
+      virtual void operator()( const int16_t& v     ){ throw std::bad_cast();}
+      virtual void operator()( const int32_t& v     ){ throw std::bad_cast();}
+      virtual void operator()( const int64_t& v     ){ throw std::bad_cast();}
+      virtual void operator()( const uint8_t& v     ){ throw std::bad_cast();}
+      virtual void operator()( const uint16_t& v    ){ throw std::bad_cast();}
+      virtual void operator()( const uint32_t& v    ){ throw std::bad_cast();}
+      virtual void operator()( const uint64_t& v    ){ throw std::bad_cast();}
+      virtual void operator()( const float& v       ){ throw std::bad_cast();}
+      virtual void operator()( const double& v      ){ throw std::bad_cast();}
+      virtual void operator()( const bool& v        ){ throw std::bad_cast();}
+      virtual void operator()( const std::string& v ){ throw std::bad_cast();}
+      virtual void operator()( const object& a )     { throw std::bad_cast();}
+      virtual void operator()( const array&  )       { throw std::bad_cast();}
+      virtual void operator()( )                     { }
+    };
 
     namespace detail {
         template<bool IsSeq=false>

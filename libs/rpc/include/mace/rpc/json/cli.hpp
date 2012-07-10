@@ -82,9 +82,9 @@ class cli {
               m_cli.methods[name] = cli_functor<typename R::fused_params, R&>(m_vtbl.*m);
               */
          }
-         std::vector<std::string>& m_api;
-         VTableType&               m_vtbl;
          cli&                      m_cli;
+         VTableType&               m_vtbl;
+         std::vector<std::string>& m_api;
        };
 
        template<typename Seq, typename Functor>
@@ -103,10 +103,15 @@ class cli {
            {
               typedef typename boost::fusion::traits::deduce_sequence<Seq>::type param_type;
               mace::rpc::function_filter<void> f;
-              auto v = json::io::pack( f, wait_future( m_func(json::io::unpack<param_type>(f, std::vector<char>(cli.begin(),cli.end()))) ));
-              if( v.size() )
-                  return std::string( &v.front(), v.size() );
-              return std::string();
+              try {
+                return json::to_pretty_string( m_func.call_fused(json::io::unpack<param_type>(f, std::vector<char>(cli.begin(),cli.end()))) );
+              } catch ( ... ) {
+                return boost::current_exception_diagnostic_information(); 
+              }
+          //    auto v = json::io::pack( f, wait_future( 
+           //   if( v.size() )
+            //      return std::string( &v.front(), v.size() );
+           //   return std::string();
            }
            Functor m_func;
        };

@@ -1,6 +1,7 @@
 #ifndef _MACE_REFLECT_ERROR_HPP_
 #define _MACE_REFLECT_ERROR_HPP_
 #include <boost/exception/all.hpp>
+#include <boost/format.hpp>
 
 namespace mace { namespace reflect {
 

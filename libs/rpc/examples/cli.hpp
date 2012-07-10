@@ -78,8 +78,8 @@ class cli {
               m_cli.methods[name] = cli_functor<typename R::fused_params, R&>(m_vtbl.*m);
               */
          }
-         VTableType&   m_vtbl;
          cli&          m_cli;
+         VTableType&   m_vtbl;
        };
 
        template<typename Seq, typename Functor>

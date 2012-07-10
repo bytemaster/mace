@@ -11,7 +11,7 @@ SET( sources
             src/thread.cpp
             src/mutex.cpp
             src/asio.cpp
-            src/stdin.cpp
+#            src/stdin.cpp
             src/asio/acceptor.cpp
             src/asio/udp/socket.cpp
             src/asio/tcp/socket.cpp

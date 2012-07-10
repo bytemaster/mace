@@ -118,6 +118,7 @@ namespace mace { namespace rpc { namespace json {
    */
   mace::rpc::value to_value( std::vector<char>&& d, error_collector& ec );
   mace::rpc::value to_value( char* start, char* end, error_collector& ec );
+  mace::rpc::value to_value( const char* start, const char* end, error_collector& ec );
   std::map<std::string,json::string> read_key_vals( char* in, char* end, mace::rpc::json::error_collector& ec );
 
   struct io {
