@@ -11,13 +11,13 @@ namespace mace { namespace rpc { namespace raw { namespace udp {
         typedef std::shared_ptr<connection> ptr;
 
         connection()
-        :rpc::udp::connection<IODelegate>( new mace::rpc::raw::udp::detail::connection() ) {}
+        :rpc::udp::connection<IODelegate>( new mace::rpc::raw::udp::detail::connection(*this) ) {}
 
         connection( const boost::asio::ip::udp::endpoint& ep )
-        :rpc::udp::connection<IODelegate>( new mace::rpc::raw::udp::detail::connection(ep) ){}
+        :rpc::udp::connection<IODelegate>( new mace::rpc::raw::udp::detail::connection(*this,ep) ){}
 
         connection( const mace::rpc::udp::socket_ptr& sock )
-        :rpc::udp::connection<IODelegate>( new mace::rpc::raw::udp::detail::connection(sock) ) {}
+        :rpc::udp::connection<IODelegate>( new mace::rpc::raw::udp::detail::connection(*this,sock) ) {}
     };
 
 } } } } // mace::rpc::raw::udp

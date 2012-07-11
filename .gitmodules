@@ -7,3 +7,6 @@
 [submodule "libs/context"]
 	path = libs/context
 	url = git@github.com:bytemaster/boost_context.git
+[submodule "libs/scrypt"]
+	path = libs/scrypt
+	url = git@github.com:bytemaster/scrypt.git

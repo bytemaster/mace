@@ -22,15 +22,20 @@ namespace mace { namespace rpc { namespace udp {
 
   namespace raw = mace::rpc::raw;
 
+  /**
+   *  TODO: move implementation to CPP
+   */
   class connection : public mace::rpc::detail::connection_base {
     public:
-      connection(){}
+      connection(mace::rpc::connection_base& cb)
+      :mace::rpc::detail::connection_base(cb){}
 
-      connection( const boost::asio::ip::udp::endpoint& ep ) {
+      connection( mace::rpc::connection_base& cb, const boost::asio::ip::udp::endpoint& ep )
+      :mace::rpc::detail::connection_base(cb) {
         connect( ep );
       }
-      connection( const socket_ptr& sock )
-      :m_sock(sock){
+      connection( mace::rpc::connection_base& cb, const socket_ptr& sock )
+      :mace::rpc::detail::connection_base(cb), m_sock(sock){
         if( m_sock ) {
           m_read_done = mace::cmt::async( [=]{ this->read_loop(); } );
         }
