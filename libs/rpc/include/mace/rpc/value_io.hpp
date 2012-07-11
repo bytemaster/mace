@@ -32,6 +32,12 @@ namespace mace { namespace rpc {
   template<typename T, typename Filter> 
   void unpack( Filter&, const mace::rpc::value& jsv, T& v ); 
 
+  template<typename T, typename Filter> 
+  void pack( Filter&, mace::rpc::value& jsv, const boost::optional<T>& v );
+
+  template<typename T, typename Filter> 
+  void unpack( Filter&, const mace::rpc::value& jsv, boost::optional<T>& v );
+
   template<typename Filter>
   inline void pack( Filter& f, mace::rpc::value& jsv, const mace::rpc::value& v )  { jsv = v; }
   template<typename Filter>
@@ -73,8 +79,6 @@ namespace mace { namespace rpc {
 
   template<typename Filter>
   void pack( Filter& c, mace::rpc::value& jsv, const std::vector<char>& value );
-  template<typename T, typename Filter>
-  void pack( Filter& c, mace::rpc::value& jsv, const boost::optional<T>& v );
   template<typename T, typename Filter>
   void pack( Filter& c, mace::rpc::value& jsv, const std::vector<T>& value );
   template<typename T, typename Filter>
@@ -127,8 +131,6 @@ namespace mace { namespace rpc {
   void unpack( Filter& c, const mace::rpc::value& jsv, std::string& v );
   template<typename Filter>
   void unpack( Filter& c, const mace::rpc::value& jsv, std::vector<char>& value );
-  template<typename T, typename Filter>
-  void unpack( Filter& c, const mace::rpc::value& jsv, boost::optional<T>& v );
   template<typename T, typename Filter>
   void unpack( Filter& c, const mace::rpc::value& jsv, std::vector<T>& value );
   template<typename T, typename Filter>
@@ -367,13 +369,26 @@ namespace mace { namespace rpc {
     }
   }
 
+  template<typename T, typename Filter> 
+  void pack( Filter& f , mace::rpc::value& jsv, const boost::optional<T>& v ) {
+    if( v ) pack( f, jsv, *v );
+    else jsv = mace::rpc::value();
+  }
+  template<typename T, typename Filter> 
+  void unpack( Filter& f, const mace::rpc::value& jsv, boost::optional<T>& v ) {
+    if( strcmp( jsv.type(), "void" ) != 0 ) {
+      T tmp;
+      unpack( f, jsv, tmp );
+      v = std::move(tmp);
+    }
+  }
 
   template<typename T, typename Filter> 
   inline void pack( Filter& f, mace::rpc::value& jsv, const T& v ) {
       detail::if_fusion_seq< boost::fusion::traits::is_sequence<T>::value >::pack(f,jsv,f(v));
   }
 
-  
+ /* 
   template<typename T, typename Filter> 
   inline void pack( Filter& f, mace::rpc::value& jsv, const boost::optional<T>& v ) {
       mace::rpc::pack( f, jsv, f(*v) );
@@ -384,6 +399,7 @@ namespace mace { namespace rpc {
       v = T();
       mace::rpc::unpack( f, jsv, *v );
   }
+  */
 
 
   template<typename T, typename Filter>

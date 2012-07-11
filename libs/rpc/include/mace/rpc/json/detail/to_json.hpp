@@ -24,6 +24,9 @@ namespace mace { namespace rpc { namespace json {
   void to_json( const std::set<T>& v, Stream& os, Filter& f );
 
   template<typename T, typename Stream, typename Filter>
+  void to_json( const boost::optional<T>& v, Stream& os, Filter& f );
+
+  template<typename T, typename Stream, typename Filter>
   void to_json( const std::list<T>& v, Stream& os, Filter& f );
 
   template<typename K, typename V, typename Stream, typename Filter>
@@ -136,6 +139,11 @@ namespace mace { namespace rpc { namespace json {
   template<typename T, typename Stream, typename Filter >
   void to_json( const std::vector<T>& v, Stream& os, Filter& f ) {
     to_json_array( v.begin(), v.end(), os, f );
+  }
+  template<typename T, typename Stream, typename Filter >
+  void to_json( const boost::optional<T>& v, Stream& os, Filter& f ) {
+    if( v ) to_json( *v, os, f );
+    else os << "null";
   }
   template<typename T, typename Stream, typename Filter >
   void to_json( const std::set<T>& v, Stream& os, Filter& f ) {
