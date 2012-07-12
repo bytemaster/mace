@@ -38,7 +38,9 @@ namespace mace { namespace rpc { namespace detail {
        */
       void handle( message&& m );
   };
-  
-} } }
+
+} //namespace detail
+
+} } // namespace mace::rpc
 
 #endif // _MACE_RPC_DETAIL_CONNECTION_BASE_HPP_

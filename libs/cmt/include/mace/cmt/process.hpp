@@ -2,10 +2,9 @@
 #define _MACE_CMT_PROCESS_HPP_
 #include <boost/filesystem/path.hpp>
 #include <mace/cmt/future.hpp>
+#include <mace/cmt/detail/process.hpp>
 
 namespace mace { namespace cmt { 
-
-  namespace detail { class process_d; }
 
   /**
    *  You can move, but not copy a process.
@@ -68,7 +67,7 @@ namespace mace { namespace cmt {
       /**
        *  @brief returns a stream that writes to the process' stdin
        */
-      std::ostream& in_stream();
+      boost::iostreams::stream<detail::process_sink>& in_stream();
 
       /**
        *  @brief returns a stream that reads from the process' stdout

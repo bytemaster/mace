@@ -15,9 +15,12 @@ namespace mace { namespace rpc { namespace pipe {
       public:
         typedef std::shared_ptr<connection> ptr;
 
-        void send( message&& m ){
-          this->my->send( std::move(m) );
-        }
+        void send( message&& m ){ this->my->send( std::move(m) ); }
+
+        /* This is an impl detail that should not be exposed...
+        std::istream& in_stream()  { return static_cast<mace::rpc::pipe::detail::connection*>(my)->in_stream(); }
+        std::ostream& out_stream() { return static_cast<mace::rpc::pipe::detail::connection*>(my)->out_stream(); }
+        */
       protected:
         connection( mace::rpc::pipe::detail::connection* m )
         :rpc::connection<IODelegate>(m){}

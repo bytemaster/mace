@@ -26,26 +26,6 @@ namespace mace { namespace ssh {
         process_d&      m_process;
         int             m_chan;
     };
-    /*
-    class process_sink : public io::sink {
-      public:
-        struct category : io::sink::category, io::flushable_tag {};
-        typedef char      type;
-
-        process_sink( process_d& p, int chan )
-        :m_process(p),m_chan(chan){}
-
-        std::streamsize write( const char* s, std::streamsize n );
-        void close();
-        bool flush();
-
-      private:
-        process_d&      m_process;
-        int             m_chan;
-    };
-    */
-
-
 
 
     struct process_d {

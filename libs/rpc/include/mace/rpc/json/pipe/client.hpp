@@ -26,9 +26,7 @@ namespace mace { namespace rpc {  namespace json { namespace pipe {
          delegate_type::set_vtable( *this, m_con );
       }
 
-      client( client&& c ) {
-        m_con = std::move(c.m_con);
-      }
+      client( client&& c ) { m_con = std::move(c.m_con); }
 
       bool operator!()const { return !m_con; }
 
@@ -39,6 +37,10 @@ namespace mace { namespace rpc {  namespace json { namespace pipe {
         }
         return *this;
       }
+      client& operator=( client&& c ) {
+        std::swap( *this, c );
+        return *this;
+      }
 
       client( const typename ConnectionType::ptr& c) 
       :m_con(c) {
@@ -46,8 +48,7 @@ namespace mace { namespace rpc {  namespace json { namespace pipe {
       }      
 
       void connect( std::istream& in, std::ostream& out) {
-        typename ConnectionType::ptr c( new ConnectionType( in, out ) );
-        m_con = c;
+        m_con.reset( new ConnectionType( in, out ) );
         delegate_type::set_vtable( *this, m_con );
       }
 

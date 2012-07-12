@@ -2,7 +2,6 @@
 #include <mace/cmt/error.hpp>
 #include <mace/cmt/asio.hpp>
 #include <boost/process.hpp>
-#include <boost/iostreams/stream.hpp>
 
 namespace mace { namespace cmt {
 
@@ -10,6 +9,7 @@ namespace mace { namespace cmt {
   namespace io = boost::iostreams;
 
   namespace detail {
+     /*
     class process_sink : public io::sink {
       public:
         struct category : io::sink::category, io::flushable_tag {};
@@ -24,6 +24,7 @@ namespace mace { namespace cmt {
       private:
         process_d&      m_process;
     };
+    */
 
     class process_source : public io::source {
       public:
@@ -160,7 +161,7 @@ namespace mace { namespace cmt {
   /**
    *  @brief returns a stream that writes to the process' stdin
    */
-  std::ostream& process::in_stream() {
+  boost::iostreams::stream<detail::process_sink>& process::in_stream() {
     return my->std_in;
   }
   /**

@@ -34,6 +34,10 @@ namespace mace {
 
       void handle_error( message::error_type e, const std::string& msg );
 
+/*
+      std::istream& in_stream()  { return m_in;  }
+      std::ostream& out_stream() { return m_out; }
+*/
 
     protected:
       mace::cmt::thread*      m_read_thread;

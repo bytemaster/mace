@@ -22,7 +22,7 @@ namespace mace { namespace rpc { namespace pipe { namespace detail {
   }
   void connection::close() {
      // cancel currently pending read, if we can
-     m_read_done.cancel();
+//     m_read_done.cancel();
      if( &m_in == &std::cin ) {
        // If I call quit, this will hang because cin will 'block' waiting
        // for input therefore it will never join the thread.
@@ -42,12 +42,10 @@ namespace mace { namespace rpc { namespace pipe { namespace detail {
       if( e.code() != boost::asio::error::eof ) 
         BOOST_THROW_EXCEPTION(e);
     } catch ( ... ) {
-      elog( "connection closed: %1%", 
-            boost::current_exception_diagnostic_information() );
+      wlog( "connection closed: %1%", boost::current_exception_diagnostic_information() );
     }
     break_promises();
 
-    wlog( "self.closed!" );
     self.closed(); // emit signal
   }
   void connection::handle_error( message::error_type e, const std::string& msg ) {

@@ -20,6 +20,11 @@ SET( libraries
 #add_executable( json_io json_io.cpp )
 #target_link_libraries(json_io ${libraries} )
 
+add_executable( parent  parent.cpp  )
+add_executable( child  child.cpp  )
+target_link_libraries( parent ${libraries} )
+target_link_libraries( child ${libraries} )
+
 add_executable( tcpc  tcpc.cpp  )
 target_link_libraries( tcpc ${libraries} )
 add_executable( tcps  tcps.cpp  )

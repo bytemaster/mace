@@ -9,6 +9,8 @@ namespace mace { namespace rpc {
     delete my;
   }
 
+  void connection_base::close() { my->close(); }
+
   const method* connection_base::get_method( const std::string& n )const {
     detail::method_map::const_iterator i = my->methods.find(n);
     if( i != my->methods.end() ) return &i->second;

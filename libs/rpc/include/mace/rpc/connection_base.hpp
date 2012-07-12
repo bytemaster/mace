@@ -54,6 +54,8 @@ namespace mace { namespace rpc  {
         return *this;
       }
 
+      void close();
+
       /**
        *  Emited when read loop exits.
        */
