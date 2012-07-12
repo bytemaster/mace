@@ -61,8 +61,8 @@ namespace asio {
     /** @brief wraps boost::asio::async_write
      *  @return the number of bytes written
      */
-    template<typename AsyncReadStream, typename MutableBufferSequence>
-    cmt::future<size_t> write( AsyncReadStream& s, const MutableBufferSequence& buf ) {
+    template<typename AsyncWriteStream, typename ConstBufferSequence>
+    cmt::future<size_t> write( AsyncWriteStream& s, const ConstBufferSequence& buf ) {
         promise<size_t>::ptr p(new promise<size_t>("mace::cmt::asio::write"));
         boost::asio::async_write( s, buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
         return p;
@@ -71,8 +71,8 @@ namespace asio {
     /** @brief wraps boost::asio::async_write_some
      *  @return the number of bytes written
      */
-    template<typename AsyncReadStream, typename MutableBufferSequence>
-    cmt::future<size_t> write_some( AsyncReadStream& s, const MutableBufferSequence& buf ) {
+    template<typename AsyncWriteStream, typename ConstBufferSequence>
+    cmt::future<size_t> write_some( AsyncWriteStream& s, const ConstBufferSequence& buf ) {
         promise<size_t>::ptr p(new promise<size_t>("mace::cmt::asio::write_some"));
         s.async_write_some(  buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
         return p;

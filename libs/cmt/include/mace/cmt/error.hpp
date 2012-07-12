@@ -1,6 +1,7 @@
 #ifndef _MACE_CMT_ERROR_HPP_
 #define _MACE_CMT_ERROR_HPP_
 #include <boost/exception/all.hpp>
+#include <boost/format.hpp>
 
 namespace mace { namespace cmt {
     namespace error {
@@ -44,6 +45,18 @@ namespace mace { namespace cmt {
             virtual void rethrow()const      { BOOST_THROW_EXCEPTION(*this); }
         };
     } // namespace error
+    typedef boost::error_info<struct err_msg_,std::string> err_msg;
+
+    struct exception : public virtual boost::exception, public virtual std::exception {
+        const char* what()const throw()     { return "exception";                     }
+        virtual void       rethrow()const   { BOOST_THROW_EXCEPTION(*this);                  } 
+        const std::string& message()const   { return *boost::get_error_info<mace::cmt::err_msg>(*this); }
+    };
 } } // namespace mace::cmt
+
+#define MACE_CMT_THROW( MSG, ... ) \
+  do { \
+    BOOST_THROW_EXCEPTION( mace::cmt::exception() << mace::cmt::err_msg( (boost::format( MSG ) __VA_ARGS__ ).str() ) );\
+  } while(0)
 
 #endif // _MACE_CMT_ERROR_HPP_

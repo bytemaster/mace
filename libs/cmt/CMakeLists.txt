@@ -1,5 +1,6 @@
 
 include_directories( include )
+include_directories( ../process/include )
 include_directories( ../context/include )
 include_directories( ../atomic/include )
 include_directories( ../reflect/include )
@@ -11,6 +12,7 @@ SET( sources
             src/thread.cpp
             src/mutex.cpp
             src/asio.cpp
+            src/process.cpp
 #            src/stdin.cpp
             src/asio/acceptor.cpp
             src/asio/udp/socket.cpp

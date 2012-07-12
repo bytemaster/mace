@@ -7,6 +7,7 @@ SET( libraries
     ${pthread_library}
     ${rt_library}
     ${Boost_THREAD_LIBRARY} 
+    ${Boost_FILESYSTEM_LIBRARY} 
     ${Boost_CHRONO_LIBRARY} 
     ${Boost_ASIO_LIBRARY} 
     ${Boost_SYSTEM_LIBRARY} 
@@ -18,10 +19,12 @@ SET( libraries
 add_executable( actor  actor.cpp  )
 add_executable( cmt_test test.cpp  )
 add_executable( mutex mutex.cpp  )
+add_executable( run run.cpp  )
 #add_executable( thread_test thread_test.cpp  )
 
 
 
+target_link_libraries( run ${libraries} )
 target_link_libraries( actor ${libraries} )
 target_link_libraries( cmt_test ${libraries} )
 target_link_libraries( mutex ${libraries} )
