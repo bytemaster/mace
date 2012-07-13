@@ -335,7 +335,6 @@ namespace mace { namespace ssh {
    */
   void  client::scp_send( const boost::filesystem::path& local_path, const boost::filesystem::path& remote_path, 
                      boost::function<bool(size_t,size_t)> progress  ) {
-
     /**
      *  Tests have shown that if one scp is 'blocked' by a need to read (presumably to 
      *  ack recv for the trx window), and then a second transfer begins that the first
@@ -373,7 +372,7 @@ namespace mace { namespace ssh {
         my->wait_on_socket();
         chan = libssh2_scp_send64( my->m_session, local_path.native().c_str(), 0700, fsize, now, now );
       } else {
-          MACE_SSH_THROW( "scp failed %1% - %2%", %ec %msg );
+          MACE_SSH_THROW( "scp %3% to %4% failed %1% - %2%", %ec %msg %local_path %remote_path );
       }
     }
     try {

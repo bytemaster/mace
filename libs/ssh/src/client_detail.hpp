@@ -128,24 +128,24 @@ namespace mace { namespace ssh {
             char buf[1024];
             client_d* self = (client_d*)*abstract;
 
-            printf("Performing keyboard-interactive authentication.\n");
+    //        printf("Performing keyboard-interactive authentication.\n");
 
-            printf("Authentication name: '");
-            fwrite(name, 1, name_len, stdout);
-            printf("'\n");
+     //       printf("Authentication name: '");
+      //      fwrite(name, 1, name_len, stdout);
+      //      printf("'\n");
 
-            printf("Authentication instruction: '");
-            fwrite(instruction, 1, instruction_len, stdout);
-            printf("'\n");
+       //     printf("Authentication instruction: '");
+       //     fwrite(instruction, 1, instruction_len, stdout);
+       //     printf("'\n");
 
-            printf("Number of prompts: %d\n\n", num_prompts);
+       //     printf("Number of prompts: %d\n\n", num_prompts);
 
             for (i = 0; i < num_prompts; i++) {
-                printf("Prompt %d from server: '", i);
+        //        printf("Prompt %d from server: '", i);
                 fwrite(prompts[i].text, 1, prompts[i].length, stdout);
-                printf("'\n");
+          //      printf("'\n");
 
-                printf("Please type response: ");
+         //       printf("Please type response: ");
 
                 if( self->upass.size() == 0 ) {
                     fgets(buf, sizeof(buf), stdin);
@@ -161,12 +161,12 @@ namespace mace { namespace ssh {
                     responses[i].length = self->upass.size();
                 }
 
-                printf("Response %d from user is '", i);
-                fwrite(responses[i].text, 1, responses[i].length, stdout);
-                printf("'\n\n");
+             //   printf("Response %d from user is '", i);
+             //   fwrite(responses[i].text, 1, responses[i].length, stdout);
+             //   printf("'\n\n");
             }
 
-            printf("Done. Sending keyboard-interactive responses to server now.\n");
+         //   printf("Done. Sending keyboard-interactive responses to server now.\n");
         }
 
 
