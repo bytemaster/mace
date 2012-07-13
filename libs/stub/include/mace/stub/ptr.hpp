@@ -64,6 +64,12 @@ namespace mace { namespace stub {
       ptr& operator=( const ptr& p ) {
         m_ptr = p.m_ptr;
         m_vtable = p.m_vtable;
+        return *this;
+      }
+      ptr& operator=( ptr&& p ) {
+        std::swap(m_ptr,p.m_ptr);
+        std::swap(m_vtable,p.m_vtable);
+        return *this;
       }
        
     protected:
