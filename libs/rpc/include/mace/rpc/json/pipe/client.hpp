@@ -38,7 +38,9 @@ namespace mace { namespace rpc {  namespace json { namespace pipe {
         return *this;
       }
       client& operator=( client&& c ) {
-        std::swap( *this, c );
+        mace::stub::ptr<InterfaceType,delegate_type>& base = *this;
+        std::swap( m_con, c.m_con );
+        base = std::move(c);
         return *this;
       }
 

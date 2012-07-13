@@ -65,7 +65,6 @@ namespace mace { namespace rpc {  namespace process {
        */
       void  exec( const boost::filesystem::path& exe, std::vector<std::string>&& args = std::vector<std::string>(), 
                   const boost::filesystem::path& work_dir=".", int opt = use_out_stream | recv_err_stream) {
-        BOOST_ASSERT( !( (opt & use_out_stream) && (opt & use_err_stream) ) );
         BOOST_ASSERT( !m_proc );
         BOOST_ASSERT( !m_con  );
 
