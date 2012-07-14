@@ -54,4 +54,13 @@ namespace mace { namespace rpc {
 
 } }
 
+#include <mace/reflect/reflect.hpp>
+MACE_REFLECT_ENUM( mace::rpc::message::error_type,
+    (mace::rpc::message::none)
+    (mace::rpc::message::unknown_method)
+    (mace::rpc::message::invalid_response)
+    (mace::rpc::message::broken_promise)
+    (mace::rpc::message::exception_thrown) 
+)
+
 #endif // _MACE_RPC_MESSAGE_HPP_

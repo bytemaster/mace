@@ -18,7 +18,7 @@ IF( ENABLE_TESTS MATCHES ON )
 add_subdirectory( tests )
 ENDIF()
 
-SET( libraries  mace_cmt )
+SET( libraries  mace_cmt ${Boost_FILESYSTEM_LIBRARY})
 SET( sources 
         src/connection_base.cpp
         src/pipe/connection.cpp

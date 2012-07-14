@@ -48,9 +48,5 @@ namespace mace { namespace rpc { namespace pipe { namespace detail {
 
     self.closed(); // emit signal
   }
-  void connection::handle_error( message::error_type e, const std::string& msg ) {
-    elog( "%1%: %2%", int(e), msg );
-    MACE_RPC_THROW( "Unhandled Error!" );
-  }
 
 }}}}

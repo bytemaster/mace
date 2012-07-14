@@ -28,7 +28,10 @@ namespace mace { namespace rpc { namespace detail {
 
       virtual void close() {}
       virtual void send( message&& m ) = 0;
-      virtual void handle_error( message::error_type, const std::string& message ) = 0;
+      /**
+       *  Default implementation replies with an error object.
+       */
+      virtual void handle_error( message::error_type, message&& m );
 
       void break_promises();
 

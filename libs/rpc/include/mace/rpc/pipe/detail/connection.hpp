@@ -32,7 +32,6 @@ namespace mace {
        */
       void read_loop( );
 
-      void handle_error( message::error_type e, const std::string& msg );
 
 /*
       std::istream& in_stream()  { return m_in;  }

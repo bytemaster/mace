@@ -62,7 +62,7 @@ namespace detail {
       if( itr != methods.end() ) {
          send( itr->second( m ) );
       } else {
-         handle_error( message::unknown_method, m.meth ); 
+         handle_error( message::unknown_method, std::move(m) );
       }
     } else if( m.id ) {
       auto itr = results.find( *m.id );
@@ -74,12 +74,25 @@ namespace detail {
         }
         results.erase(itr);
       } else {
-         handle_error( message::invalid_response, "Unexpected response id "+ boost::lexical_cast<std::string>(*m.id)  ); 
+         handle_error( message::invalid_response, std::move(m) );
       }
     } else {
-      handle_error( message::invalid_response, "no method or request id" );
+      handle_error( message::invalid_response, std::move(m) );
     }
   }
+
+  void connection_base::handle_error( message::error_type e, message&& msg ) {
+    elog( "%1%", mace::reflect::reflector<message::error_type>::to_string(e) );
+
+    message reply;
+    reply.id   = msg.id;
+    reply.err  = e; 
+    auto s = mace::reflect::reflector<message::error_type>::to_string(e);
+    reply.data = std::vector<char>(strlen(s));//(s, s+ strlen(s));
+
+    send( std::move(reply) );
+  }
+
 } // namespace detail
 
 } } // namepace mace::rpc
