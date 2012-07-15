@@ -123,10 +123,8 @@ namespace mace { namespace ssh {
     };
 
     int process_d::write_some( const char* data, size_t len, int stream_id ) {
-        if( !sshc->my->m_session ) {
-          elog( "SESSION CLOSED" );
-          MACE_SSH_THROW( "Session closed\n" );
-        }
+        if( !sshc->my->m_session ) { MACE_SSH_THROW( "Session closed\n" ); }
+
        int rc;
        const char* buf = data;
        size_t buflen = len;
@@ -163,9 +161,7 @@ namespace mace { namespace ssh {
        return buf-data;
     }
     int process_d::read_some( char* data, size_t len, int stream_id ) {
-        if( !sshc->my->m_session ) {
-          MACE_SSH_THROW( "Session closed\n" );
-        }
+        if( !sshc->my->m_session ) { MACE_SSH_THROW( "Session closed\n" ); }
        
        int rc;
        char* buf = data;
@@ -193,6 +189,8 @@ namespace mace { namespace ssh {
                }
              } else {
                char* msg;
+               if( !sshc || !sshc->my || !sshc->my->m_session ) { MACE_SSH_THROW( "Session closed" ); }
+               slog( "my: %1%", sshc->my );
                rc   = libssh2_session_last_error( sshc->my->m_session, &msg, 0, 0 );
                MACE_SSH_THROW( "read failed: %1% - %2%", %rc %msg  ); return buf-data;
              }
@@ -241,6 +239,7 @@ namespace mace { namespace ssh {
   :my( new detail::process_d( c, cmd, pty_type ) ){}
 
   process::~process() { 
+    slog("");
     try {
       BOOST_ASSERT( !my->result );
       if( my->sshc->my->m_session ) {
@@ -254,7 +253,9 @@ namespace mace { namespace ssh {
         my->chan = 0;
       } 
     }catch ( ... ) {elog("error %1%", boost::current_exception_diagnostic_information() ); }
+    slog( "delete my" );
     delete my; 
+    my = 0;
   }
 
   /**
