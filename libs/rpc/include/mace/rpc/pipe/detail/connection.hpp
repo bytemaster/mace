@@ -32,12 +32,6 @@ namespace mace {
        */
       void read_loop( );
 
-
-/*
-      std::istream& in_stream()  { return m_in;  }
-      std::ostream& out_stream() { return m_out; }
-*/
-
     protected:
       mace::cmt::thread*      m_read_thread;
       cmt::future<void>       m_read_done;

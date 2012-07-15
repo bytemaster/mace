@@ -4,13 +4,12 @@
 #include <boost/fusion/include/make_vector.hpp>
 #include <mace/rpc/json/io.hpp>
 #include <boost/process/all.hpp>
+#include <mace/cmt/thread.hpp>
 
 
-#include <mace/rpc/raw/tcp/connection.hpp>
 #include <boost/fusion/container/generation/make_vector.hpp>
 #include <mace/rpc/json/pipe/connection.hpp>
 #include <mace/rpc/json/pipe/client.hpp>
-#include <mace/rpc/json/tcp/client.hpp>
 #include <iostream>
 
 class test_fixture {
@@ -26,7 +25,8 @@ namespace bp = boost::process;
 namespace bpb = boost::process::behavior;
 
 int main( int argc, char** argv ) {
-
+  try {
+   mace::cmt::thread::current().set_name( "pipe_test_main" );
    std::string runner = "runner";
    boost::process::context ctx;
    ctx.streams[boost::process::stdout_id] = boost::process::behavior::pipe();
@@ -44,6 +44,11 @@ int main( int argc, char** argv ) {
    mace::rpc::json::pipe::client<test_fixture> cl(con);
 
    slog( "sending hello!" );
-   std::cout<< cl->hello( "World" ).wait()<<std::endl;
+   auto r = cl->hello( "World" ).wait();
+
+   std::cerr<<"done" <<std::endl;
+  } catch( ... ) {
+    elog( "%1%", boost::current_exception_diagnostic_information() );
+  }
    return 0;
 }

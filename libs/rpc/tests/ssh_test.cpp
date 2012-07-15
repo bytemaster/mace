@@ -10,12 +10,11 @@
 #include <mace/ssh/process.hpp>
 
 #include <boost/exception/all.hpp>
-#include <mace/rpc/raw/tcp/connection.hpp>
 #include <boost/fusion/container/generation/make_vector.hpp>
 #include <mace/rpc/json/pipe/connection.hpp>
 #include <mace/rpc/json/pipe/client.hpp>
-#include <mace/rpc/json/tcp/client.hpp>
 #include <iostream>
+#include <mace/cmt/thread.hpp>
 
 class test_fixture {
   public:
@@ -102,6 +101,7 @@ try {
    auto end = boost::chrono::system_clock::now();
    slog( "call %1%/s", cnt * 1000000000ll / double((end-start).count()) );
 
+   con->close();
    proc->in_stream().close();
    mace::cmt::thread::current().debug("main");
    wlog("result: %1%",proc->result() );

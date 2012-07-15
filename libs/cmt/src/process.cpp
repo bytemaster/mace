@@ -36,7 +36,7 @@ namespace mace { namespace cmt {
         std::streamsize read( char* s, std::streamsize n ) {
           if( !m_pi ) return -1;
           try {
-              return mace::cmt::asio::read_some( *m_pi, boost::asio::buffer( s, n ) ).wait();
+              return mace::cmt::asio::read_some( *m_pi, boost::asio::buffer( s, n ) );
           } catch ( const boost::system::system_error& e ) {
             if( e.code() == boost::asio::error::eof )  
                 return -1;
@@ -72,7 +72,7 @@ namespace mace { namespace cmt {
     
     std::streamsize process_sink::write( const char* s, std::streamsize n ) {
        if( !m_process.inp ) return -1;
-       return mace::cmt::asio::write( *m_process.inp, boost::asio::const_buffers_1( s, n ) ).wait();
+       return mace::cmt::asio::write( *m_process.inp, boost::asio::const_buffers_1( s, n ) );
     }
     void process_sink::close() {
        if( m_process.inp )

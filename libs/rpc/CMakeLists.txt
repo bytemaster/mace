@@ -24,7 +24,7 @@ SET( sources
         src/pipe/connection.cpp
         src/json/io.cpp
         src/json/message.cpp
-        src/json/tcp/connection.cpp
+#        src/json/tcp/connection.cpp
         src/json/pipe/connection.cpp
         src/value.cpp
 

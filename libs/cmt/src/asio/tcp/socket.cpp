@@ -35,24 +35,25 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
   
     socket::socket()
     :boost::asio::ip::tcp::socket( mace::cmt::asio::default_io_service() ) {
-        my = new detail::socket(*this);
+       // my = new detail::socket(*this);
     }
     
     socket::~socket() {
-      try { flush(); } catch( ... ){}
-      delete my;
+     // try { flush(); } catch( ... ){}
+     // delete my;
       // By default this function always fails with operation_not_supported when used on Windows XP, Windows Server 2003
       #ifndef WIN32 
         try { cancel(); }
         catch( ... ) {}
       #endif
+      //delete my;
     }
 
 
     mace::cmt::future<boost::system::error_code> socket::connect( const boost::asio::ip::tcp::endpoint& ep ) {
         return mace::cmt::asio::tcp::connect( *this, ep );
     }
-
+    /*
     inline size_t detail::socket::read_some( char* buf, size_t size ) {
   
         // if there is any data in the read buf, grab it first
@@ -129,6 +130,7 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
     size_t socket::read( char* buf, size_t size ) {
         return my->read(buf,size);
     }
+    */
 
     socket::iterator socket::iterator::operator++(int) {
         iterator tmp = *this;
@@ -145,7 +147,6 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
     /**
      *  This method will loop until both write_buf's are empty.
      *
-     */
     void detail::socket::write_loop( uint8_t write_buf_idx ) {
       do {
         size_t r = 0;
@@ -171,8 +172,9 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
         }
       }while( cur_write_buf );
     }
+     */
 
-
+    /*
     inline size_t detail::socket::write( const char* buffer, size_t size ) {
       if( write_complete.error() ) 
           write_complete.wait();
@@ -198,18 +200,21 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
 
       return size;
     }
+    */
 
     /**
      *  Alternate between two buffers, fill one while asio is writing the other,
      *  then switch.
-     */
     size_t socket::write( const char* buffer, size_t size ) {
       return my->write(buffer,size);
     }
+     */
 
+    /*
     void socket::flush() {
       if( my->write_complete.valid() )
         my->write_complete.wait();
     }
+    */
 
 } } } }  // namespace mace::cmt::asio::tcp
