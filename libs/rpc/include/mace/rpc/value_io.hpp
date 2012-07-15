@@ -175,6 +175,15 @@ namespace mace { namespace rpc {
         mace::rpc::value& obj;
     };
 
+    template<typename T>
+    struct is_optional {
+      typedef boost::false_type type;
+    };
+    template<typename T>
+    struct is_optional<boost::optional<T> > {
+      typedef boost::true_type type;
+    };
+
     template<typename Class, typename Filter>
     struct unpack_object_visitor  {
       unpack_object_visitor(Filter& _f, Class& _c, const mace::rpc::value& _val)
@@ -186,7 +195,9 @@ namespace mace { namespace rpc {
              mace::rpc::unpack( f, obj[name], c.*p );
          }
          else {
-            wlog( "unable to find name: '%1%'",name);
+            if( !is_optional< typename std::remove_reference<decltype(c.*p)>::type >::type::value ) {
+                wlog( "unable to find name: '%1%'",name);
+            }
          }
       }
       Filter&                 f;

@@ -91,12 +91,9 @@ namespace mace { namespace rpc { namespace json {
               reply["result"] = itr->second(*this, m["params"]);
           else
               reply["result"] = itr->second(*this, json::value());
-      } catch ( const boost::exception& e ) {
+      } catch ( ... ) {
           reply["error"]["code"]    = (int64_t)error_code::server_error;
-          reply["error"]["message"] = std::string(boost::diagnostic_information(e));
-      } catch ( const std::exception& e ) {
-          reply["error"]["code"]    = (int64_t)error_code::server_error;
-          reply["error"]["message"] = std::string(boost::diagnostic_information(e));
+          reply["error"]["message"] = std::string(boost::current_exception_diagnostic_information() );
       }
     } else {
       reply["error"]["code"]    = (int64_t)error_code::method_not_found;

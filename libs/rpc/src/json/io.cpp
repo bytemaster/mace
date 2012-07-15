@@ -40,7 +40,7 @@ namespace mace { namespace rpc { namespace json {
 
 
 
-  std::string escape_string( const std::string s ) {
+  std::string escape_string( const std::string& s ) {
     // calculate escape string size.
     uint32_t ecount = 0;
     for( auto i = s.begin(); i != s.end(); ++i ) {
@@ -97,7 +97,7 @@ namespace mace { namespace rpc { namespace json {
     return c;
   }
   
-  std::string unescape_string( const std::string s ) {
+  std::string unescape_string( const std::string& s ) {
     std::string out; out.reserve(s.size());
     for( auto i = s.begin(); i != s.end(); ++i ) {
       if( *i != '\\' ) {

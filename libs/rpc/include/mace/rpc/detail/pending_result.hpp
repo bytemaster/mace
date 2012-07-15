@@ -2,6 +2,7 @@
 #define _MACE_RPC_DETAIL_PENDING_RESULT_HPP_
 #include <mace/cmt/future.hpp>
 #include <mace/rpc/filter.hpp>
+#include <mace/rpc/error.hpp>
 
 namespace mace { namespace rpc { 
 
@@ -52,8 +53,10 @@ namespace mace { namespace rpc {
           } 
         }
         virtual void handle_error( int32_t code, datavec&& d ) {
-          ///TODO: set exception
-          //prom->
+          prom->set_exception( 
+            boost::copy_exception( 
+              mace::rpc::exception() << mace::rpc::error_message( std::string(d.begin(),d.end()))
+                                     << mace::rpc::error_code( code ) ) ); 
         }
     
         typename mace::cmt::promise<R>::ptr prom;

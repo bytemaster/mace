@@ -1,9 +1,10 @@
 #include <mace/rpc/json/process/server.hpp>
 #include <mace/cmt/signals.hpp>
+#include <mace/rpc/error.hpp>
 
 class test_fixture {
   public:
-    std::string hello( std::string w ) { return "Hi, " + w; }
+    std::string hello( std::string w ) { MACE_RPC_THROW( "Test" ); throw std::runtime_error( "Hello Exception" ); return "Hi, " + w; }
 };
 
 MACE_STUB( test_fixture, (hello) )

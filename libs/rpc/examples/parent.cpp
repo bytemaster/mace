@@ -24,7 +24,8 @@ int main( int argc, char** argv ) {
   try {
     mace::rpc::json::process::client<test_fixture> c;
     c.exec( "child" );
-    slog( "return: '%1%'", c->hello( "World" ).wait() );
+    auto r = c->hello("World").wait();
+    slog( "return: '%1%'", r );
     auto f = mace::cmt::async( [&](){ read_error( c.err_stream()); } );
     c.close();
     slog( "result: %1%", c.result() );

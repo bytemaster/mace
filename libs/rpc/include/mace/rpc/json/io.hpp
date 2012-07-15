@@ -68,14 +68,14 @@ namespace mace { namespace rpc { namespace json {
    *  @note This method does not add the begining and ending quotes,
    *        it merely escapes the 'internal' part of the string.
    */
-  std::string escape_string( const std::string s );
+  std::string escape_string( const std::string& s );
 
   /**
    *  @brief the inverse of escape_string()
    *  
    *   ASSERT( s == unescape_string(escape_string(s)) )
    */
-  std::string unescape_string( const std::string s );
+  std::string unescape_string( const std::string& s );
 
   /**
    *  Because escaped strings are always equal to or larger than

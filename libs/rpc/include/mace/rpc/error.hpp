@@ -4,12 +4,14 @@
 #include <boost/format.hpp>
 
 namespace mace { namespace rpc {
-typedef boost::error_info<struct err_msg_,std::string> err_msg;
+typedef boost::error_info<struct err_message,std::string> error_message;
+typedef boost::error_info<struct err_code,int64_t>        error_code;
 
 struct exception : public virtual boost::exception, public virtual std::exception {
-    const char* what()const throw()     { return "exception";                     }
+    const char* what()const throw()     { return boost::get_error_info<mace::rpc::error_message>(*this)->c_str(); }
     virtual void       rethrow()const   { BOOST_THROW_EXCEPTION(*this);                  } 
-    const std::string& message()const   { return *boost::get_error_info<mace::rpc::err_msg>(*this); }
+    const std::string& message()const   { return *boost::get_error_info<mace::rpc::error_message>(*this); }
+    int64_t            code()const      { return *boost::get_error_info<mace::rpc::error_code>(*this); }
 };
 
 } } // mace::rpc
@@ -19,7 +21,7 @@ struct exception : public virtual boost::exception, public virtual std::exceptio
  */
 #define MACE_RPC_THROW( MSG, ... ) \
   do { \
-    BOOST_THROW_EXCEPTION( mace::rpc::exception() << mace::rpc::err_msg( (boost::format( MSG ) __VA_ARGS__ ).str() ) );\
+    BOOST_THROW_EXCEPTION( mace::rpc::exception() << mace::rpc::error_message( (boost::format( MSG ) __VA_ARGS__ ).str() ) );\
   } while(0)
 
 #endif
