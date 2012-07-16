@@ -6,9 +6,10 @@
 class test_fixture {
   public:
     std::string hello( std::string w ) { /*MACE_RPC_THROW( "Test" ); throw std::runtime_error( "Hello Exception" );*/ return "Hi, " + w; }
+    std::vector<double> vec( const std::vector<double>& v ) { std::cerr.flush(); return v; }
 };
 
-MACE_STUB( test_fixture, (hello) )
+MACE_STUB( test_fixture, (hello)(vec) )
 
 int main( int argc, char** argv ) {
   try {

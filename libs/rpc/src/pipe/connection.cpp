@@ -23,6 +23,10 @@ namespace mace { namespace rpc { namespace pipe { namespace detail {
   void connection::close() {
      // cancel currently pending read, if we can
      m_read_done.cancel();
+<<<<<<< HEAD
+=======
+      
+>>>>>>> master
      if( &m_in == &std::cin ) {
        // If I call quit, this will hang because cin will 'block' waiting
        // for input therefore it will never join the thread.
@@ -36,6 +40,8 @@ namespace mace { namespace rpc { namespace pipe { namespace detail {
         mace::cmt::yield();
         //handle( read_message() );
       }
+    } catch ( const mace::cmt::error::task_canceled& ) {
+      // do nothing... just exit
     } catch ( const boost::system::system_error& e ) {
       // TODO: should other errors be signaled via closed
       // supress eof error, this is expected and indicated by the closed signal

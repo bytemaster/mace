@@ -5,9 +5,10 @@
 class test_fixture {
   public:
     std::string hello( std::string w ) { return "Hi, " + w; }
+    std::vector<double> vec( const std::vector<double>& v ) { return v; }
 };
 
-MACE_STUB( test_fixture, (hello) )
+MACE_STUB( test_fixture, (hello)(vec) )
 
 
 void read_error( std::istream& err ) {
@@ -24,6 +25,27 @@ int main( int argc, char** argv ) {
   try {
     mace::rpc::json::process::client<test_fixture> c;
     c.exec( "child" );
+   // std::vector<std::string> args;
+    //args.push_back( "out.txt" );
+  // c.exec( "/usr/bin/tee", std::move(args) );
+    auto f = mace::cmt::async( [&](){ read_error( c.err_stream()); } );
+
+  {
+    std::vector<double> d(boost::lexical_cast<int>(argv[1]));
+    for( uint32_t i= 0; i <d.size(); ++i ) {
+      d[i] = rand();
+    }
+   auto start = boost::chrono::system_clock::now();
+   int cnt = 100;
+   for( uint32_t i = 0; i < cnt; ++i ) {
+        auto r = c->vec(d).wait();
+   }
+   auto end = boost::chrono::system_clock::now();
+   slog( "call %1%/s", cnt * 1000000000ll / double((end-start).count()) );
+
+}
+
+
 
    auto start = boost::chrono::system_clock::now();
    int cnt = 100000;
@@ -32,6 +54,14 @@ int main( int argc, char** argv ) {
    }
    auto end = boost::chrono::system_clock::now();
    slog( "call %1%/s", cnt * 1000000000ll / double((end-start).count()) );
+
+
+
+
+
+
+
+
    std::vector< mace::cmt::future<std::string> > results(cnt);
    start = boost::chrono::system_clock::now();
    for( int i = 0; i < cnt; ++i ) {
@@ -56,7 +86,6 @@ int main( int argc, char** argv ) {
 
 
   //  slog( "return: '%1%'", r );
-    auto f = mace::cmt::async( [&](){ read_error( c.err_stream()); } );
     c.close();
     slog( "result: %1%", c.result() );
     f.wait();

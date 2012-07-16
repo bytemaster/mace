@@ -17,6 +17,9 @@ namespace mace { namespace rpc { namespace json {
   template<typename Stream, typename Filter>
   void to_json( const void_t&, Stream& os, Filter& f ) { os<<"null"; }
 
+  template<typename Stream, typename Filter>
+  void to_json( const std::vector<double>& v, Stream& os, Filter& f );
+
   template<typename T, typename Stream, typename Filter>
   void to_json( const std::vector<T>& v, Stream& os, Filter& f );
 
@@ -44,29 +47,30 @@ namespace mace { namespace rpc { namespace json {
   template< typename Iterator, typename Stream, typename Filter>
   void to_json_array( Iterator b, Iterator e, Stream& os, Filter& f );
 
-  template<typename T, typename Stream, typename Filter>
+  template<typename Stream, typename Filter>
   void to_json( const std::vector<char>& v, Stream& os, Filter& f );
+
 
   template<typename Stream, typename Filter>
   void to_json( const std::string& s,    Stream& os, Filter& f ) { os << '"'<<escape_string(s)<<'"'; }
   template<typename Stream, typename Filter>
-  void to_json( const uint64_t& i,       Stream& os, Filter& f ) { os << i;                       }
+  void to_json( const uint64_t& i,       Stream& os, Filter& f ) { os << i; }
   template<typename Stream, typename Filter>
-  void to_json( const int64_t& i,        Stream& os, Filter& f ) { os << i;                       }
+  void to_json( const int64_t& i,        Stream& os, Filter& f ) { os << i; }
   template<typename Stream, typename Filter>
-  void to_json( const uint32_t& i,       Stream& os, Filter& f ) { os << i;                       }
+  void to_json( const uint32_t& i,       Stream& os, Filter& f ) { os << i; }
   template<typename Stream, typename Filter>
-  void to_json( const int32_t& i,        Stream& os, Filter& f ) { os << i;                       }
+  void to_json( const int32_t& i,        Stream& os, Filter& f ) { os << i; }
   template<typename Stream, typename Filter>
-  void to_json( const uint16_t& i,       Stream& os, Filter& f ) { os << i;                       }
+  void to_json( const uint16_t& i,       Stream& os, Filter& f ) { os << i; }
   template<typename Stream, typename Filter>
-  void to_json( const int16_t& i,        Stream& os, Filter& f ) { os << i;                       }
+  void to_json( const int16_t& i,        Stream& os, Filter& f ) { os << i; }
   template<typename Stream, typename Filter>
-  void to_json( const uint8_t& i,        Stream& os, Filter& f ) { os << i;                       }
+  void to_json( const uint8_t& i,        Stream& os, Filter& f ) { os << i; }
   template<typename Stream, typename Filter>
-  void to_json( const int8_t& i,         Stream& os, Filter& f ) { os << i;                       }
+  void to_json( const int8_t& i,         Stream& os, Filter& f ) { os << i; }
   template<typename Stream, typename Filter>
-  void to_json( const double& d,         Stream& os, Filter& f ) { os << d;                       }
+  void to_json( const double& d,         Stream& os, Filter& f ) { os << d; }
   template<typename Stream, typename Filter>
   void to_json( const float& v,          Stream& os, Filter& f ) { os << v;                       }
   template<typename Stream, typename Filter>
@@ -158,10 +162,17 @@ namespace mace { namespace rpc { namespace json {
     to_json_array( v.begin(), v.end(), os, f );
   }
 
-  template<typename T, typename Stream, typename Filter>
+  template<typename Stream, typename Filter>
   void to_json( const std::vector<char>& v, Stream& os, Filter& f ) {
     if( v.size() )
         to_json( base64_encode((unsigned char*)&v.front(),v.size() ), os, f );
+    else
+        to_json( base64_encode(0,0), os, f );
+  }
+  template<typename Stream, typename Filter>
+  void to_json( const std::vector<double>& v, Stream& os, Filter& f ) {
+    if( v.size() )
+        to_json( base64_encode((unsigned char*)&v.front(),v.size()*sizeof(double) ), os, f );
     else
         to_json( base64_encode(0,0), os, f );
   }

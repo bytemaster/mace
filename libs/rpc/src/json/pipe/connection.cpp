@@ -48,23 +48,18 @@ void  connection::send_message( rpc::message&& m ) {
     }
     std::string s = ss.str();
     assert(s.size());
-    std::cerr.write( s.c_str(), s.size() );
     m_out.write( s.c_str(), s.size() );
     
     if( !m.err ) {
       m_out.write(&m.data.front(), m.data.size() ); 
-      std::cerr.write( &m.data.front(), m.data.size() );
     }
     m_out.write( "}", 1 );
-    std::cerr.write("}",1);
   } else {
     ss<<'}';
     std::string s = ss.str();
     m_out.write( s.c_str(), s.size() );
-    std::cerr.write( s.c_str(), s.size() );
   }
   m_out.flush();
-  std::cerr.flush();
   assert(m_out);
 }
 

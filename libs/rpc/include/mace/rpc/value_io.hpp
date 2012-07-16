@@ -129,6 +129,11 @@ namespace mace { namespace rpc {
   void unpack( Filter& c, const mace::rpc::value& jsv, int64_t& v );
   template<typename Filter>
   void unpack( Filter& c, const mace::rpc::value& jsv, std::string& v );
+
+
+  template<typename Filter>
+  void unpack( Filter& c, const mace::rpc::value& jsv, std::vector<double>& value );
+
   template<typename Filter>
   void unpack( Filter& c, const mace::rpc::value& jsv, std::vector<char>& value );
   template<typename T, typename Filter>
@@ -526,6 +531,11 @@ namespace mace { namespace rpc {
   }
 
   template<typename Filter>
+  inline void pack( Filter& f, mace::rpc::value& jsv, const std::vector<double>& data ) {
+     if( data.size() ) { pack( f, jsv, f(mace::rpc::base64_encode((unsigned char*)&data.front(),data.size()*8))); } 
+     else{ pack( f, jsv, "" ); }
+  }
+  template<typename Filter>
   inline void pack( Filter& f, mace::rpc::value& jsv, const std::vector<char>& data ) {
      if( data.size() ) { pack( f, jsv, f(mace::rpc::base64_encode((unsigned char*)&data.front(),data.size()))); } 
   }
@@ -534,6 +544,14 @@ namespace mace { namespace rpc {
       data.clear();
       std::string d = mace::rpc::base64_decode( value_cast<std::string>(jsv) );
       data.insert(data.begin(),d.begin(),d.end());
+  }
+  template<typename Filter>
+  inline void unpack( Filter& f, const mace::rpc::value& jsv, std::vector<double>& data ) {
+      data.clear();
+      std::string d = mace::rpc::base64_decode( value_cast<std::string>(jsv) );
+      data.resize( d.size() / 8 );
+      memcpy( (char*)&data.front(), d.c_str(), d.size() );
+      //data.insert(data.begin(),d.begin(),d.end());
   }
 
 

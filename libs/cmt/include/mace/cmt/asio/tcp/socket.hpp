@@ -4,6 +4,8 @@
 #include <mace/cmt/future.hpp>
 
 namespace mace { namespace cmt { namespace asio { namespace tcp {
+
+  #if 0
   namespace detail { struct socket; }
 
   /**
@@ -27,7 +29,6 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
 
       /**
        * Reads one element at a time.
-       */
       struct iterator : public std::iterator<std::input_iterator_tag,char,void> {
         iterator( mace::cmt::asio::tcp::socket* _s = NULL)
         :s(_s){ if(_s){++*this;}  }
@@ -47,7 +48,9 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
           char               value;
           mace::cmt::asio::tcp::socket* s;
       };
+       */
 
+      /*
       size_t read_some( char* buffer, size_t size );
       size_t read( char* buffer, size_t size );
       size_t write( const char* buffer, size_t size );
@@ -55,7 +58,9 @@ namespace mace { namespace cmt { namespace asio { namespace tcp {
       void flush();
     private:
       detail::socket* my;
+      */
   };
+  #endif
 
 } } } } // namespace mace::cmt::asio::tcp
 

@@ -87,7 +87,7 @@ namespace mace { namespace rpc {  namespace process {
       void  exec( const boost::filesystem::path& exe, const boost::filesystem::path& work_dir, int opt = use_out_stream | recv_err_stream) {
         exec( exe, std::vector<std::string>(), work_dir, opt );
       }
-      void  exec( const boost::filesystem::path& exe, std::vector<std::string>&& args,  int opt = use_out_stream | recv_err_stream) {
+      void  exec( const boost::filesystem::path& exe, std::vector<std::string>&& args,  int opt ) {
         exec( exe, std::move(args), ".", opt );
       }
 

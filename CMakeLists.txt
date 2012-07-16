@@ -27,6 +27,8 @@ option( ENABLE_ARM "Build for ARM CPU" OFF )
 
 include_directories(/usr/local/include)
 
+add_definitions( -DBOOST_NO_SCOPED_ENUMS )
+
 #ADD_DEFINITIONS( -DBOOST_CONTEXT_UCTX )
 #ADD_DEFINITIONS( -D_XOPEN_SOURCE )
 

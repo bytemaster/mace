@@ -139,6 +139,9 @@ namespace mace { namespace rpc { namespace json {
   std::vector<char> io::pack( const T& v ) {
       default_filter f;
       std::stringstream ss;
+      ss << std::ios::fixed;
+      ss.precision(12);
+      ss.unsetf( std::ios::floatfield );
       detail::to_json( v, ss, f );
       std::string s = ss.str();
       std::vector<char> rv(s.size());
@@ -150,6 +153,9 @@ namespace mace { namespace rpc { namespace json {
  template<typename T, typename Filter>
  std::vector<char> io::pack( Filter& f, const T& v ) {
    std::stringstream ss;
+   ss.setf( std::ios::fixed );
+   ss.precision(12);
+   ss.unsetf( std::ios::floatfield );
    detail::to_json( v, ss, f );
    std::string s = ss.str();
    std::vector<char> rv(s.size());

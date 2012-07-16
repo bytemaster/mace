@@ -190,12 +190,11 @@ namespace mace { namespace ssh {
                m_sock.reset( new boost::asio::ip::tcp::socket( mace::cmt::asio::default_io_service() ) );
                
                for( uint32_t i = 0; i < eps.size(); ++i ) {
-                  boost::system::error_code e = mace::cmt::asio::tcp::connect( *m_sock, eps[i] );
-                  if( !e ) {
-                    slog( "connected to remote endpoint" );
+                  try {
+                    mace::cmt::asio::tcp::connect( *m_sock, eps[i] );
                     endpt = eps[i];
                     break;
-                  }
+                  } catch ( ... ) {}
                }
 
                slog( "Creating session" );
@@ -322,6 +321,26 @@ namespace mace { namespace ssh {
     process::ptr cpp(new process(*this,std::string(),pty_type));
     return cpp;
   }
+  
+  void client::rm( const boost::filesystem::path& remote_path ) {
+    auto s = stat(remote_path);
+    if( s.is_directory() ) {
+      MACE_SSH_THROW( "Directory exists at path %1%", %remote_path );
+    }
+    else if( !s.exists() ) {
+      return; // nothing to do
+    }
+
+    int rc = libssh2_sftp_unlink(my->m_sftp, remote_path.native().c_str() );
+    while( rc == LIBSSH2_ERROR_EAGAIN ) {
+      my->wait_on_socket();
+      rc = libssh2_sftp_unlink(my->m_sftp, remote_path.native().c_str() );
+    }
+    if( 0 != rc ) {
+       rc = libssh2_sftp_last_error(my->m_sftp);
+       MACE_SSH_THROW( "rm error %1%", %rc );
+    }
+  }
 
   /**
    *  Handles uploading file to remote host via scp.  The file will be memory mapped and then
@@ -405,6 +424,11 @@ namespace mace { namespace ssh {
     while( ec == LIBSSH2_ERROR_EAGAIN ) {
       my->wait_on_socket();
       ec = libssh2_channel_free( chan );  
+    }
+    if( ec < 0 ) {
+       char* msg = 0;
+       int ec = libssh2_session_last_error( my->m_session, &msg, 0, 0 );
+       MACE_SSH_THROW( "scp failed %1% - %2%", %ec %msg );
     }
   }
 

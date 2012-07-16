@@ -16,7 +16,7 @@ SET( sources
 #            src/stdin.cpp
             src/asio/acceptor.cpp
             src/asio/udp/socket.cpp
-            src/asio/tcp/socket.cpp
+#            src/asio/tcp/socket.cpp
              )
 
 

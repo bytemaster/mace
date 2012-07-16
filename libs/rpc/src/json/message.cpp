@@ -7,7 +7,7 @@ namespace mace { namespace rpc { namespace json {
   /**
    */
   mace::rpc::message to_message( datavec&& msg ) {
-      slog( "%1%", std::string( msg.begin(), msg.end() ) );
+      //slog( "%1%", std::string( msg.begin(), msg.end() ) );
       BOOST_ASSERT( msg.front() == '{' );
       //BOOST_ASSERT( msg.back()  == '}' );
 

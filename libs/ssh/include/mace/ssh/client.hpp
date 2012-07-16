@@ -96,6 +96,11 @@ namespace mace { namespace ssh {
                               boost::function<bool(size_t,size_t)> progress = [](size_t,size_t){return true;} );
 
 
+      /**
+       *  @pre remote_path is not a directory
+       *  @post remote file is removed from the remote filesystem
+       */
+      void rm( const boost::filesystem::path& remote_path );
       file_attrib stat( const boost::filesystem::path& remote_path );
 
       /**

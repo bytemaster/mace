@@ -23,10 +23,12 @@ SET( sources
 #        src/connection_base.cpp
 #        src/pipe/connection.cpp
         src/json/io.cpp
+        src/value.cpp
 #        src/json/message.cpp
 #        src/json/tcp/connection.cpp
 #        src/json/pipe/connection.cpp
-        src/value.cpp
+#        src/json/message.cpp
+#        src/json/tcp/connection.cpp
 
 #        src/json/connection.cpp
 #        src/json/tcp_connection.cpp
