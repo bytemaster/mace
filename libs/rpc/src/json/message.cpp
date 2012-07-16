@@ -9,7 +9,7 @@ namespace mace { namespace rpc { namespace json {
   mace::rpc::message to_message( datavec&& msg ) {
       slog( "%1%", std::string( msg.begin(), msg.end() ) );
       BOOST_ASSERT( msg.front() == '{' );
-      BOOST_ASSERT( msg.back()  == '}' );
+      //BOOST_ASSERT( msg.back()  == '}' );
 
       error_collector ec; // TODO: Do something with parse errors
       auto mfields = read_key_vals( &msg.front()+1, &msg.back()-1, ec );

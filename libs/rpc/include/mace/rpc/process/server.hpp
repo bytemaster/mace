@@ -11,9 +11,9 @@ namespace mace { namespace rpc { namespace process {
   template<typename InterfaceType, typename ConnectionType>
   class server : public mace::rpc::server<InterfaceType,ConnectionType> {
     public:
-      template<typename SessionType>
-      server( const std::shared_ptr<SessionType>& shared_session, std::istream& in, std::ostream& out )
-      :mace::rpc::server<InterfaceType,ConnectionType>( shared_session ), m_con( new ConnectionType(in,out) ) { 
+      template<typename SessionType, typename IStream, typename OStream>
+      server( const std::shared_ptr<SessionType>& shared_session, IStream& in, OStream& out, const char* read_thread_name = NULL )
+      :mace::rpc::server<InterfaceType,ConnectionType>( shared_session ), m_con( new ConnectionType(in,out,read_thread_name) ) { 
         this->sc->init_connection(m_con); 
         m_con->closed.connect( boost::ref(closed) );
       }

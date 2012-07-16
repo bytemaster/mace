@@ -22,6 +22,8 @@ namespace mace { namespace cmt {
         open_stderr = 0x04,
         open_all    = open_stdin|open_stdout|open_stderr,
       };
+      typedef boost::iostreams::stream<detail::process_sink> ostream;
+      typedef std::istream                                   istream;
 
       typedef std::shared_ptr<process> ptr;
       process();
@@ -67,7 +69,7 @@ namespace mace { namespace cmt {
       /**
        *  @brief returns a stream that writes to the process' stdin
        */
-      boost::iostreams::stream<detail::process_sink>& in_stream();
+      ostream& in_stream();
 
       /**
        *  @brief returns a stream that reads from the process' stdout

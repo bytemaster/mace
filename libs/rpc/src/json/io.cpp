@@ -430,7 +430,7 @@ char* read_key_val( std::map<std::string,json::string>& obj, bool sc, char* in, 
   temp_set ntemp(name_end,'\0');
   temp_set vtemp(val_end,'\0');
   //slog( "name: '%1%'", std::string(name,name_end) );
-  obj[name] = std::string(val,val_end);
+  obj[name] = std::vector<char>(val,val_end);
 //  obj.fields.push_back( key_val( name, to_value( val, val_end, ec ) ) );
   return val_end;
 }

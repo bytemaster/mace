@@ -22,7 +22,7 @@ namespace mace { namespace rpc { namespace pipe { namespace detail {
   }
   void connection::close() {
      // cancel currently pending read, if we can
-//     m_read_done.cancel();
+     m_read_done.cancel();
      if( &m_in == &std::cin ) {
        // If I call quit, this will hang because cin will 'block' waiting
        // for input therefore it will never join the thread.

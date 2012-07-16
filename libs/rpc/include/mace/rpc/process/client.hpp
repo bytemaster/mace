@@ -4,6 +4,7 @@
 #include <mace/rpc/client_interface.hpp>
 #include <mace/cmt/process.hpp>
 #include <mace/rpc/error.hpp>
+#include <boost/signals.hpp>
 
 namespace mace { namespace rpc {  namespace process {
   enum options_enum {
@@ -24,11 +25,12 @@ namespace mace { namespace rpc {  namespace process {
     public:
       typedef mace::rpc::client_interface< ConnectionType > delegate_type;
 
-      client( typename ConnectionType::ptr c )
+      client( const typename ConnectionType::ptr& c )
       :m_opt(0),m_con(c){
         delegate_type::set_vtable( *this, m_con );
       }
-      client( std::istream& in, std::ostream& out )
+      template<typename IStream, typename OStream>
+      client( IStream& in, OStream& out )
       :m_opt(0),m_con( new ConnectionType( in, out ) ){ }
 
       client():m_opt(0){}
@@ -43,7 +45,7 @@ namespace mace { namespace rpc {  namespace process {
       }
 
       void close() {
-        if( m_proc ) m_proc->in_stream().close();
+        //if( m_proc ) m_proc->in_stream().close();
         if( m_con  ) m_con->close();
       }
 

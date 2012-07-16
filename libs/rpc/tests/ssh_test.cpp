@@ -83,11 +83,12 @@ try {
 
    slog( "sending hello!" );
    auto start = boost::chrono::system_clock::now();
-   int cnt = 10000;
+   int cnt = 1000;
    std::vector< mace::cmt::future<std::string> > results(cnt);
    for( int i = 0; i < cnt; ++i ) {
       try {
-        results[i] = cl->hello("WorldEnd");
+        if( i > 9 ) results[0].wait();
+        results[i%10] = cl->hello("WorldEnd");
       } catch ( ... ) {
         elog( "%1%", boost::current_exception_diagnostic_information() );
       }

@@ -35,6 +35,10 @@ namespace mace { namespace rpc { namespace json {
       string( string&& s ):json_data(std::move(s.json_data)){}
       string(){}
 
+      string& operator=( const std::string& s ) {
+        json_data = std::vector<char>(s.begin(),s.end());
+        return *this;
+      }
       template<typename T>
       string& operator=( T&& t ) {
         json_data = std::forward<T>(t);
@@ -49,10 +53,7 @@ namespace mace { namespace rpc { namespace json {
         json_data = s.json_data;
         return *this;
       }
-
-      
-      
-      std::string json_data;
+      std::vector<char> json_data;
   };
 
   /**
@@ -76,6 +77,13 @@ namespace mace { namespace rpc { namespace json {
    *   ASSERT( s == unescape_string(escape_string(s)) )
    */
   std::string unescape_string( const std::string& s );
+
+  /**
+   *  @brief the inverse of escape_string()
+   *  
+   *   ASSERT( s == unescape_string(escape_string(s)) )
+   */
+  json::string& inplace_unescape_string( json::string& s );
 
   /**
    *  Because escaped strings are always equal to or larger than

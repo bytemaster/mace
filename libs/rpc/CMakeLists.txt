@@ -20,12 +20,12 @@ ENDIF()
 
 SET( libraries  mace_cmt ${Boost_FILESYSTEM_LIBRARY})
 SET( sources 
-        src/connection_base.cpp
-        src/pipe/connection.cpp
+#        src/connection_base.cpp
+#        src/pipe/connection.cpp
         src/json/io.cpp
-        src/json/message.cpp
-        src/json/tcp/connection.cpp
-        src/json/pipe/connection.cpp
+#        src/json/message.cpp
+#        src/json/tcp/connection.cpp
+#        src/json/pipe/connection.cpp
         src/value.cpp
 
 #        src/json/connection.cpp
