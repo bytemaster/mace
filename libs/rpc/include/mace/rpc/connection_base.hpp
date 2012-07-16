@@ -3,6 +3,7 @@
 #include <mace/rpc/message.hpp>
 #include <mace/rpc/detail/pending_result.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/signals.hpp>
 
 namespace mace { namespace rpc { 
 

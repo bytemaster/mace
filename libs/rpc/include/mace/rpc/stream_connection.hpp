@@ -1,6 +1,7 @@
 #ifndef _MACE_RPC_STREAM_CONNECTION_HPP_
 #define _MACE_RPC_STREAM_CONNECTION_HPP_
 #include <mace/rpc/connection.hpp>
+#include <mace/cmt/thread.hpp>
 #include <mace/cmt/bind.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/asio/error.hpp>

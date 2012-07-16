@@ -5,6 +5,7 @@
 #include <boost/function_types/result_type.hpp>
 #include <boost/fusion/include/make_fused.hpp>
 #include <boost/fusion/support/deduce_sequence.hpp>
+#include <mace/stub/ptr.hpp>
 
 namespace mace { namespace rpc { 
 

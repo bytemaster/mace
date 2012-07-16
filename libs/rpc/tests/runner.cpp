@@ -1,4 +1,4 @@
-#include <mace/rpc/json/pipe/connection.hpp>
+#include <mace/rpc/json/process_server.hpp>
 #include <fstream>
 #include <mace/cmt/signals.hpp>
 
@@ -27,8 +27,19 @@ void print_std(){
 MACE_STUB( test_fixture, (hello) )
 
 int main( int argc, char** argv ) {
-   mace::cmt::thread::current().set_name( "runner_main" );
-   
+  mace::cmt::thread::current().set_name( "runner_main" );
+  try {
+      mace::cmt::async( print_err );
+
+      auto tf( std::make_shared<test_fixture>() );
+      mace::rpc::json::process::server<test_fixture> s( tf, std::cin, std::cout, "cin" );
+      mace::cmt::wait( s.closed );
+      return 0;
+  } catch ( ... ) {
+    elog( "%1%", boost::current_exception_diagnostic_information() );
+    return -1;
+  }
+  /* 
    mace::stub::ptr<test_fixture> serv( std::make_shared<test_fixture>() );
 
    typedef mace::rpc::json::pipe::connection<> connection;
@@ -36,9 +47,9 @@ int main( int argc, char** argv ) {
 
    mace::stub::visit( serv, connection::add_interface_visitor<test_fixture>( *c, serv ) );
 
-   mace::cmt::async( print_err );
 
    mace::cmt::wait( c->closed );
+   */
 
    return 6;
 }

@@ -23,9 +23,9 @@ namespace mace { namespace rpc { namespace json {
       typedef mace::rpc::message                                message_type;
 
       stream_connection( istream_type& i, ostream_type& o, const char* read_thread_name = NULL )
-      :base_type( *this, i, o, read_thread_name ) {}
+      :base_type( *this, i, o, read_thread_name ) { }
 
-      stream_connection(){}
+      stream_connection(){ }
 
     private:
        /**

@@ -25,13 +25,15 @@ int main( int argc, char** argv ) {
   try {
     mace::rpc::json::process::client<test_fixture> c;
     c.exec( "child" );
+    int num = 10;
+    if( argc > 1 ) num = atoi(argv[1]);
    // std::vector<std::string> args;
     //args.push_back( "out.txt" );
   // c.exec( "/usr/bin/tee", std::move(args) );
     auto f = mace::cmt::async( [&](){ read_error( c.err_stream()); } );
 
   {
-    std::vector<double> d(boost::lexical_cast<int>(argv[1]));
+    std::vector<double> d(num);
     for( uint32_t i= 0; i <d.size(); ++i ) {
       d[i] = rand();
     }

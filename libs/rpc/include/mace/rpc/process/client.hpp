@@ -20,7 +20,7 @@ namespace mace { namespace rpc {  namespace process {
    *
    *  @tparam ConnectionType - must impliment mace::rpc::pipe::connection<T> interface
    */
-  template<typename InterfaceType, typename ConnectionType /* ie: = mace::rpc::json::pipe::connection<json::io>*/ >
+  template<typename InterfaceType, typename ConnectionType >
   class client : public mace::stub::ptr<InterfaceType, mace::rpc::client_interface< ConnectionType > > {
     public:
       typedef mace::rpc::client_interface< ConnectionType > delegate_type;

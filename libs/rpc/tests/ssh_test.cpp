@@ -11,8 +11,8 @@
 
 #include <boost/exception/all.hpp>
 #include <boost/fusion/container/generation/make_vector.hpp>
-#include <mace/rpc/json/pipe/connection.hpp>
-#include <mace/rpc/json/pipe/client.hpp>
+#include <mace/rpc/json/json_stream_connection.hpp>
+#include <mace/rpc/stream_client.hpp>
 #include <iostream>
 #include <mace/cmt/thread.hpp>
 
@@ -57,7 +57,7 @@ void read_out( mace::ssh::process::ptr p ) {
 
 MACE_STUB( test_fixture, (hello) )
 
-typedef mace::rpc::json::pipe::connection<> connection;
+typedef mace::rpc::json::stream_connection<> connection;
 
 namespace bp = boost::process;
 namespace bpb = boost::process::behavior;
@@ -78,7 +78,7 @@ try {
    auto con = connection::ptr( new connection( proc->out_stream(), proc->in_stream() ) );
    
    slog( "creating client" );
-   mace::rpc::json::pipe::client<test_fixture> cl(con);
+   mace::rpc::stream_client<test_fixture,connection> cl(con);
 
    slog( "sending hello!" );
    auto start = boost::chrono::system_clock::now();
@@ -96,7 +96,7 @@ try {
         try {
           results[i].wait(boost::chrono::microseconds(1000000*5));
         } catch ( ... ) {
-          mace::cmt::thread::current().debug("wait on result" );
+      //    mace::cmt::thread::current().debug("wait on result" );
         }
    }
    auto end = boost::chrono::system_clock::now();
