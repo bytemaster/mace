@@ -83,10 +83,10 @@ namespace mace { namespace rpc { namespace json {
           }
           if( m.has_error() ) {
             if( c ) {
-                const char mid[] = ",\"error\":\"{\"code\":";
+                const char mid[] = ",\"error\":{\"code\":";
                 this->out().write( mid, sizeof(mid)-1 );
             } else {
-                const char mid[] = "\"error\":\"{\"code\":";
+                const char mid[] = "\"error\":{\"code\":";
                 this->out().write( mid, sizeof(mid)-1 );
             }
             std::string cd = boost::lexical_cast<std::string>(m.get_error().code.value );

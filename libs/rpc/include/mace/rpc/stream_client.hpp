@@ -12,6 +12,8 @@ namespace mace { namespace rpc {
     public:
       typedef mace::rpc::client_interface< ConnectionType > delegate_type;
 
+      stream_client(){}
+
       stream_client( const typename ConnectionType::ptr& c )
       :m_con(c){
         delegate_type::set_vtable( *this, m_con );
@@ -22,6 +24,11 @@ namespace mace { namespace rpc {
       :m_con( new ConnectionType( in, out ) ){ }
 
       stream_client( const stream_client& c ):m_con(c.m_con) {
+         delegate_type::set_vtable( *this, m_con );
+      }
+
+      void set_connection( const typename ConnectionType::ptr& c ) {
+        m_con = c;
          delegate_type::set_vtable( *this, m_con );
       }
 
