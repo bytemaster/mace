@@ -100,7 +100,7 @@ namespace mace { namespace rpc { namespace json {
             this->out().write( "}", 1 );
             c = true;
           }
-          this->out().write("}",1);
+          this->out().write("}\n",2);
           this->out().flush();
           if( !this->out() ) {
             MACE_RPC_THROW( "Error writing to stream" );
