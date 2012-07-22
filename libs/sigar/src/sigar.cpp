@@ -15,8 +15,14 @@ namespace mace {
     stat.time = boost::chrono::system_clock::now().time_since_epoch().count();
 
     stat.cpu.count = cpulist.number;
+    stat.cpu.percent = 0;
+    stat.cpu.load = 0;
     for (uint32_t i=0; i<cpulist.number; i++) {
         sigar_cpu_t cpu = cpulist.data[i];
+	std::cerr<<"cpu user "<<cpu.user<<std::endl;
+	std::cerr<<"cpu sys "<<cpu.sys<<std::endl;
+	std::cerr<<"cpu total "<<cpu.total<<std::endl;
+	std::cerr<<"cpu per "<<double(cpu.user+cpu.sys)/cpu.total<<std::endl;
         stat.cpu.percent += (uint64_t(cpu.user)+cpu.sys)/double(cpu.total);
     }
     sigar_cpu_list_destroy(sigar, &cpulist);
@@ -28,8 +34,9 @@ namespace mace {
     sigar_cpu_info_list_destroy( sigar, &cpui );
 
     sigar_loadavg_t load;
-    sigar_loadavg_get( sigar, &load );
-    stat.cpu.load = load.loadavg[0];
+    if( SIGAR_OK == sigar_loadavg_get( sigar, &load ) )
+	    stat.cpu.load = load.loadavg[0];
+    std::cerr<<"load: "<<load.loadavg[0]<< " "<<load.loadavg[1] << "  " <<load.loadavg[2]<<std::endl;
 
     sigar_mem_t mem;
     sigar_mem_get( sigar, &mem );

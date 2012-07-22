@@ -13,6 +13,7 @@ SET( CMAKE_DEBUG_POSTFIX _debug )
 SET( BUILD_SHARED_LIBS NO )
 
 SET(Boost_USE_STATIC_LIBS ON)
+FIND_PACKAGE(OpenSSL)
 FIND_PACKAGE(Boost COMPONENTS test thread date_time system filesystem program_options signals serialization chrono unit_test_framework ) 
 
 MESSAGE( STATUS "Boost Include Dir: ${Boost_INCLUDE_DIR}" )
@@ -21,6 +22,8 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
 
+SET( OPEN_SSL_LIBS ${SSL_EAY_RELEASE} ${LIB_EAY_RELEASE} )
+
 INCLUDE( SetupTargetMacros )
 
 option( ENABLE_EXAMPLES "Build Examples" ON )
@@ -28,6 +31,8 @@ option( ENABLE_TESTS "Build Tests" ON )
 option( ENABLE_ARM "Build for ARM CPU" OFF )
 
 include_directories(/usr/local/include)
+include_directories(${OPENSSL_INCLUDE_DIR})
+include_directories(vendor/libssh2-1.4.2/include)
 
 
 #ADD_DEFINITIONS( -DBOOST_CONTEXT_UCTX )
@@ -61,4 +66,5 @@ endif()
 
 
 add_subdirectory(libs)
+add_subdirectory(vendor)
 #add_subdirectory(examples)
