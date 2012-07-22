@@ -27,7 +27,7 @@
         slog( "r %1%", r );
         if( r == 0 ) {
           slog( "async" );
-          return m_read_thread->async( [=](){ std::cin.read(s,1); return 1; }, "cin.getch" ).wait();
+          return m_read_thread->async( [=]()->size_t{ std::cin.read(s,1); return 1; }, "cin.getch" ).wait();
         }
         slog( "Return %1%", r );
         return r;

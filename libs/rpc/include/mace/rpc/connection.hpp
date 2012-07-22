@@ -8,6 +8,18 @@
 #include <mace/stub/ptr.hpp>
 
 namespace mace { namespace rpc { 
+/** disable warning C4355 because we can safely pass 'this' 
+  * to the base class because the base class constructor only
+  * stores it is not used by the base class until after the 
+  * constructor has completed.
+  *
+  * This is passed to the base class so that the base class
+  * does not need to use dynamic cast (or unsafe static cast) to
+  * get the derived class pointer in the 'static polymorphic methods'
+  */
+#pragma warning( push )
+#pragma warning(disable : 4355 )
+
 
   /**
    *  @tparam io_delegate_type must implement the following expressions
@@ -153,5 +165,8 @@ namespace mace { namespace rpc {
   };
 
 } } // mace::rpc
+
+// re-enable warning C4355 (passing this to base class)
+#pragma warning( pop )
 
 #endif //  _MACE_RPC_CONNECTION_HPP_

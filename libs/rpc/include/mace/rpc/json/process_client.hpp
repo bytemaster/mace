@@ -25,21 +25,21 @@ namespace mace { namespace rpc {  namespace json { namespace process {
   class client : public mace::rpc::process::client<InterfaceType,connection> {
     public:
       typedef std::shared_ptr<client>                       ptr;
-      typedef mace::rpc::client_interface< connection > delegate_type;
+      typedef mace::rpc::client_interface< connection_type > delegate_type;
 
       client(){}
 
       client( const client& c )
-      :mace::rpc::process::client<InterfaceType,connection>(c){}
+      :mace::rpc::process::client<InterfaceType,connection_type>(c){}
 
       client( client&& c )
-      :mace::rpc::process::client<InterfaceType,connection>(std::move(c)){}
+      :mace::rpc::process::client<InterfaceType,connection_type>(std::move(c)){}
 
       client( const typename connection::ptr& c) 
-      :mace::rpc::process::client<InterfaceType,connection>(c){}
+      :mace::rpc::process::client<InterfaceType,connection_type>(c){}
 
-      using mace::rpc::process::client<InterfaceType,connection>::operator!;
-      using mace::rpc::process::client<InterfaceType,connection>::operator=;
+      using mace::rpc::process::client<InterfaceType,connection_type>::operator!;
+      using mace::rpc::process::client<InterfaceType,connection_type>::operator=;
 
   };
 #endif // BOOST_NO_TEMPLATE_ALIASES

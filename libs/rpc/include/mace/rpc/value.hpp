@@ -24,7 +24,7 @@ namespace mace { namespace rpc {
         value();
         value( value&& m );
         value( const value& m );
-        value( value& m );
+
         value( char* c );
         value( int8_t );
         value( int16_t );

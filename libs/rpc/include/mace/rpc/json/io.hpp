@@ -31,7 +31,6 @@ namespace mace { namespace rpc { namespace json {
       template<typename T>
       string( T&& v ):json_data( std::forward<T>(v) ){}
       string( const string& s ):json_data(s.json_data){}
-      string( string& s ):json_data(s.json_data){}
       string( string&& s ):json_data(std::move(s.json_data)){}
       string(){}
 

@@ -86,13 +86,13 @@ namespace mace { namespace rpc { namespace json {
       }
 
       inline bool report( int32_t e )const {
-        return m_eclass[report_error_t] & e;
+        return 0 != (m_eclass[report_error_t] & e);
       }
       inline bool recover( int32_t e )const {
-        return m_eclass[recover_error_t] & e;
+        return 0 != (m_eclass[recover_error_t] & e);
       }
       inline bool ignore( int32_t e )const {
-        return m_eclass[ignore_error_t] & e;
+        return 0 != (m_eclass[ignore_error_t] & e);
       }
 
       void report_error( int32_t e ) {

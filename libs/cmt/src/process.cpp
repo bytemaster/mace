@@ -36,7 +36,7 @@ namespace mace { namespace cmt {
         std::streamsize read( char* s, std::streamsize n ) {
           if( !m_pi ) return -1;
           try {
-              return mace::cmt::asio::read_some( *m_pi, boost::asio::buffer( s, n ) );
+              return static_cast<std::streamsize>(mace::cmt::asio::read_some( *m_pi, boost::asio::buffer( s, static_cast<size_t>(n) ) ));
           } catch ( const boost::system::system_error& e ) {
             if( e.code() == boost::asio::error::eof )  
                 return -1;
@@ -72,7 +72,7 @@ namespace mace { namespace cmt {
     
     std::streamsize process_sink::write( const char* s, std::streamsize n ) {
        if( !m_process.inp ) return -1;
-       return mace::cmt::asio::write( *m_process.inp, boost::asio::const_buffers_1( s, n ) );
+       return static_cast<std::streamsize>(mace::cmt::asio::write( *m_process.inp, boost::asio::const_buffers_1( s, static_cast<size_t>(n) ) ));
     }
     void process_sink::close() {
        if( m_process.inp )
@@ -97,7 +97,8 @@ namespace mace { namespace cmt {
     process p;
     p.my = std::make_shared<detail::process_d>();
 
-    p.my->pctx.work_dir = work_dir.native();
+    p.my->pctx.work_dir = work_dir.string();
+
     if( opt&open_stdout)
         p.my->pctx.streams[boost::process::stdout_id] = bp::behavior::async_pipe();
     else 
@@ -114,22 +115,23 @@ namespace mace { namespace cmt {
     else
         p.my->pctx.streams[boost::process::stdin_id]  = bp::behavior::close();
 
-    p.my->child.reset( new bp::child( bp::create_child( exe.native(), std::move(args), p.my->pctx ) ) );
+    p.my->child.reset( new bp::child( bp::create_child( exe.string(), std::move(args), p.my->pctx ) ) );
 
     if( opt & open_stdout ) {
        bp::handle outh = p.my->child->get_handle( bp::stdout_id );
        p.my->outp.reset( new bp::pipe( cmt::asio::default_io_service(), outh.release() ) );
-       p.my->outp->non_blocking(true);
+       //p.my->outp->non_blocking(true);
     }
     if( opt & open_stderr ) {
        bp::handle errh = p.my->child->get_handle( bp::stderr_id );
        p.my->errp.reset( new bp::pipe( cmt::asio::default_io_service(), errh.release() ) );
-       p.my->errp->non_blocking(true);
+       //p.my->errp->non_blocking(true);
     }
     if( opt & open_stdin ) {
        bp::handle inh  = p.my->child->get_handle( bp::stdin_id );
        p.my->inp.reset(  new bp::pipe( cmt::asio::default_io_service(), inh.release()  ) );
-       p.my->inp->non_blocking(true);
+       // TODO: inp does not have a non_blocking call on Windows... hopefully this is fixed in cmt::read_some/write_some
+       //p.my->inp->non_blocking(true);
     }
     return p;
   }

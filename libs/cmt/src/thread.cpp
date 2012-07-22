@@ -27,8 +27,9 @@ namespace mace { namespace cmt {
       namespace chrono = boost::chrono;
       boost::posix_time::time_duration const time_since_epoch=from-boost::posix_time::from_time_t(0); 
       system_clock::time_point t = chrono::system_clock::from_time_t(time_since_epoch.total_seconds());
-      long nsec=time_since_epoch.fractional_seconds()*(1000000000/time_since_epoch.ticks_per_second()); 
-      return t+chrono::nanoseconds(nsec); 
+      uint64_t nsec=time_since_epoch.fractional_seconds()*(1000000000/time_since_epoch.ticks_per_second()); 
+      t += boost::chrono::duration_cast<system_clock::time_point::duration>(chrono::nanoseconds(nsec));
+      return t;
     }
 
     struct sleep_priority_less {

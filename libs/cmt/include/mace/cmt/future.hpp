@@ -38,9 +38,9 @@ namespace mace { namespace cmt {
       virtual void set_exception( const boost::exception_ptr& e )=0;
 
     private:
-      friend class thread;
-      friend class context;
-      friend class thread_private;
+      friend class  thread;
+      friend struct context;
+      friend class  thread_private;
 
       const char*       m_desc;
       task*             m_task;

@@ -170,7 +170,7 @@ namespace asio {
         io_device( AsyncStream& p ):m_stream(p){}
     
         std::streamsize write( const char* s, std::streamsize n ) {
-          return mace::cmt::asio::write( m_stream, boost::asio::const_buffers_1(s,n) );
+          return mace::cmt::asio::write( m_stream, boost::asio::const_buffers_1(s,static_cast<size_t>(n)) );
         }
         std::streamsize read( char* s, std::streamsize n ) {
           try {
