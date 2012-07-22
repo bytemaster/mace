@@ -130,7 +130,7 @@ namespace mace { namespace rpc {
       *error = std::move(e);
     }
 
-    private: // this implementation could change
+//    private: // this implementation could change
        boost::optional<request_id_type>  id;     
        boost::optional<error_type>       error;  
        boost::optional<method_id_type>   method; 
@@ -139,5 +139,8 @@ namespace mace { namespace rpc {
   };
 
 } }
+
+MACE_REFLECT( mace::rpc::message, (id)(error)(method)(params)(result) )
+MACE_REFLECT( mace::rpc::error_object, (code)(message) )
 
 #endif // _MACE_RPC_MESSAGE_HPP_

@@ -75,8 +75,8 @@
      reply.set_request_id( m.take_request_id() );
      try {
        Seq paramv;
+       function_filter<connection> f(m_con);
        if( boost::fusion::size(paramv) ) {
-          function_filter<connection> f(m_con);
           if( reply.has_request_id() ) {
              reply.set_result(  
                  iod::pack(f, m_func(iod::template unpack<Seq, function_filter<connection> >( f, m.take_params() ))  ));
@@ -84,8 +84,11 @@
             m_func(iod::template unpack<Seq,function_filter<connection> >( f, m.take_params() ));
           }
        } else {
-         // TODO:  why don't I do anything here???
-         elog( "what now... paramsize 0..." ); 
+          if( reply.has_request_id() ) {
+             reply.set_result( iod::pack(f, m_func(paramv) ));
+          } else {
+             m_func(paramv);
+          }
        }
      } catch ( ... ) {
        if(reply.has_request_id() ) {
