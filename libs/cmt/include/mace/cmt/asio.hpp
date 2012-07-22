@@ -69,20 +69,20 @@ namespace asio {
      */
     template<typename AsyncReadStream, typename MutableBufferSequence>
     size_t read_some( AsyncReadStream& s, const MutableBufferSequence& buf ) {
-        BOOST_ASSERT( s.non_blocking() );
+     // TODO: windows::basic_stream_handle   BOOST_ASSERT( s.non_blocking() );
      //   if( !s.non_blocking() ) { s.non_blocking(true); }
-        boost::system::error_code ec;
+     if( !s.bytes_available() ) {
+        promise<size_t>::ptr p(new promise<size_t>("mace::cmt::asio::read_some"));
+        s.async_read_some( buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
+        return p->wait();
+     }
+     boost::system::error_code ec;
         size_t r = s.read_some( buf, ec );
         if( ec ) {
-            if( ec == boost::asio::error::would_block ) {
-               promise<size_t>::ptr p(new promise<size_t>("mace::cmt::asio::read_some"));
-               s.async_read_some( buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
-               return p->wait();
-            }
+        //    if( ec == boost::asio::error::would_block ) {
+         //   }
             BOOST_THROW_EXCEPTION( boost::system::system_error(ec) );
         }
-       // promise<size_t>::ptr p(new promise<size_t>("mace::cmt::asio::read_some"));
-       // s.async_read_some( buf, boost::bind( detail::read_write_handler, p, _1, _2 ) );
         return r;
     }
 
@@ -91,8 +91,9 @@ namespace asio {
      */
     template<typename AsyncWriteStream, typename ConstBufferSequence>
     size_t write( AsyncWriteStream& s, const ConstBufferSequence& buf ) {
-        BOOST_ASSERT( s.non_blocking() );
+     // TODO: windows::basic_stream_handle   BOOST_ASSERT( s.non_blocking() );
     //    if( !s.non_blocking() ) { s.non_blocking(true); }
+    	
         boost::system::error_code ec;
         size_t r = boost::asio::write( s, buf, ec );
         if( ec ) {
