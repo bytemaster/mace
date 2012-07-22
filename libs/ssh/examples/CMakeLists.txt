@@ -1,4 +1,8 @@
+MESSAGE( STATUS "LIB EAY: ${LIB_EAY_RELEASE}" )
+MESSAGE( STATUS "SSL EAY: ${SSL_EAY_RELEASE}" )
 SET( libraries 
+    ${LIB_EAY_RELEASE}
+    ${SSL_EAY_RELEASE}
     mace_cmt
     mace_ssh
     boost_context 
@@ -8,7 +12,12 @@ SET( libraries
     ${Boost_CHRONO_LIBRARY} 
     ${Boost_ASIO_LIBRARY} 
     ${Boost_SYSTEM_LIBRARY} 
-    ${Boost_SIGNALS_LIBRARY})
+    ${Boost_SIGNALS_LIBRARY}
+    ${LIB_EAY_DEBUG}
+    ${LIB_EAY_RELEASE}
+    ${SSL_EAY_DEBUG}
+    ${SSL_EAY_RELEASE}
+    )
 
 #add_executable( interact  interact.cpp  )
 #target_link_libraries( interact ${libraries} )
