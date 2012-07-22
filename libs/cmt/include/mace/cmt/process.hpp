@@ -50,7 +50,7 @@ namespace mace { namespace cmt {
         return exec( exe, std::vector<std::string>(), boost::filesystem::path("."), opt );
       }
 
-      static process exec( const boost::filesystem::path& exe, const boost::filesystem::path& work_dir, int opt = open_all ) {
+      static process exec( const boost::filesystem::path& exe, const boost::filesystem::path& work_dir, int opt  ) {
         return exec( exe, std::vector<std::string>(), work_dir, opt );
       }
 

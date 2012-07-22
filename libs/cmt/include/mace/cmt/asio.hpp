@@ -49,6 +49,7 @@ namespace asio {
     template<typename AsyncReadStream, typename MutableBufferSequence>
     size_t read( AsyncReadStream& s, const MutableBufferSequence& buf ) {
         BOOST_ASSERT( s.non_blocking() );
+        if( !s.non_blocking() ) { s.non_blocking(true); }
         boost::system::error_code ec;
         size_t r = boost::asio::read( s, buf, ec );
         if( ec ) {
@@ -69,6 +70,7 @@ namespace asio {
     template<typename AsyncReadStream, typename MutableBufferSequence>
     size_t read_some( AsyncReadStream& s, const MutableBufferSequence& buf ) {
         BOOST_ASSERT( s.non_blocking() );
+     //   if( !s.non_blocking() ) { s.non_blocking(true); }
         boost::system::error_code ec;
         size_t r = s.read_some( buf, ec );
         if( ec ) {
@@ -90,6 +92,7 @@ namespace asio {
     template<typename AsyncWriteStream, typename ConstBufferSequence>
     size_t write( AsyncWriteStream& s, const ConstBufferSequence& buf ) {
         BOOST_ASSERT( s.non_blocking() );
+    //    if( !s.non_blocking() ) { s.non_blocking(true); }
         boost::system::error_code ec;
         size_t r = boost::asio::write( s, buf, ec );
         if( ec ) {
@@ -109,8 +112,9 @@ namespace asio {
      *  @return the number of bytes written
      */
     template<typename AsyncWriteStream, typename ConstBufferSequence>
-    cmt::future<size_t> write_some( AsyncWriteStream& s, const ConstBufferSequence& buf ) {
+    size_t write_some( AsyncWriteStream& s, const ConstBufferSequence& buf ) {
         BOOST_ASSERT( s.non_blocking() );
+      //  if( !s.non_blocking() ) { s.non_blocking(true); }
         boost::system::error_code ec;
         size_t r = s.write_some( buf, ec );
         if( ec ) {

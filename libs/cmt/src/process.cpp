@@ -119,14 +119,17 @@ namespace mace { namespace cmt {
     if( opt & open_stdout ) {
        bp::handle outh = p.my->child->get_handle( bp::stdout_id );
        p.my->outp.reset( new bp::pipe( cmt::asio::default_io_service(), outh.release() ) );
+       p.my->outp->non_blocking(true);
     }
     if( opt & open_stderr ) {
        bp::handle errh = p.my->child->get_handle( bp::stderr_id );
        p.my->errp.reset( new bp::pipe( cmt::asio::default_io_service(), errh.release() ) );
+       p.my->errp->non_blocking(true);
     }
     if( opt & open_stdin ) {
        bp::handle inh  = p.my->child->get_handle( bp::stdin_id );
        p.my->inp.reset(  new bp::pipe( cmt::asio::default_io_service(), inh.release()  ) );
+       p.my->inp->non_blocking(true);
     }
     return p;
   }

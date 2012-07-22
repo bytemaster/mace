@@ -150,7 +150,6 @@ namespace mace { namespace cmt {
 
   void mutex::unlock() {
     cmt::context* next = 0;
-    BOOST_ASSERT( cmt::thread::current().current_context()->next == 0 );
     { boost::unique_lock<cmt::spin_yield_lock> lock(m_blist_lock);
       get_tail(m_blist, next);
       if( next ) {
