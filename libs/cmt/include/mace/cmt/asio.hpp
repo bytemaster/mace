@@ -39,7 +39,9 @@ namespace asio {
           bool operator()( C& c, bool s ) { c.non_blocking(s); return true; } 
         };
         #if WIN32  // windows stream handles do not support non blocking!
+	template<>
         struct non_blocking<boost::asio::windows::stream_handle> { 
+	  typedef boost::asio::windows::stream_handle C;
           bool operator()( C& ) { return false; } 
           bool operator()( C&, bool ) { return false; } 
         };
@@ -192,7 +194,7 @@ namespace asio {
         io_device( AsyncStream& p ):m_stream(p){}
     
         std::streamsize write( const char* s, std::streamsize n ) {
-          return mace::cmt::asio::write( m_stream, boost::asio::const_buffers_1(s,n) );
+          return mace::cmt::asio::write( m_stream, boost::asio::const_buffers_1(s,static_cast<size_t>(n)) );
         }
         std::streamsize read( char* s, std::streamsize n ) {
           try {

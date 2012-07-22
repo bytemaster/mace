@@ -4,6 +4,7 @@ SET( libraries
     #/usr/local/lib/tcmalloc/libtcmalloc.a
     mace_cmt
     boost_context 
+    ${Rpcrt4}
     ${pthread_library}
     ${rt_library}
     ${Boost_THREAD_LIBRARY} 

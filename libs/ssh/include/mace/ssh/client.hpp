@@ -6,7 +6,7 @@
 
 namespace mace { namespace ssh {
   namespace detail {
-    class client_d;
+    struct client_d;
   };
 
   enum sftp_file_type {
@@ -116,7 +116,7 @@ namespace mace { namespace ssh {
     private:
       client();
       friend class process;
-      friend class detail::process_d;
+      friend struct detail::process_d;
       detail::client_d* my;
   };
 

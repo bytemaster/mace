@@ -6,9 +6,9 @@
 namespace mace { namespace ssh {
 
     namespace detail {
-    namespace io = boost::iostreams;
+      namespace io = boost::iostreams;
 
-    class process_d;
+      struct process_d;
       class process_sink : public io::sink {
         public:
           struct category : io::sink::category, io::flushable_tag {};

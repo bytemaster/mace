@@ -1,3 +1,4 @@
+#include <boost/asio.hpp>
 #include <boost/test/unit_test.hpp>
 #include <mace/rpc/value.hpp>
 #include <mace/rpc/value_io.hpp>
@@ -67,11 +68,12 @@ int test( ) {
 try {
    mace::cmt::thread::current().set_name("ssh_test_main");
    auto sshc = mace::ssh::client::create();
-   sshc->connect( "dlarimer", "rapture", "localhost");
+   sshc->connect( "dlarimer", "rapture", "galt");
 
    fs::path run("runner");
    //auto proc = sshc->exec((fs::absolute(run).native()) + " 2> out.txt   | /usr/bin/tee sout.txt ");//, "vt100");
-   auto proc = sshc->exec((fs::absolute(run).native()));//, "vt100");
+   //auto proc = sshc->exec((fs::absolute(run).string()));//, "vt100");
+   auto proc = sshc->exec("/Users/dlarimer/runner");
 
    mace::cmt::async( std::bind(read_err, proc ), "read_err" );
 
@@ -129,7 +131,7 @@ int main( int argc, char** argv ) {
   mace::cmt::thread* t2 = mace::cmt::thread::create("th2");
   mace::cmt::thread* t3 = mace::cmt::thread::create("th3");
   auto start = boost::chrono::system_clock::now();
-  auto f1 = t1->async( test, "t1" );
+  auto f1 = t1->async( &test, "t1" );
   /*
   auto f11 = t1->async( test, "t11" );
   auto f2 = t2->async( test, "t2" );

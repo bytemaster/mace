@@ -13,24 +13,29 @@ bool progress( const std::string& file, size_t sent, size_t total ) {
  *  result without 'blocking'.
  */
 int main( int argc, char** argv ) {
+  if( argc < 4 ){
+  	wlog( "Usage: %1% user pass host", argv[0] );
+	return -1;
+  }
   mace::cmt::thread::current().set_name("main");  
   try {
       mace::cmt::thread::current().debug("main");
 
       auto sshc = mace::ssh::client::create();
-      sshc->connect( argv[1], argv[2], "localhost");
+      sshc->connect( argv[1], argv[2], argv[3]);
 
-      auto ls   = sshc->exec( "/Users/dlarimer/projects/mace/libs/ssh/examples/test", "vt100");
-      ls->in_stream()<<"ls\n";
+      auto ls   = sshc->exec( "cat" );
+      ls->in_stream()<<"hello world\n";
       ls->in_stream().flush();
-   //   ls->in_stream().close();
+      ls->in_stream().close();
 
       //std::string str((std::istreambuf_iterator<char>(ls->out_stream())),
       //              std::istreambuf_iterator<char>());
       std::string t;
-      while( ls->out_stream() ) {
       ls->out_stream() >> t;
-      std::cout<<"stdout: "<<t<<std::endl;
+      while( ls->out_stream() ) {
+      	std::cout<<"stdout: "<<t<<std::endl;
+      	ls->out_stream() >> t;
       }
       std::cout<<"\nresult: "<<ls->result()<<std::endl;
       return 0;

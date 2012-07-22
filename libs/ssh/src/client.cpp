@@ -255,7 +255,7 @@ namespace mace { namespace ssh {
     return LIBSSH2_SFTP_S_ISREG(permissions);
   }
   bool file_attrib::exists() {
-    return permissions;
+    return 0 != permissions;
   }
 
   client::ptr client::create() {
@@ -331,10 +331,10 @@ namespace mace { namespace ssh {
       return; // nothing to do
     }
 
-    int rc = libssh2_sftp_unlink(my->m_sftp, remote_path.native().c_str() );
+    int rc = libssh2_sftp_unlink(my->m_sftp, remote_path.string().c_str() );
     while( rc == LIBSSH2_ERROR_EAGAIN ) {
       my->wait_on_socket();
-      rc = libssh2_sftp_unlink(my->m_sftp, remote_path.native().c_str() );
+      rc = libssh2_sftp_unlink(my->m_sftp, remote_path.string().c_str() );
     }
     if( 0 != rc ) {
        rc = libssh2_sftp_last_error(my->m_sftp);
@@ -374,7 +374,7 @@ namespace mace { namespace ssh {
 
     using namespace boost::interprocess;
     // memory map the file
-    file_mapping fmap( local_path.native().c_str(), read_only );
+    file_mapping fmap( local_path.string().c_str(), read_only );
     size_t       fsize = file_size(local_path);
 
     mapped_region mr( fmap, boost::interprocess::read_only, 0, fsize );
@@ -383,13 +383,13 @@ namespace mace { namespace ssh {
     time_t now;
     memset( &now, 0, sizeof(now) );
     // TODO: preserve creation / modification date
-    chan = libssh2_scp_send64( my->m_session, remote_path.native().c_str(), 0700, fsize, now, now );
+    chan = libssh2_scp_send64( my->m_session, remote_path.string().c_str(), 0700, fsize, now, now );
     while( chan == 0 ) {
       char* msg;
       int ec = libssh2_session_last_error( my->m_session, &msg, 0, 0 );
       if( ec == LIBSSH2_ERROR_EAGAIN ) {
         my->wait_on_socket();
-        chan = libssh2_scp_send64( my->m_session, local_path.native().c_str(), 0700, fsize, now, now );
+        chan = libssh2_scp_send64( my->m_session, local_path.string().c_str(), 0700, fsize, now, now );
       } else {
           MACE_SSH_THROW( "scp %3% to %4% failed %1% - %2%", %ec %msg %local_path %remote_path );
       }
@@ -435,10 +435,10 @@ namespace mace { namespace ssh {
   file_attrib client::stat( const boost::filesystem::path& remote_path ) {
      my->init_sftp();
      LIBSSH2_SFTP_ATTRIBUTES att;
-     int ec = libssh2_sftp_stat( my->m_sftp, remote_path.native().c_str(), &att );
+     int ec = libssh2_sftp_stat( my->m_sftp, remote_path.string().c_str(), &att );
      while( ec == LIBSSH2_ERROR_EAGAIN ) {
         my->wait_on_socket();
-        ec = libssh2_sftp_stat( my->m_sftp, remote_path.native().c_str(), &att );
+        ec = libssh2_sftp_stat( my->m_sftp, remote_path.string().c_str(), &att );
      }
      if( ec ) {
         return file_attrib();
@@ -456,10 +456,10 @@ namespace mace { namespace ssh {
       MACE_SSH_THROW( "Non directory exists at path %1%", %rdir );
     }
 
-    int rc = libssh2_sftp_mkdir(my->m_sftp, rdir.native().c_str(), mode );
+    int rc = libssh2_sftp_mkdir(my->m_sftp, rdir.string().c_str(), mode );
     while( rc == LIBSSH2_ERROR_EAGAIN ) {
       my->wait_on_socket();
-      rc = libssh2_sftp_mkdir(my->m_sftp, rdir.native().c_str(), mode );
+      rc = libssh2_sftp_mkdir(my->m_sftp, rdir.string().c_str(), mode );
     }
     if( 0 != rc ) {
        rc = libssh2_sftp_last_error(my->m_sftp);

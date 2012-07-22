@@ -71,6 +71,7 @@ namespace mace {
       sigar();
       ~sigar();
       double percent_cpu_usage();
+      double load_average();
     private:
       struct sigar_d* my;
   };

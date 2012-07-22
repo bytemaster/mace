@@ -13,11 +13,16 @@ SET( CMAKE_DEBUG_POSTFIX _debug )
 SET( BUILD_SHARED_LIBS NO )
 
 SET(Boost_USE_STATIC_LIBS ON)
+FIND_PACKAGE(OpenSSL)
 FIND_PACKAGE(Boost COMPONENTS test thread date_time system filesystem program_options signals serialization chrono unit_test_framework ) 
 
+MESSAGE( STATUS "Boost Include Dir: ${Boost_INCLUDE_DIR}" )
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
+
+SET( OPEN_SSL_LIBS ${SSL_EAY_RELEASE} ${LIB_EAY_RELEASE} )
 
 INCLUDE( SetupTargetMacros )
 
@@ -26,8 +31,9 @@ option( ENABLE_TESTS "Build Tests" ON )
 option( ENABLE_ARM "Build for ARM CPU" OFF )
 
 include_directories(/usr/local/include)
+include_directories(${OPENSSL_INCLUDE_DIR})
+include_directories(vendor/libssh2-1.4.2/include)
 
-add_definitions( -DBOOST_NO_SCOPED_ENUMS )
 
 #ADD_DEFINITIONS( -DBOOST_CONTEXT_UCTX )
 #ADD_DEFINITIONS( -D_XOPEN_SOURCE )
@@ -37,7 +43,9 @@ IF( WIN32 )
 	ADD_DEFINITIONS( -D_SCL_SECURE_NO_WARNINGS )
 	ADD_DEFINITIONS( -D_WIN32_WINNT=0x0501 )
 	ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS )
+	SET( Rpcrt4 Rpcrt4 )
 ELSE(WIN32)
+   add_definitions( -DBOOST_NO_SCOPED_ENUMS )
    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall")
 #    INCLUDE(CheckCCompilerFlag)
 #    CHECK_C_COMPILER_FLAG(-std=c++0x HAVE_CPPOX)

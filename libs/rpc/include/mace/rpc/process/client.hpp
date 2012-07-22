@@ -24,6 +24,7 @@ namespace mace { namespace rpc {  namespace process {
   class client : public mace::stub::ptr<InterfaceType, mace::rpc::client_interface< ConnectionType > > {
     public:
       typedef mace::rpc::client_interface< ConnectionType > delegate_type;
+      typedef ConnectionType				    connection_type;
 
       client( const typename ConnectionType::ptr& c )
       :m_opt(0),m_con(c){

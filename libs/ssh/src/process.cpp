@@ -107,6 +107,7 @@ namespace mace { namespace ssh {
         }
       }
       bool flush() {
+      	if( !chan ) return true;
         int ec = libssh2_channel_flush_ex( chan, LIBSSH2_CHANNEL_FLUSH_EXTENDED_DATA);
         while( ec == LIBSSH2_ERROR_EAGAIN ) {
           sshc->my->wait_on_socket();
@@ -114,9 +115,7 @@ namespace mace { namespace ssh {
         }
         if( ec < 0 ) {
           char* msg = 0;
-          libssh2_session_last_error( sshc->my->m_session, &msg, 0, 0 );
-          elog( "flush failed: %1% - %2%", ec, msg  );
-          MACE_SSH_THROW( "flush failed: %1% - %2%", %ec %msg  );
+          MACE_SSH_THROW( "flush failed: channel error %1%", %ec  );
         }
         return true;
       }

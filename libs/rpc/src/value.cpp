@@ -63,9 +63,6 @@ value::value( const value& m ){
 value::value( char* c ) {
    new (holder) detail::value_holder_impl<std::string>( c );
 }
-value::value( value& m ){
-  gh(m.holder)->copy_helper(holder);
-}
 value::~value() {
   gh(holder)->~value_holder();
 }

@@ -2,6 +2,7 @@ SET( libraries
     mace_cmt
     mace_rpc
     boost_context 
+    ${Rpcrt4}
     ${pthread_library}
     ${rt_library}
     ${Boost_THREAD_LIBRARY} 

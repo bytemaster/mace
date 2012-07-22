@@ -28,7 +28,7 @@ void listen_test( uint16_t p ) {
 
 BOOST_AUTO_TEST_CASE( async_tcp_acceptor ) {
   mace::cmt::async( []() {listen_test( 9808 );} );
-  auto con = mace::cmt::async( []() {
+  auto con = mace::cmt::async( []() -> std::shared_ptr<socket_t> {
      slog( "attempting to connect" );
      auto iosp = std::shared_ptr<socket_t>( new socket_t( mace::cmt::asio::default_io_service()  ) );
      mace::cmt::asio::tcp::connect( *iosp, tcp::endpoint( tcp::v4(), 9808 ) );

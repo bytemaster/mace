@@ -4,6 +4,19 @@
 #include <mace/rpc/json/io.hpp>
 #include <mace/cmt/mutex.hpp>
 
+
+/** disable warning C4355 because we can safely pass 'this' 
+  * to the base class because the base class constructor only
+  * stores it is not used by the base class until after the 
+  * constructor has completed.
+  *
+  * This is passed to the base class so that the base class
+  * does not need to use dynamic cast (or unsafe static cast) to
+  * get the derived class pointer in the 'static polymorphic methods'
+  */
+#pragma warning( push )
+#pragma warning(disable : 4355 )
+
 namespace mace { namespace rpc { namespace json {
 
   /**
@@ -178,6 +191,10 @@ namespace mace { namespace rpc { namespace json {
   };
 
 } } } 
+
+// re-enable warning C4355 (passing this to base class)
+#pragma warning( push )
+
 #include <mace/rpc/connection_base.ipp>
 
 #endif // _MACE_RPC_JSON_STREAM_CONNECTION_HPP_

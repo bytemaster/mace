@@ -1,3 +1,4 @@
+include_directories(include)
 SET( sources 
     src/agent.c
     src/channel.c
