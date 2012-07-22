@@ -2,8 +2,73 @@
 #include <mace/sigar.hpp>
 #include <boost/asio.hpp>
 #include <boost/chrono.hpp>
+#include <mace/cmt/thread.hpp>
 
 namespace mace {
+  struct sigar_d {
+    sigar_t *sigar;
+    sigar_cpu_list_t cpulist;
+    int total_sys;
+    int total_user;
+    int total_total;
+    double last = -1;
+  };
+  sigar::sigar() {
+    my = new sigar_d();
+    sigar_open(&my->sigar);
+    sigar_cpu_list_get(my->sigar, &my->cpulist);
+
+    my->total_sys = 0;
+    my->total_user = 0;
+    my->total_total = 0;
+    for (uint32_t i=0; i<my->cpulist.number; i++) {
+      my->total_sys += my->cpulist.data[i].sys;
+      my->total_user += my->cpulist.data[i].user;
+      my->total_total += my->cpulist.data[i].total;
+    }
+    my->last = -1;
+  }
+
+  double sigar::percent_cpu_usage() {
+    sigar_cpu_list_t cpulist;
+    sigar_cpu_list_get(my->sigar, &my->cpulist);
+
+    int64_t total_sys = 0;
+    int64_t total_user = 0;
+    int64_t total_total = 0;
+
+    for (uint32_t i=0; i<cpulist.number; i++) {
+      total_sys += my->cpulist.data[i].sys;
+      total_user += my->cpulist.data[i].user;
+      total_total += my->cpulist.data[i].total;
+    }
+
+    int64_t dtotal = total_total - my->total_total;
+    int64_t duser = total_user - my->total_user;
+    int64_t dsys = total_sys - my->total_sys;
+
+    if( dtotal == 0 ) 
+      return my->last;
+
+    my->last  = double(duser+dsys) / dtotal;
+
+    my->total_total = total_total;
+    my->total_user  = total_user;
+    my->total_sys   = total_sys;
+
+    sigar_cpu_list_destroy(my->sigar, &my->cpulist);
+    memcpy( &my->cpulist, &cpulist, sizeof(cpulist) ); 
+
+    return dsys;
+  }
+
+  sigar::~sigar() {
+    sigar_cpu_list_destroy(my->sigar, &my->cpulist);
+    sigar_close(my->sigar);
+    delete my;
+  }
+
+
   sys_stat system_status( const std::string& dir ) {
     sigar_t *sigar;
     sigar_open(&sigar);

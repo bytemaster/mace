@@ -54,7 +54,26 @@ namespace mace {
 
   disk_stat disk_status(const std::string& dir = "/");
   cpu_stat  cpu_status();
+  mem_stat  mem_status();
   sys_stat  system_status(const std::string& dir = "/");
+
+  /**
+   *  @brief used to calculate cpu usage over time.
+   *
+   *  There is no such thing as an instantanious CPU
+   *  usage percent.  Each time you call percent_cpu_usage()
+   *  it will return average since the last time it was 
+   *  called. The first time it is called takes longer
+   *  to run.
+   */
+  class sigar {
+    public:
+      sigar();
+      ~sigar();
+      double percent_cpu_usage();
+    private:
+      struct sigar_d* my;
+  };
 }
 
 #include <mace/reflect/reflect.hpp>
