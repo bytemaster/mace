@@ -151,7 +151,7 @@ namespace mace { namespace rpc { namespace json {
   template<typename T>
   std::string to_string( const T& v ) {
     auto i = io::pack(v);
-    return std::string(&i.front(),i.size());
+    return std::string(i.begin(),i.end()); //&i.front(),i.size());
   }
   template<typename T>
   T from_string( const std::string& s ) {

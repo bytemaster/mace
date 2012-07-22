@@ -139,8 +139,9 @@ namespace mace { namespace rpc { namespace json {
   std::vector<char> io::pack( const T& v ) {
       default_filter f;
       std::stringstream ss;
-      ss << std::ios::fixed;
+      //ss << std::ios::fixed();
       ss.precision(12);
+      ss.setf( std::ios::fixed );
       ss.unsetf( std::ios::floatfield );
       detail::to_json( v, ss, f );
       std::string s = ss.str();
