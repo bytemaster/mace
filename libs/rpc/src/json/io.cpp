@@ -642,7 +642,6 @@ mace::rpc::value to_value( char* start, char* end, error_collector& ec ) {
 }
 
 std::string pretty_print( std::vector<char>&& v, uint8_t indent ) {
-  slog( "%1%", std::string(&v.front(),v.size() ) );
   int level = 0;
   std::stringstream ss;
   bool first = false;

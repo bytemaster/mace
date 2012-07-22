@@ -16,10 +16,17 @@
 
 #ifndef SIGAR_OS_H
 #define SIGAR_OS_H
+#ifdef __APPLE__
+#define DARWIN
+#endif
 
 #ifdef DARWIN
 /// Added to allow this code to compile with gcc4.7 vs Apple's built in compiler.
 #define __private_extern__ extern
+
+
+
+
 #include <mach/port.h>
 #include <mach/host_info.h>
 #ifdef DARWIN_HAS_LIBPROC_H

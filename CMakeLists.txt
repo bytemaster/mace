@@ -58,4 +58,5 @@ endif()
 
 
 add_subdirectory(libs)
+add_subdirectory(vendor)
 #add_subdirectory(examples)

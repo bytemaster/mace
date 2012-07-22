@@ -11,6 +11,8 @@ namespace mace { namespace rpc {
   {
     public:
       typedef mace::rpc::client_interface< ConnectionType > delegate_type;
+      typedef ConnectionType                                connection_type;
+      typedef std::shared_ptr<stream_client>                ptr;
 
       stream_client(){}
 
@@ -29,7 +31,7 @@ namespace mace { namespace rpc {
 
       void set_connection( const typename ConnectionType::ptr& c ) {
         m_con = c;
-         delegate_type::set_vtable( *this, m_con );
+        delegate_type::set_vtable( *this, m_con );
       }
 
       /**
@@ -40,6 +42,8 @@ namespace mace { namespace rpc {
       void close() {
         if( m_con  ) m_con->close();
       }
+
+      bool connected() { return !!m_con; }
 
     private:
       typename ConnectionType::ptr   m_con;
