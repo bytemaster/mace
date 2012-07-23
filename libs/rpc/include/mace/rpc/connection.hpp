@@ -8,6 +8,7 @@
 #include <mace/stub/ptr.hpp>
 
 namespace mace { namespace rpc { 
+#ifdef _MSC_VER
 /** disable warning C4355 because we can safely pass 'this' 
   * to the base class because the base class constructor only
   * stores it is not used by the base class until after the 
@@ -19,6 +20,7 @@ namespace mace { namespace rpc {
   */
 #pragma warning( push )
 #pragma warning(disable : 4355 )
+#endif
 
 
   /**
@@ -166,7 +168,9 @@ namespace mace { namespace rpc {
 
 } } // mace::rpc
 
+#ifdef _MSC_VER
 // re-enable warning C4355 (passing this to base class)
 #pragma warning( pop )
+#endif
 
 #endif //  _MACE_RPC_CONNECTION_HPP_

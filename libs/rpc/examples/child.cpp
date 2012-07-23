@@ -14,7 +14,7 @@ MACE_STUB( test_fixture, (hello)(vec) )
 int main( int argc, char** argv ) {
   try {
       std::cerr<<"Child Cerr\n";
-      auto tf( std::make_shared<test_fixture>() );
+      auto tf =  std::make_shared<test_fixture>();
       mace::rpc::json::process::server<test_fixture> s( tf, std::cin, std::cout, "cin" );
       mace::cmt::wait( s.closed );
       std::cerr<<"Done\n";

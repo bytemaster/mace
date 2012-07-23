@@ -5,6 +5,7 @@
 #include <mace/cmt/mutex.hpp>
 
 
+#ifdef _MSC_VER
 /** disable warning C4355 because we can safely pass 'this' 
   * to the base class because the base class constructor only
   * stores it is not used by the base class until after the 
@@ -16,6 +17,7 @@
   */
 #pragma warning( push )
 #pragma warning(disable : 4355 )
+#endif
 
 namespace mace { namespace rpc { namespace json {
 
@@ -192,8 +194,10 @@ namespace mace { namespace rpc { namespace json {
 
 } } } 
 
+#ifdef _MSC_VER
 // re-enable warning C4355 (passing this to base class)
 #pragma warning( push )
+#endif
 
 #include <mace/rpc/connection_base.ipp>
 

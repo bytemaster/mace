@@ -10,7 +10,7 @@ namespace mace { namespace rpc {  namespace json { namespace process {
 
 #ifndef BOOST_NO_TEMPLATE_ALIASES
   template<typename Interface>
-  using client = mace::rpc::proces::client<Interface,connection>;
+  using client = mace::rpc::process::client<Interface,connection>;
 #else // BOOST_NO_TEMPLATE_ALIASES 
 
   /**

@@ -6,6 +6,7 @@ SET( libraries
     ${pthread_library}
     ${rt_library}
     ${Boost_THREAD_LIBRARY} 
+    ${Boost_FILESYSTEM_LIBRARY} 
     ${Boost_ASIO_LIBRARY} 
     ${Boost_SYSTEM_LIBRARY} 
     ${Boost_SIGNALS_LIBRARY})

@@ -2,6 +2,8 @@ SET( libraries
     mace_rpc
     boost_context 
     mace_ssh
+    ${OPENSSL_CRYPTO_LIBRARY}
+    ${ZLIB_LIBRARY}
     ${pthread_library}
     ${Boost_THREAD_LIBRARY} 
     ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} 

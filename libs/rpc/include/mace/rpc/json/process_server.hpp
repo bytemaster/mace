@@ -8,7 +8,7 @@ namespace mace { namespace rpc {  namespace json { namespace process {
   typedef mace::rpc::json::stream_connection<std::istream,std::ostream> server_connection;
 #ifndef BOOST_NO_TEMPLATE_ALIASES
   template<typename Interface>
-  using server = mace::rpc::server<Interface,server_connection>;
+  using server = mace::rpc::process::server<Interface,server_connection>;
 #else // BOOST_NO_TEMPLATE_ALIASES 
 
   template<typename Interface>

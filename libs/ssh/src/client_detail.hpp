@@ -154,10 +154,13 @@ namespace mace { namespace ssh {
                       n--;
                     buf[n] = 0;
 
-                    responses[i].text = _strdup(buf);
+                    #ifdef WIN32 // fix warning
+                      #define strdup _strdup
+                    #endif
+                    responses[i].text = strdup(buf);
                     responses[i].length = n;
                 } else {
-                    responses[i].text = _strdup(self->upass.c_str());
+                    responses[i].text = strdup(self->upass.c_str());
                     responses[i].length = self->upass.size();
                 }
 
