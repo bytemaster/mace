@@ -1,8 +1,8 @@
 SET( libraries 
     ${LIB_EAY_RELEASE} 
     ${SSL_EAY_RELEASE}
-    ${CRYPTO_LIBRARY}
-    ${ZLIB}
+    ${OPENSSL_CRYPTO_LIBRARY}
+    ${ZLIB_LIBRARY}
     mace_cmt
     mace_ssh
     boost_context 
