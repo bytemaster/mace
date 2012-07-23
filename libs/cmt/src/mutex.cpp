@@ -82,7 +82,7 @@ namespace mace { namespace cmt {
     return ( get_tail( m_blist, n ) == cc );
   }
 
-  bool mutex::timed_lock( const boost::system_time& abs_time ) {
+  bool mutex::try_lock_until( const boost::chrono::system_clock::time_point& abs_time ) {
     cmt::context* n  = 0;
     cmt::context* cc = cmt::thread::current().current_context();
 
@@ -103,7 +103,7 @@ namespace mace { namespace cmt {
       m_blist = cc;
     } // end lock scope
     try {
-        cmt::thread::current().yield_until( to_time_point(abs_time), false );
+        cmt::thread::current().yield_until( abs_time, false );
         return( 0 == cc->next_blocked );
     } catch (...) {
       cleanup( *this, m_blist_lock, m_blist, cc);

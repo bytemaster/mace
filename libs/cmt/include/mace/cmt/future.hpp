@@ -3,11 +3,9 @@
 #include <mace/cmt/retainable.hpp>
 #include <mace/cmt/error.hpp>
 #include <mace/cmt/log/log.hpp>
-#include <boost/thread/mutex.hpp>
 #include <mace/cmt/spin_yield_lock.hpp>
 #include <boost/optional.hpp>
 #include <boost/chrono.hpp>
-#include <boost/thread/condition_variable.hpp>
 
 namespace mace { namespace cmt {
   class thread;

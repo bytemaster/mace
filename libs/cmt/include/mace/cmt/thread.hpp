@@ -7,6 +7,8 @@
 #include <boost/chrono.hpp>
 #include <mace/cmt/abstract_thread.hpp>
 
+namespace boost { class thread; }
+
 namespace mace { 
 /**
  *  @brief All types that are part of the MACE Cooperative Multi-Tasking Library

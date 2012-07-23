@@ -1,5 +1,6 @@
 #ifndef MACE_CMT_MUTEX_HPP_
 #define MACE_CMT_MUTEX_HPP_
+#include <boost/chrono.hpp>
 #include <mace/cmt/spin_yield_lock.hpp>
 
 namespace mace { namespace cmt {
@@ -93,13 +94,13 @@ namespace mace { namespace cmt {
       ~mutex();
 
       bool try_lock();
-      bool timed_lock( const boost::system_time& abs_time);
+      bool try_lock_until( const boost::chrono::system_clock::time_point& abs_time);
       void lock();
       void unlock();
 
       template<typename DurationType>
-      bool timed_lock( const DurationType& rel_time ) {
-        return timed_lock( boost::get_system_time() + rel_time );
+      bool try_lock_for( const DurationType& rel_time ) {
+        return try_lock_until( boost::chrono::system_clock::now() + rel_time );
       }
 
     private:

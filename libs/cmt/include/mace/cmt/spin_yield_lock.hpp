@@ -2,7 +2,7 @@
 #define _MACE_CMT_SPIN_YIELD_LOCK_HPP_
 #include <boost/atomic.hpp>
 #include <boost/memory_order.hpp>
-#include <boost/thread/thread_time.hpp>
+#include <boost/chrono.hpp>
 
 namespace mace { namespace cmt {
   /// cmt::thread::current().yield()
@@ -30,12 +30,12 @@ namespace mace { namespace cmt {
       }
 
       template<typename DurationType>
-      bool timed_lock( const DurationType& rel_time ) {
-        return timed_lock( boost::get_system_time() + rel_time );
+      bool try_lock_for( const DurationType& rel_time ) {
+        return try_lock_until( boost::chrono::system_clock::now() + rel_time );
       }
 
-      bool timed_lock( const boost::system_time& abs_time) {
-        while( abs_time > boost::get_system_time() ) {
+      bool try_lock_until( const boost::chrono::system_clock::time_point& abs_time) {
+        while( abs_time > boost::chrono::system_clock::now() ) {
            if( try_lock() ) 
               return true;
            yield(); 

@@ -23,21 +23,23 @@ namespace mace { namespace cmt {
         return epoch + boost::posix_time::seconds(long(d/1000000))  
                      + boost::posix_time::microseconds(long(d%1000000));
     }
-    */
     template < typename Duration>
     boost::posix_time::ptime to_system_time(const boost::chrono::time_point<boost::chrono::system_clock, Duration>& from) {
+    	static  auto delta = to_time_point( boost::get_system_time() ) - system_clock::now();
         typedef boost::chrono::time_point<boost::chrono::system_clock, Duration> time_point_t;
         typedef boost::chrono::nanoseconds duration_t;
         typedef duration_t::rep rep_t;
-        rep_t d = boost::chrono::duration_cast<duration_t>(from.time_since_epoch()).count();
+        rep_t d = boost::chrono::duration_cast<duration_t>((from-delta).time_since_epoch()).count();
         rep_t sec = d/1000000000;
         rep_t nsec = d%1000000000;
-        return  boost::posix_time::from_time_t(0)+ boost::posix_time::seconds(static_cast<long>(sec))+
+        boost::posix_time::ptime r =  boost::posix_time::from_time_t(0)+ boost::posix_time::seconds(static_cast<long>(sec))+
                 #ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
                 boost::posix_time::nanoseconds(nsec);
                 #else
                 boost::posix_time::microseconds((nsec+500)/1000);
                 #endif
+	slog( "error %1%", to_time_point( r) - from );
+	return r;
     }
 
     system_clock::time_point to_time_point( const boost::posix_time::ptime& from ) {
@@ -48,6 +50,7 @@ namespace mace { namespace cmt {
       t += boost::chrono::duration_cast<system_clock::time_point::duration>(chrono::nanoseconds(nsec));
       return t;
     }
+    */
 
     struct sleep_priority_less {
         bool operator()( const cmt::context::ptr& a, const cmt::context::ptr& b ) {
@@ -358,7 +361,7 @@ namespace mace { namespace cmt {
                   if( timeout_time == system_clock::time_point::max() ) {
                     task_ready.wait( lock );
                   } else if( timeout_time != system_clock::time_point::min() ) {
-                    task_ready.timed_wait( lock, to_system_time(timeout_time) );
+                    task_ready.wait_until( lock, timeout_time );
                   }
                 }
               }
