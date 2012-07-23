@@ -2,6 +2,7 @@ include_directories( ../reflect/include )
 include_directories( ../rpc/include )
 include_directories( ../void/include )
 include_directories( ../cmt/include )
+include_directories( ../atomic/include )
 include_directories( include )
 include_directories( ${CMAKE_SOURCE_DIR}/vendor/sigar/include )
 
