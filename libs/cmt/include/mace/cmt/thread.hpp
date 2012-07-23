@@ -21,7 +21,6 @@ namespace cmt {
    inline void usleep( uint64_t us );
    inline void sleep_until( const system_clock::time_point& tp );
 
-   boost::posix_time::ptime to_system_time( const system_clock::time_point& t );
    system_clock::time_point to_time_point( const boost::posix_time::ptime& from );
 
   /**

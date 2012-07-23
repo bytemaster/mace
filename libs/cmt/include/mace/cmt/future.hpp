@@ -13,7 +13,6 @@ namespace mace { namespace cmt {
   class thread;
   using boost::chrono::microseconds;
   using boost::chrono::system_clock;
-  boost::system_time to_system_time( const boost::chrono::system_clock::time_point& t );
 
   class abstract_thread;
   class task;

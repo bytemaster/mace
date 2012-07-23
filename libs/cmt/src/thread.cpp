@@ -14,6 +14,7 @@
 namespace mace { namespace cmt {
     using boost::chrono::system_clock;
 
+    /*
     boost::posix_time::ptime to_system_time( const system_clock::time_point& t ) {
         typedef boost::chrono::microseconds duration_t;
         typedef duration_t::rep rep_t;
@@ -21,6 +22,22 @@ namespace mace { namespace cmt {
         static boost::posix_time::ptime epoch(boost::gregorian::date(1970, boost::gregorian::Jan, 1));
         return epoch + boost::posix_time::seconds(long(d/1000000))  
                      + boost::posix_time::microseconds(long(d%1000000));
+    }
+    */
+    template < typename Duration>
+    boost::posix_time::ptime to_system_time(const boost::chrono::time_point<boost::chrono::system_clock, Duration>& from) {
+        typedef boost::chrono::time_point<boost::chrono::system_clock, Duration> time_point_t;
+        typedef boost::chrono::nanoseconds duration_t;
+        typedef duration_t::rep rep_t;
+        rep_t d = boost::chrono::duration_cast<duration_t>(from.time_since_epoch()).count();
+        rep_t sec = d/1000000000;
+        rep_t nsec = d%1000000000;
+        return  boost::posix_time::from_time_t(0)+ boost::posix_time::seconds(static_cast<long>(sec))+
+                #ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
+                boost::posix_time::nanoseconds(nsec);
+                #else
+                boost::posix_time::microseconds((nsec+500)/1000);
+                #endif
     }
 
     system_clock::time_point to_time_point( const boost::posix_time::ptime& from ) {
