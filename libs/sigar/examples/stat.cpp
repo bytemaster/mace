@@ -1,6 +1,7 @@
 #include <mace/rpc/json/io.hpp>
 #include <mace/sigar.hpp>
 #include <mace/cmt/thread.hpp>
+#include <Windows.h>
 
 int main( int argc, char** argv ) {
   if( argc > 1 )
@@ -12,6 +13,7 @@ int main( int argc, char** argv ) {
   mace::sigar s;
   while( true ) {
   std::cout<<"CPU %:" <<s.percent_cpu_usage()<<"  Load Avg: "<<s.load_average()<<std::endl;
+  //Sleep(1000);
   mace::cmt::usleep(1000000);
   }
 

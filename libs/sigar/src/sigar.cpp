@@ -6,12 +6,13 @@
 
 namespace mace {
   struct sigar_d {
+    sigar_d():last(-1){}
     sigar_t *sigar;
     sigar_cpu_list_t cpulist;
     int total_sys;
     int total_user;
     int total_total;
-    double last = -1;
+    double last;
   };
   sigar::sigar() {
     my = new sigar_d();
