@@ -132,14 +132,20 @@ namespace mace { namespace rpc { namespace json {
         * is no need to make it reentrant;
         */
        message_type read_message() {
+          this->in().unsetf(std::ios::skipws);
           std::istream_iterator<char> itr(this->in());
           std::istream_iterator<char> end;
-            
-          auto msg  = read_value(itr,end);
+          //std::string line; 
+          //std::getline( this->in(), line );
+          //slog( "read message '%1%'", line );
+          //std::vector<char> msg(line.begin(),line.end());//read_value(itr,end);
+          auto msg = read_value(itr,end);
           if( !msg.size() )  {
             BOOST_THROW_EXCEPTION( boost::system::system_error( boost::asio::error::eof ) );
           }
-          BOOST_ASSERT( msg.front() == '{' );
+          if( msg.front() != '{' ) {
+            MACE_RPC_THROW( "Expected '{' but got '%1%'.", %msg.front() );
+          }
           //BOOST_ASSERT( msg.back()  == '}' );
           
           error_collector ec; // TODO: Do something with parse errors

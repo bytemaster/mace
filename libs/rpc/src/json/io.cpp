@@ -570,7 +570,6 @@ mace::rpc::value to_value( std::vector<char>&& v, error_collector& ec  ) {
  *      any errors that occur while parsing the string.
  */
 mace::rpc::value to_value( char* start, char* end, error_collector& ec ) {
-  //slog( "to_value '%1%'", std::string(start,end) );
   if( start == end ) return value();
 
   char* ve = 0;

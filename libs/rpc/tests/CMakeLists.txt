@@ -11,6 +11,8 @@ SET( libraries
     ${Boost_SYSTEM_LIBRARY} 
     ${Boost_SIGNALS_LIBRARY})
 
+add_executable( json json.cpp )
+target_link_libraries( json ${libraries} )
 add_executable( value_test value_test.cpp )
 target_link_libraries( value_test ${libraries} )
 #add_executable( raw_test raw_test.cpp )
