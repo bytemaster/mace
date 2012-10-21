@@ -68,6 +68,9 @@ rpc::message connection::read_message() {
    std::istream_iterator<char> end;
      
    auto msg  = read_value(itr,end);
+   if( msg.size() < 5 ) {
+        wlog( "'%1%'", msg );
+   }
    if( !msg.size() )  {
      BOOST_THROW_EXCEPTION( boost::system::system_error( boost::asio::error::eof ) );
    }

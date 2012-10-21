@@ -195,6 +195,7 @@ namespace mace { namespace rpc { namespace json {
  */
 char* read_value( char* in, char* end, char*& oend ) {
    char* start = in;
+   char* oin = in;
    // ignore leading whitespace
    while( (in < end) && ((*in == ' ') || (*in == '\t') || (*in == '\n') || (*in == '\r')) ) {
      ++in;
@@ -285,7 +286,7 @@ char* read_value( char* in, char* end, char*& oend ) {
   }
   if( depth != 0 ) {
    // TODO: Throw Parse Error!
-   elog("Parse Error!!");
+   elog("Parse Error!!  '%1%' size: %2%", std::string( oin, end ), (oin-start));
   }
   oend = in; return start;
 }
@@ -570,11 +571,11 @@ mace::rpc::value to_value( std::vector<char>&& v, error_collector& ec  ) {
  *      any errors that occur while parsing the string.
  */
 mace::rpc::value to_value( char* start, char* end, error_collector& ec ) {
-  //slog( "to_value '%1%'", std::string(start,end) );
   if( start == end ) return value();
 
   char* ve = 0;
   char* s = read_value( start, end, ve );
+  //slog( "'%1%'", std::string(start,ve) );
   switch( s[0] ) {
     case '[': {
       array a;
@@ -636,7 +637,7 @@ mace::rpc::value to_value( char* start, char* end, error_collector& ec ) {
     }
 
     default:
-      wlog( "return unable to parse... return as string" );
+      wlog( "return unable to parse... return as string '%1%'", std::string(s,ve) );
       return value( std::string( s, ve) );
   }
 }
@@ -650,8 +651,10 @@ std::string pretty_print( std::vector<char>&& v, uint8_t indent ) {
   for( uint32_t i = 0; i < v.size(); ++i ) {
      switch( v[i] ) {
         case '\\':
-          if( quote ) 
-            escape = true;
+          if( !escape ) {
+            if( quote ) 
+              escape = true;
+          } else { escape = false; }
           ss<<v[i];
           break;
         case ':':

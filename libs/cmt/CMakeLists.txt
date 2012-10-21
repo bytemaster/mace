@@ -13,7 +13,7 @@ SET( sources
             src/mutex.cpp
             src/asio.cpp
             src/process.cpp
-#            src/stdin.cpp
+            src/stdin.cpp
             src/asio/acceptor.cpp
             src/asio/udp/socket.cpp
 #            src/asio/tcp/socket.cpp
@@ -32,5 +32,5 @@ SETUP_LIBRARY( mace_cmt SOURCES ${sources}
                              LIBRARY_TYPE STATIC )
 
 install( DIRECTORY include/mace/cmt DESTINATION include/mace )
-add_subdirectory( examples )
-add_subdirectory( tests )
+#add_subdirectory( examples )
+#add_subdirectory( tests )

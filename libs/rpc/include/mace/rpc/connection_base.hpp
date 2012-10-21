@@ -16,6 +16,8 @@ namespace mace { namespace rpc {
       exception_thrown     = 5,
       broken_promise       = 6
     };
+    connection_error( int64_t e ):value(connection_error_enum(e)){}
+
     connection_error( connection_error_enum e = none ):value(e){}
     operator connection_error_enum()const { return value; }
 
@@ -132,5 +134,14 @@ namespace mace { namespace rpc {
       pending_map                                         results;
   };
 } } // mace::rpc 
+
+MACE_REFLECT_ENUM( mace::rpc::connection_error,
+    (mace::rpc::connection_error::none)
+    (mace::rpc::connection_error::invalid_message_type)
+    (mace::rpc::connection_error::invalid_response)
+    (mace::rpc::connection_error::unknown_method)
+    (mace::rpc::connection_error::exception_thrown)
+    (mace::rpc::connection_error::broken_promise)
+)
 
 #endif //_MACE_RPC_CONNECTION_BASE_HPP_

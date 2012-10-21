@@ -24,7 +24,8 @@ namespace mace { namespace rpc {  namespace json { namespace process {
   template<typename InterfaceType>
   class client : public mace::rpc::process::client<InterfaceType,connection> {
     public:
-      typedef std::shared_ptr<client>                       ptr;
+      typedef std::shared_ptr<client>                        ptr;
+      typedef mace::rpc::json::process::connection           connection_type;
       typedef mace::rpc::client_interface< connection_type > delegate_type;
 
       client(){}

@@ -18,4 +18,4 @@ SETUP_LIBRARY( mace_ssh SOURCES ${sources}
                         LIBRARIES  ${libraries}
                         LIBRARY_TYPE STATIC )
  
-add_subdirectory(examples)
+#add_subdirectory(examples)

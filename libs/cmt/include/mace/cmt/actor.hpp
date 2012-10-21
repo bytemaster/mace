@@ -18,17 +18,17 @@ namespace mace { namespace cmt {
     public:
       typedef std::shared_ptr<actor>   ptr;
 
-      actor(mace::cmt::thread* t = mace::cmt::thread::current() )
+      actor(mace::cmt::thread* t = &mace::cmt::thread::current() )
       :actor_base(t){
       }
       template<typename T>
-      actor( T* v, mace::cmt::thread* t = mace::cmt::thread::current() )  
+      actor( T* v, mace::cmt::thread* t = &mace::cmt::thread::current() )  
       :actor_base(t) {
         this->m_ptr.reset( new boost::any(v) );
         cmt::actor_interface::set_vtable(*this->m_vtable,*v,this);
       }
       template<typename T>
-      actor( const std::shared_ptr<T>& v,mace::cmt::thread* t = mace::cmt::thread::current() ) 
+      actor( const std::shared_ptr<T>& v,mace::cmt::thread* t = &mace::cmt::thread::current() ) 
       :actor_base(t) {
         this->m_ptr.reset( new boost::any(v) );
         *(this->m_ptr) = v;
@@ -36,7 +36,7 @@ namespace mace { namespace cmt {
       }
       template<typename OtherInterface,typename OtherDelegate>
       actor( const mace::stub::ptr<OtherInterface,OtherDelegate>& v,
-             mace::cmt::thread* t = mace::cmt::thread::current() ) 
+             mace::cmt::thread* t = &mace::cmt::thread::current() ) 
       :actor_base(t) {
         this->m_ptr.reset( new boost::any(v) );
         *(this->m_ptr) = v;

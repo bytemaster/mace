@@ -191,8 +191,8 @@ template<typename R, typename Class BOOST_PP_COMMA_IF(n) PARAM_TYPE_NAMES>
 struct actor_member<R(Class::*)(PARAM_TYPES)const> : public detail::actor_member_base
 {
   // boost::result_of
-  typedef typename mace::adapt_void<R>::result_type                    result_type;
-  typedef mace::cmt::future<result_type>                             future_type;
+  typedef typename mace::adapt_void<R>::result_type              result_type;
+  typedef mace::cmt::future<result_type>                         future_type;
   typedef actor_member                                           self_type;
   typedef boost::fusion::vector<PARAM_TYPES>                     fused_params;
   typedef boost::fusion::vector<DEDUCED_PARAM_TYPES>             deduced_params;

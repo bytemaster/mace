@@ -4,13 +4,16 @@
 #include <mace/cmt/error.hpp>
 #include <mace/cmt/log/log.hpp>
 #include <mace/cmt/spin_yield_lock.hpp>
+#include <mace/void.hpp>
 #include <boost/optional.hpp>
 #include <boost/chrono.hpp>
+#include <boost/function.hpp>
 
 namespace mace { namespace cmt {
   class thread;
   using boost::chrono::microseconds;
   using boost::chrono::system_clock;
+
 
   class abstract_thread;
   class task;
@@ -26,6 +29,7 @@ namespace mace { namespace cmt {
       task*    get_task()const { return m_task; }
       void     cancel();
       virtual bool ready()const = 0;
+      virtual void reset() = 0;
     protected:
       void enqueue_thread();
       void wait( const microseconds& timeout_us );
@@ -44,8 +48,6 @@ namespace mace { namespace cmt {
       abstract_thread*  m_blocked_thread;
       microseconds      m_timeout;  
   };
-
-  struct void_t {};
 
   /**
    *  This promise blocks cooperatively until the value is
@@ -109,6 +111,7 @@ namespace mace { namespace cmt {
           boost::unique_lock<spin_yield_lock> lock( m_spin_yield );
           m_error = e;
         }
+        if( m_completion ) m_completion( m_value, m_error );
         notify();
       }
       virtual void set_value( T&& v ) {
@@ -118,6 +121,7 @@ namespace mace { namespace cmt {
             return;
           m_value = std::move(v);
         }
+        if( m_completion ) m_completion( m_value, m_error );
         notify();
       }
       virtual void set_value( const T& v ) {
@@ -127,7 +131,23 @@ namespace mace { namespace cmt {
             return;
           m_value = v;
         }
+        if( m_completion ) m_completion( m_value, m_error );
         notify();
+      }
+
+      virtual void reset() {
+          boost::unique_lock<spin_yield_lock> lock( m_spin_yield );
+          m_value = boost::optional<T>();
+          m_error = boost::exception_ptr();
+      }
+      template<typename Completion>
+      void on_complete( Completion&& c ) {
+          boost::unique_lock<spin_yield_lock> lock( m_spin_yield );
+          if( m_error || m_value ) {
+            c( m_value, m_error );
+          } else {
+            m_completion = std::forward<Completion>(c);
+          }
       }
       
     protected:
@@ -144,6 +164,7 @@ namespace mace { namespace cmt {
       mutable cmt::spin_yield_lock  m_spin_yield;
       mutable boost::exception_ptr  m_error;
       mutable boost::optional<T>    m_value;
+      boost::function<void( boost::optional<T>& value, boost::exception_ptr& e ) > m_completion;
   };
 
 
@@ -175,7 +196,7 @@ namespace mace { namespace cmt {
    * is short hand for mace::cmt::future<T>::wait().
    *  
    */
-  template<typename T = void_t>
+  template<typename T>
   class future {
     public:
 	    typedef typename promise<T>::ptr promise_ptr;
@@ -202,9 +223,14 @@ namespace mace { namespace cmt {
         if( !m_prom ) BOOST_THROW_EXCEPTION( error::null_future() );
         return m_prom->wait_until(timeout); 
       }
+      template<typename Completion>
+      void on_complete( Completion&& c ) { 
+        if( !m_prom ) BOOST_THROW_EXCEPTION( error::null_future() );
+        return m_prom->on_complete(c);
+      }
 
 
-    private:
+    protected:
       friend class mace::cmt::thread;
       mutable promise_ptr m_prom;
   };
@@ -212,9 +238,12 @@ namespace mace { namespace cmt {
   template<>
   class future<void> : public future<void_t> {
     public:
+      future( const future<void_t>& c )
+      :future<void_t>(c){}
       future( const  promise<void_t>::ptr& p =  promise<void_t>::ptr() )
       :future<void_t>(p){}
       future( const void_t& v ):future<void_t>(v){}
+      operator future<void_t>& () { return *this; }
   };
 
 

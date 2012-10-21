@@ -31,7 +31,11 @@
       auto itr = results.find( m.get_request_id() );
       if( itr != results.end() ) {
         if( !m.has_error() ) {
-          itr->second->handle_value( m.take_result() ); 
+          if( m.has_result() )  {
+            itr->second->handle_value( m.take_result() ); 
+          } else {
+            wlog( "message without result, error, or method" );
+          }
         } else {
           itr->second->handle_error( m.take_error() );
         }

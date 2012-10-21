@@ -1,4 +1,5 @@
 include_directories(include)
+include_directories( ${OPENSSL_INCLUDE_DIR} )
 SET( sources 
     src/agent.c
     src/channel.c

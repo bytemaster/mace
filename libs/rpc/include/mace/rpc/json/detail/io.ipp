@@ -42,6 +42,7 @@ namespace mace { namespace rpc { namespace json {
    */
   template<typename Iterator>
   std::vector<char> read_value( Iterator itr, const Iterator& end ) {
+     if( itr == end ) return std::vector<char>();
      std::vector<char> buf;
      if( !skip_whitespace(itr,end) ) return buf;
 
@@ -166,24 +167,42 @@ namespace mace { namespace rpc { namespace json {
  }
 
  template<typename T, typename Filter>
- T io::unpack( Filter& f, std::vector<char>& d ) {
-   T tmp;
+ void from_json( boost::fusion::vector1<T>& vec, Filter& f, std::vector<char>& d ) {
+    json::error_collector ec;
+     mace::rpc::value v = to_value( d.data(), d.data()+d.size(), ec );
+    if( !has_named_parameters<T>::value )  {
+      mace::rpc::unpack( f, v, vec );
+    } else {
+      T tmp;
+      // convert rpc value into T applying filter f
+      mace::rpc::unpack( f, v, tmp );
+      vec = boost::fusion::vector1<T>(tmp);
+    }
+ }
+ template<typename T, typename Filter>
+ void from_json( T& tmp, Filter& f, std::vector<char>& d ) {
+   //slog( "unpacking %1%  %2%", d.data(), mace::reflect::get_typename<T>() );
    json::error_collector ec;
    // convert json string into rpc::value
-   mace::rpc::value v = to_value( std::move(d), ec );
+   mace::rpc::value v = to_value( d.data(), d.data() + d.size(), ec );
    // convert rpc value into T applying filter f
    mace::rpc::unpack( f, v, tmp );
+ }
+
+
+ template<typename T, typename Filter>
+ T io::unpack( Filter& f, std::vector<char>& d ) {
+   //slog( "%1%", d.data() );
+   T tmp;
+   from_json(tmp, f, d );
    return tmp;
  }
 
  template<typename T, typename Filter>
  T io::unpack( Filter& f, std::vector<char>&& d ) {
+   //slog( "%1%", d.data() );
    T tmp;
-   json::error_collector ec;
-   // convert json string into rpc::value
-   mace::rpc::value v = to_value( std::move(d), ec );
-   // convert rpc value into T applying filter f
-   mace::rpc::unpack( f, v, tmp );
+   from_json(tmp, f, d );
    return tmp;
  }
 

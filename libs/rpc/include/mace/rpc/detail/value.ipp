@@ -38,7 +38,7 @@ namespace mace { namespace rpc {
       virtual void operator()( const uint64_t& v    ){ m_out = boost::numeric_cast<T>(v); }
       virtual void operator()( const float& v       ){ m_out = boost::numeric_cast<T>(v); }
       virtual void operator()( const double& v      ){ m_out = boost::numeric_cast<T>(v); }
-      virtual void operator()( const bool& v        ){ m_out = boost::numeric_cast<T>(v); }
+      virtual void operator()( const bool& v        ){ m_out = 0 !=v; }
       virtual void operator()( const std::string& v ){ m_out = boost::lexical_cast<T>(v); }
       virtual void operator()( const object&  )      { throw std::bad_cast();             }
       virtual void operator()( const array&  )       { throw std::bad_cast();             }
@@ -61,7 +61,7 @@ namespace mace { namespace rpc {
       virtual void operator()( const uint64_t& v    ){ m_out = boost::lexical_cast<std::string>(v); }
       virtual void operator()( const float& v       ){ m_out = boost::lexical_cast<std::string>(v); }
       virtual void operator()( const double& v      ){ m_out = boost::lexical_cast<std::string>(v); }
-      virtual void operator()( const bool& v        ){ m_out = boost::lexical_cast<std::string>(v); }
+      virtual void operator()( const bool& v        ){ m_out = m_out = v ? "true" : "false"; }
       virtual void operator()( const std::string& v ){ m_out = v;                                   }
       virtual void operator()( const object&  )      { throw std::bad_cast();                       }
       virtual void operator()( const array&  )       { throw std::bad_cast();                       }
@@ -69,6 +69,29 @@ namespace mace { namespace rpc {
 
       private:
       std::string& m_out;
+    };
+    template<>
+    struct cast_visitor<bool> : const_visitor {
+      cast_visitor( bool& out )
+      :m_out(out){}
+      virtual void operator()( const int8_t& v      ){ m_out = v != 0; }
+      virtual void operator()( const int16_t& v     ){ m_out = v != 0; }
+      virtual void operator()( const int32_t& v     ){ m_out = v != 0; }
+      virtual void operator()( const int64_t& v     ){ m_out = v != 0; }
+      virtual void operator()( const uint8_t& v     ){ m_out = v != 0; }
+      virtual void operator()( const uint16_t& v    ){ m_out = v != 0; }
+      virtual void operator()( const uint32_t& v    ){ m_out = v != 0; }
+      virtual void operator()( const uint64_t& v    ){ m_out = v != 0; }
+      virtual void operator()( const float& v       ){ m_out = v != 0; }
+      virtual void operator()( const double& v      ){ m_out = v != 0; }
+      virtual void operator()( const bool& v        ){ m_out = v;                                    }
+      virtual void operator()( const std::string& v ){ m_out = v != "false" && v != "0" && v.size(); }
+      virtual void operator()( const object&  )      { throw std::bad_cast();                        }
+      virtual void operator()( const array&  )       { throw std::bad_cast();                        }
+      virtual void operator()( )                     { throw std::bad_cast();                        }
+
+      private:
+      bool& m_out;
     };
 
     template<>

@@ -36,9 +36,9 @@ namespace mace { namespace rpc { namespace pipe { namespace detail {
   void connection::read_loop( ) {
     try {
       while ( true ) {
-        m_created_thread.async( mace::cmt::bind( [this]( message&& m ) { handle( std::move(m) ); } , read_message() ) );
+        //m_created_thread.async( mace::cmt::bind( [this]( message&& m ) { handle( std::move(m) ); } , read_message() ) );
+        handle( read_message() );
         mace::cmt::yield();
-        //handle( read_message() );
       }
     } catch ( const mace::cmt::error::task_canceled& ) {
       // do nothing... just exit

@@ -112,6 +112,7 @@ namespace mace { namespace rpc {
         try {
           while ( _open ) {
             _handle_thread->async( mace::cmt::bind( [this]( typename Derived::message_type&& m ) { this->handle( std::move(m) ); } , _derived_self.read_message() ) );
+            //this->handle( _derived_self.read_message() ); 
             mace::cmt::yield();
           }
         } catch ( const boost::system::system_error& e ) {
@@ -119,8 +120,8 @@ namespace mace { namespace rpc {
           // supress eof error, this is expected and indicated by the closed signal
           if( e.code() != boost::asio::error::eof ) 
               wlog( "connection closed: %1%", boost::current_exception_diagnostic_information() );
-           else {
-            wlog("%1%", boost::system::system_error(e).what() );
+           else { // EOF
+              //wlog("%1%", boost::system::system_error(e).what() );
            }
         } catch ( const mace::cmt::error::task_canceled&  ) {
           // ignore this..

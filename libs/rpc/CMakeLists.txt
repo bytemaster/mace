@@ -15,8 +15,8 @@ IF( ENABLE_EXAMPLES MATCHES ON )
 add_subdirectory( examples )
 ENDIF()
 IF( ENABLE_TESTS MATCHES ON )
-add_subdirectory( tests )
 ENDIF()
+#add_subdirectory( tests )
 
 SET( libraries  mace_cmt ${Boost_FILESYSTEM_LIBRARY})
 SET( sources 

@@ -42,3 +42,4 @@ libs/stub/examples/stub_rpc_server
 Win32
 *.sdf
 *.opensdf
+*.svn

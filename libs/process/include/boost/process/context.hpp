@@ -93,6 +93,7 @@ struct context
         : work_dir(self::get_work_dir()),
         env(self::get_environment())
     {
+#if 0 // this default behavior will throw in non-console apps
 #if defined(BOOST_POSIX_API)
         streams[stdin_id] = behavior::inherit(STDIN_FILENO);
         streams[stdout_id] = behavior::inherit(STDOUT_FILENO);
@@ -101,6 +102,7 @@ struct context
         streams[stdin_id] = behavior::inherit(GetStdHandle(STD_INPUT_HANDLE));
         streams[stdout_id] = behavior::inherit(GetStdHandle(STD_OUTPUT_HANDLE));
         streams[stderr_id] = behavior::inherit(GetStdHandle(STD_ERROR_HANDLE));
+#endif
 #endif
     }
 

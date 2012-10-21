@@ -142,6 +142,9 @@ template<> struct reflector<ENUM> { \
     static inline void visit( const Visitor& v ) { \
         BOOST_PP_SEQ_FOR_EACH( MACE_REFLECT_VISIT_ENUM, v, FIELDS ) \
     }\
+    static const char* to_string(ENUM i) { \
+        return to_string(int64_t(i)); \
+    }\
     static const char* to_string(int64_t i) { \
       switch( ENUM(i) ) { \
         BOOST_PP_SEQ_FOR_EACH( MACE_REFLECT_ENUM_TO_STRING, v, FIELDS ) \

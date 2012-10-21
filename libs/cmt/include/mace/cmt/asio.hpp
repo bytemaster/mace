@@ -200,9 +200,13 @@ namespace asio {
           try {
             return mace::cmt::asio::read_some( m_stream, boost::asio::buffer(s,n) );
           } catch ( const boost::system::system_error& e ) {
-            if( e.code() == boost::asio::error::eof )  
+            if( e.code() == boost::asio::error::eof )   {
+                wlog( "eof" );     
                 return -1;
+            }
             throw;
+          } catch ( ... ) {
+             elog( "%1%", boost::current_exception_diagnostic_information() );
           }
         }
         void close() { m_stream.close(); }

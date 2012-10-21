@@ -7,7 +7,7 @@ namespace mace { namespace cmt {
   /**
    *  Provides fiber-friendly blockin on stdin.
    */
-  extern std::istream& cin;
+  std::istream& get_cin_stream();
 
 } }
 #endif // _MACE_CMT_STDIN_HPP

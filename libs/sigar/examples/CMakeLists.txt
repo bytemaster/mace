@@ -14,5 +14,5 @@ IF(APPLE)
 	SET( libraries ${libraries} ${IO_KIT} ${CORE_FOUNDATION} ${CORE_SERVICES} )
 ENDIF(APPLE) 
 
-add_executable( stat  stat.cpp  )
-target_link_libraries( stat ${libraries} )
+#add_executable( stat  stat.cpp  )
+#target_link_libraries( stat ${libraries} )

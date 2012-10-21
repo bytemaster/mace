@@ -123,7 +123,7 @@ namespace mace { namespace rpc { namespace json {
        }
 
        void handle_error( connection_error e, message_type&& m ) {
-          elog( "%1%", e );
+          elog( "%1% NOT IMPLEMENTED YET... WHAT??? %1%  %2%", e, mace::reflect::reflector<connection_error>::to_string(e) );
           //BOOST_ASSERT( !"not yet implemented!" );
        }
 
@@ -132,14 +132,23 @@ namespace mace { namespace rpc { namespace json {
         * is no need to make it reentrant;
         */
        message_type read_message() {
+          this->in().unsetf(std::ios::skipws);
           std::istream_iterator<char> itr(this->in());
           std::istream_iterator<char> end;
-            
-          auto msg  = read_value(itr,end);
+          //std::string line; 
+          //std::getline( this->in(), line );
+          //slog( "read message '%1%'", line );
+          //std::vector<char> msg(line.begin(),line.end());//read_value(itr,end);
+          auto msg = read_value(itr,end);
           if( !msg.size() )  {
+            wlog( "eof" );
             BOOST_THROW_EXCEPTION( boost::system::system_error( boost::asio::error::eof ) );
           }
-          BOOST_ASSERT( msg.front() == '{' );
+          //slog( "read '%1%'", std::string(msg.begin(),msg.end()) );
+          if( msg.front() != '{' ) {
+             elog( ".." );
+            MACE_RPC_THROW( "Expected '{' but got '%1%'.", %msg.front() );
+          }
           //BOOST_ASSERT( msg.back()  == '}' );
           
           error_collector ec; // TODO: Do something with parse errors

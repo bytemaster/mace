@@ -49,7 +49,7 @@ class cli {
        void read_loop() {
          mace::cmt::thread* getline_thread = mace::cmt::thread::create();
          std::string cmd, line, args;
-         line = getline_thread->async( [](){ std::string s; std::getline(std::cin,s); return s; } );
+         line = getline_thread->async( []()->std::string{ std::string s; std::getline(std::cin,s); return s; } );
          while( std::cin ) {
            cmd = line.substr( 0, line.find(' ') );
            args = line.substr( cmd.size(), line.size() );
@@ -58,7 +58,7 @@ class cli {
            } catch ( ... ) {
              std::cerr << boost::current_exception_diagnostic_information() << std::endl;
            }
-           line = getline_thread->async( [](){ std::string s; std::getline(std::cin,s); return s; } );
+           line = getline_thread->async( []()->std::string{ std::string s; std::getline(std::cin,s); return s; } );
          }
        }
 

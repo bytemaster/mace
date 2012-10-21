@@ -14,6 +14,12 @@
 namespace mace { namespace cmt {
     using boost::chrono::system_clock;
 
+    namespace detail {
+      uint64_t elapsed() {
+        static boost::chrono::system_clock::time_point start = system_clock::now();
+        return boost::chrono::duration_cast<microseconds>(system_clock::now() - start).count();
+      }
+    }
     /*
     boost::posix_time::ptime to_system_time( const system_clock::time_point& t ) {
         typedef boost::chrono::microseconds duration_t;
@@ -295,7 +301,7 @@ namespace mace { namespace cmt {
               }
 
               if( current->canceled )
-                  BOOST_THROW_EXCEPTION( cmt::error::task_canceled() );
+                  BOOST_THROW_EXCEPTION( cmt::error::task_canceled() << mace::cmt::err_msg( current->cur_task ? current->cur_task->get_desc() : "unknown task" ) );
 
               return true;
            }
@@ -304,9 +310,9 @@ namespace mace { namespace cmt {
               thread_private* self = (thread_private*)my;
               try {
                 self->process_tasks();
+              } catch ( const error::task_canceled& ) {
               } catch ( ... ) {
-                std::cerr<<"fiber exited with uncaught exception:\n "<< 
-                      boost::current_exception_diagnostic_information() <<std::endl;
+                elog("fiber %2% exited with uncaught exception:\n %1%", boost::current_exception_diagnostic_information(), self->current && self->current->cur_task ? self->current->cur_task->desc : "'unknown'" );
               }
               self->free_list.push_back(self->current);
               self->start_next_fiber( false );
@@ -403,6 +409,9 @@ namespace mace { namespace cmt {
         return system_clock::time_point::min();
     }
 
+    bool thread::is_current()const {
+        return this == &thread::current();
+    }
     thread& thread::current() {
 // Apple does not support __thread by default, but some custom gcc builds
 // for Mac OS X support it.  Backup use boost::thread_specific_ptr
@@ -576,11 +585,12 @@ namespace mace { namespace cmt {
     }
 
     void thread::notify( const promise_base::ptr& p ) {
-      BOOST_ASSERT(p->ready());
       if( &current() != this )  {
+        BOOST_ASSERT(p->ready());
         this->async( boost::bind( &thread::notify, this, p ) );
         return;
       }
+      BOOST_ASSERT(p->ready());
       //slog( "                                    notify task complete %1%", p.get() );
       //debug( "begin notify" );
       // TODO: store a list of blocked contexts with the promise 
@@ -715,7 +725,6 @@ namespace mace { namespace cmt {
     }
 
     void thread::quit() {
-        wlog( "quit!" );
         if( &current() != this ) {
             async( boost::bind( &thread::quit, this ) ).wait();
             if( my->boost_thread ) {
@@ -725,14 +734,17 @@ namespace mace { namespace cmt {
         }
 
         // break all promises, thread quit!
-        cmt::context* cur  = my->blocked;
-        while( cur ) {
-            cmt::context* n = cur->next;
-            // this will move the context into the ready list.
-            //cur->prom->set_exception( boost::copy_exception( error::thread_quit() ) );
-            cur->except_blocking_promises( error::thread_quit() );
-            cur = n;
-        }
+        cmt::context* cur  = 0;
+        do {
+           cmt::context* cur  = my->blocked;
+           while( cur ) {
+               cmt::context* n = cur->next;
+               // this will move the context into the ready list.
+               //cur->prom->set_exception( boost::copy_exception( error::thread_quit() ) );
+               cur->except_blocking_promises( error::thread_quit() );
+               cur = n;
+           }
+        } while( my->blocked );
         BOOST_ASSERT( my->blocked == 0 );
         //my->blocked = 0;
         

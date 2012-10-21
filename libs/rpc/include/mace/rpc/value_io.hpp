@@ -300,14 +300,14 @@ namespace mace { namespace rpc {
        // std::stringstream ss; ss << v;
        // mace::rpc::pack(f,s,f(mace::rpc::base64_encode((unsigned char const*)ss.str().c_str(),ss.str().size())));
       }
-      template<typename T,typename Filter>
-      static inline void unpack( Filter& f, const mace::rpc::value& s, T& v ) { 
-        wlog( "warning, ignoring unknown type" );
+      //template<typename T,typename Filter>
+      //static inline void unpack( Filter& f, const mace::rpc::value& s, T& v ) { 
+      //  wlog( "warning, ignoring unknown type '%s'", reflect::get_typename<T>() );
        // std::string str;
        // mace::rpc::unpack(f,s,str);
        // std::stringstream ss(mace::rpc::base64_decode(str)); 
        // ss >> v;
-      }
+      //}
     };
     template<>
     struct if_reflected<boost::true_type> {

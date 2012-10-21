@@ -79,9 +79,9 @@ namespace mace { namespace rpc {  namespace process {
         m_proc.reset( new mace::cmt::process( mace::cmt::process::exec( exe, std::move(args), work_dir, opts ) ) );
 
         if( use_out_stream & opt )
-            m_con.reset( new ConnectionType( m_proc->out_stream(), m_proc->in_stream() ) );
+            m_con.reset( new ConnectionType( m_proc->out_stream(), m_proc->in_stream(), "rpc_read_loop" ) );
         else if( use_err_stream & opt ) {
-            m_con.reset( new ConnectionType( m_proc->out_stream(), m_proc->in_stream() ) );
+            m_con.reset( new ConnectionType( m_proc->err_stream(), m_proc->in_stream(), "rpc_read_loop" ) );
         }
         delegate_type::set_vtable( *this, m_con );
       }

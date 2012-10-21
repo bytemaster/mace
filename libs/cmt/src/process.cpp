@@ -50,23 +50,23 @@ namespace mace { namespace cmt {
 
     class process_d { 
       public:
-      process_d() 
-      :std_out(process_source(outp)),
-       std_err(process_source(errp)),
-       std_in( process_sink(*this) ),
-       stat( mace::cmt::asio::default_io_service() ){}
+        process_d() 
+        :std_out(process_source(outp)),
+         std_err(process_source(errp)),
+         std_in( process_sink(*this) ),
+         stat( mace::cmt::asio::default_io_service() ){}
+          
+        boost::shared_ptr<bp::child> child;
+        boost::shared_ptr<bp::pipe>  outp;
+        boost::shared_ptr<bp::pipe>  errp;
+        boost::shared_ptr<bp::pipe>  inp;
         
-      boost::shared_ptr<bp::child> child;
-      boost::shared_ptr<bp::pipe>  outp;
-      boost::shared_ptr<bp::pipe>  errp;
-      boost::shared_ptr<bp::pipe>  inp;
-
-      io::stream<process_source>   std_out;
-      io::stream<process_source>   std_err;
-      io::stream<process_sink>     std_in;
-
-      bp::status                   stat;
-      bp::context                  pctx;
+        io::stream<process_source>   std_out;
+        io::stream<process_source>   std_err;
+        io::stream<process_sink>     std_in;
+        
+        bp::status                   stat;
+        bp::context                  pctx;
     };
 
     
@@ -144,12 +144,18 @@ namespace mace { namespace cmt {
     promise<int>::ptr p(new promise<int>("process::kill"));
     my->stat.async_wait(  my->child->get_id(), [=]( const boost::system::error_code& ec, int exit_code )
       {
+        slog( "process::result %1%", exit_code );
         if( !ec ) {
             #ifdef BOOST_POSIX_API
-            if( WIFEXITED(exit_code) )
-                p->set_value(  WEXITSTATUS(exit_code) );
-            else
-                MACE_CMT_THROW( "process exited with signal %1%", %WTERMSIG(exit_code) );
+            try {
+               if( WIFEXITED(exit_code) )
+                   p->set_value(  WEXITSTATUS(exit_code) );
+               else {
+                   MACE_CMT_THROW( "process exited with: %1% ", %strsignal(WTERMSIG(exit_code)) );
+               }
+            } catch ( ... ) {
+               p->set_exception( boost::current_exception() ); 
+            }
             #else
             p->set_value(exit_code);
             #endif

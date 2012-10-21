@@ -4,6 +4,7 @@
 #include <boost/bind.hpp>
 #include <mace/cmt/task.hpp>
 #include <mace/cmt/thread.hpp>
+#include <mace/cmt/mutex.hpp>
 
 namespace mace { namespace cmt {
    template<typename T>
@@ -18,6 +19,19 @@ namespace mace { namespace cmt {
            promise<void_t>::ptr p(new promise<void_t>());
            void (promise<void_t>::*m)( const void_t& ) = &promise<void_t>::set_value;
            boost::signals::scoped_connection c = sig.connect( boost::bind(m,p,void_t()) );
+           p->wait( timeout_us ); 
+   }
+   template<typename Mutex>
+   inline void wait( boost::signal<void()>& sig,Mutex& mu, const microseconds& timeout_us=microseconds::max() ) {
+           promise<void_t>::ptr p(new promise<void_t>());
+
+           {
+            //  boost::unique_lock<mace::cmt::mutex> lock(m);
+              void (promise<void_t>::*m)( const void_t& ) = &promise<void_t>::set_value;
+              boost::signals::scoped_connection c = sig.connect( boost::bind(m,p,void_t()) );
+              mu.unlock();
+           }
+
            p->wait( timeout_us ); 
    }
 } } // mace::cmt

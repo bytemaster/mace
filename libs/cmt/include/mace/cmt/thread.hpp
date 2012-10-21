@@ -48,6 +48,7 @@ namespace cmt {
      *  Returns the current thread.
      */
     static thread& current();
+    bool           is_current()const;
 
     /**
      *  @brief returns the name given by @ref set_name() for this thread

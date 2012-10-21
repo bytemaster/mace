@@ -71,6 +71,8 @@ namespace mace { namespace rpc {
         value&       operator[]( const std::string& key );
         const value& operator[]( const std::string& key )const;
 
+        bool         is_array()const;
+
         /** array & object interface **/
         void         clear();
         size_t       size()const;
@@ -86,10 +88,16 @@ namespace mace { namespace rpc {
         const char*  type()const;
 
         void         visit( const_visitor&& v )const;
-      private:
+
         /** throws exceptions on errors **/
         template<typename T>
         friend T value_cast( const value& v );
+
+        /** throws exceptions on errors **/
+        template<typename T>
+        T cast()const { return value_cast<T>(*this); }
+
+      private:
 
         char holder[sizeof(detail::value_holder_impl<object>)];
     };

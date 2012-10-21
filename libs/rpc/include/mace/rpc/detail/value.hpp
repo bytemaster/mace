@@ -61,6 +61,7 @@ namespace mace { namespace rpc {
     struct value_holder {
       virtual ~value_holder();
       virtual const char* type()const;
+      virtual bool is_array()const { return false; }
       virtual void visit( const_visitor&& v )const;
       virtual void visit( visitor&& v );
 
@@ -151,6 +152,7 @@ namespace mace { namespace rpc {
     template<>
     struct value_holder_impl<array> : value_holder {
       virtual const char* type()const              { return "array"; }
+      virtual bool is_array()const                 { return true; }
       virtual void visit( const_visitor&& v )const;
       virtual void visit( visitor&& v );
       virtual value_holder* move_helper( char* c );

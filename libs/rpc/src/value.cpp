@@ -66,6 +66,11 @@ value::value( char* c ) {
 value::~value() {
   gh(holder)->~value_holder();
 }
+
+bool value::is_array()const {
+  return gh(holder)->is_array();
+}
+
 value::value( int8_t v){
   new (holder) detail::value_holder_impl<int8_t>(v);
 }

@@ -17,13 +17,12 @@ int goodbye(const std::string& world ) {
 }
 void bench();
 
-void_t delay()
+void delay()
 {
     slog( "delay 3 sec, %1%", 3.13);
     mace::cmt::usleep(3000000);
     slog( "test_signal");
     test_signal("hello world!");
-	return void_t();
 }
 int hello2(int cnt) {
     slog( "%1%", cnt );    
@@ -54,7 +53,7 @@ void main2() {
 
 void bench() {
   wlog( "waiting async delay" );
-    async(delay).wait();
+    async(&delay).wait();
   wlog( "delay returned!" );
     uint64_t cnt = 1000000;
     //uint64_t cnt = 10;

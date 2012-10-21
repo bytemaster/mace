@@ -1,6 +1,7 @@
 #ifndef _MACE_RPC_JSON_DETAIL_TO_JSON_HPP_
 #define _MACE_RPC_JSON_DETAIL_TO_JSON_HPP_
 #include <mace/reflect/reflect.hpp>
+#include <mace/rpc/json/named_parameters.hpp>
 #include <mace/rpc/value.hpp>
 
 namespace mace { namespace rpc { namespace json { 
@@ -203,6 +204,18 @@ namespace mace { namespace rpc { namespace json {
     os <<'[';
     boost::fusion::for_each( v, pack_vector );
     os <<']';
+  }
+  template<typename Arg, typename Stream, typename Filter>
+  void to_json_sequence( const boost::fusion::vector<Arg>& v, Stream& os, Filter& f ) {
+    if( 0 == has_named_parameters<typename boost::remove_reference<typename boost::remove_const<Arg>::type>::type >::value )  {
+       sequence_to_json<Filter,Stream,1> pack_vector(f, os);
+       os <<'[';
+       boost::fusion::for_each( v, pack_vector );
+       os <<']';
+    } else {
+       sequence_to_json<Filter,Stream,1> pack_vector(f, os);
+       boost::fusion::for_each( v, pack_vector );
+    }
   }
 
   template<typename V, typename Stream, typename Filter >
