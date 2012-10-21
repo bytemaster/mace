@@ -146,7 +146,6 @@ namespace mace { namespace rpc { namespace json {
           }
           //slog( "read '%1%'", std::string(msg.begin(),msg.end()) );
           if( msg.front() != '{' ) {
-             elog( ".." );
             MACE_RPC_THROW( "Expected '{' but got '%1%'.", %msg.front() );
           }
           //BOOST_ASSERT( msg.back()  == '}' );
