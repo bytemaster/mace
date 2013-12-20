@@ -205,7 +205,7 @@ void from_string( const std::string& j, json::value& v ) {
 }
 
 void to_string( const value& v, std::string& j, bool pretty  ) {
-  std::stringstream ss(j);
+  std::stringstream ss;
   write( ss, v, pretty );
   j = ss.str();
 }
